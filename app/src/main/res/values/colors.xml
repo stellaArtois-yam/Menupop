@@ -8,4 +8,6 @@
     <color name="button_gray">#F5F4F4</color>
     <color name="light_gray">#8C8888</color>
 
+    <color name="red">#FF0000</color>
+
 </resources>
