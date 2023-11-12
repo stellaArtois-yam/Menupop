@@ -1,3 +1,14 @@
 <resources>
     <string name="app_name">Menupop</string>
+    <string name="checkbox_information"><u>내용보기</u></string>
+
+    <string name="password_reset_check_id">회원가입 시 등록하신 정보로\n비밀번호를 재설정 하실 수 있습니다 :)</string>
+    <string name="password_reset_email">이메일 인증 후 비밀번호를 재설정\n하실 수 있습니다 :)</string>
+    <string name="password_reset_confirm">비밀번호를 재설정 해주세요 :)</string>
+    
+    <string name="password_rule">비밀번호(최소 8자, 영문, 숫자, 기호 중 2가지 사용)</string>
+    <string name="password_rule_warning">비밀번호는 최소 8자, 영문, 숫자, 기호 중 2가지 이상 사용</string>
+    <string name="password_confirm_warning">비밀번호가 일치하지 않음</string>
+    <string name="email_rule_warning">이메일 형식이 일치하지 않음</string>
+
 </resources>
