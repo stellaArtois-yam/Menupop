@@ -26,9 +26,9 @@
             android:layout_height="@dimen/standard_height"
             android:background="@drawable/stroke"
 
-            android:text="아이디(6-12자 이내, 영문, 숫자 사용 가능)"
+            android:hint="아이디(6-12자 이내, 영문, 숫자 사용 가능)"
             android:textSize="15.5sp"
-            android:textColor="@color/light_gray"
+            android:textColorHint="@color/light_gray"
             android:paddingStart="10dp"
             android:layout_marginTop="30dp"
 
@@ -73,9 +73,11 @@
             android:layout_height="@dimen/standard_height"
             android:background="@drawable/stroke"
 
-            android:text="@string/password_rule"
-            android:textColor="@color/light_gray"
+            android:hint="@string/password_rule"
+            android:textColorHint="@color/light_gray"
             android:textSize="15.5sp"
+            android:inputType="textPassword"
+
             android:paddingStart="10dp"
             android:layout_marginTop="10dp"
 
@@ -104,9 +106,11 @@
             android:layout_height="@dimen/standard_height"
             android:background="@drawable/stroke"
 
-            android:text="비밀번호 확인"
-            android:textColor="@color/light_gray"
+            android:hint="비밀번호 확인"
+            android:textColorHint="@color/light_gray"
             android:textSize="16sp"
+            android:inputType="textPassword"
+
             android:paddingStart="10dp"
             android:layout_marginTop="10dp"
 
@@ -135,8 +139,8 @@
             android:layout_height="@dimen/standard_height"
             android:background="@drawable/stroke"
 
-            android:text="이메일"
-            android:textColor="@color/light_gray"
+            android:hint="이메일"
+            android:textColorHint="@color/light_gray"
             android:textSize="16sp"
             android:paddingStart="10dp"
             android:layout_marginTop="10dp"
@@ -192,6 +196,8 @@
             android:layout_height="@dimen/standard_height"
             android:background="@drawable/stroke"
             android:layout_marginTop="10dp"
+
+            android:textColor="@color/black"
 
             app:layout_constraintTop_toBottomOf="@id/signup_email_warning"
             app:layout_constraintStart_toStartOf="parent"
