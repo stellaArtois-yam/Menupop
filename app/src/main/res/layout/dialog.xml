@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="300dp"
+    android:layout_height="225dp"
+    android:background="@drawable/dialog_background"
+    android:orientation="vertical">
+    
+    <TextView
+        android:id="@+id/dialog_title"
+        android:layout_width="wrap_content"
+        android:layout_height="@dimen/standard_height"
+
+        android:text="잘못된 계정 정보"
+        android:textColor="@color/black"
+        android:textSize="20sp"
+        android:textStyle="bold"
+        android:layout_gravity="center"
+        android:gravity="bottom" />
+
+
+    <TextView
+        android:id="@+id/dialog_content"
+        android:layout_width="240dp"
+        android:layout_height="100dp"
+
+        android:text="@string/login_failed_warning"
+        android:textSize="16sp"
+        android:textColor="@color/light_gray"
+        android:layout_gravity="center"
+        android:gravity="center" />
+
+    <androidx.appcompat.widget.AppCompatButton
+        android:id="@+id/dialog_bottom_button"
+        android:layout_width="150dp"
+        android:layout_height="@dimen/standard_height"
+        android:background="@drawable/button_round"
+        android:backgroundTint="@color/orange"
+
+        android:text="다시 시도"
+        android:textColor="@color/white"
+        android:textStyle="bold"
+        android:textSize="18sp"
+
+        android:layout_gravity="center"
+        android:gravity="center"/>
+
+
+
+    
+    
+    
+
+</LinearLayout>
