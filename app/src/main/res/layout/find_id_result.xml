@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <include
+        android:id="@+id/appbar_menu"
+        layout="@layout/appbar"/>
+
+    <TextView
+        android:id="@+id/find_id_result_text_top"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/standard_height"
+
+        android:text="고객님의 아이디는"
+
+        android:textColor="@color/black"
+        android:textSize="25sp"
+        android:layout_marginTop="30dp"
+        android:paddingStart="30dp"/>
+
+    <TextView
+        android:id="@+id/find_id_result_id"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/standard_height"
+
+        android:textColor="@color/orange"
+        android:textSize="25sp"
+        android:textStyle="bold"
+        android:text="어쩌구"
+        android:paddingStart="30dp"
+        android:gravity="center_vertical"/>
+
+    <TextView
+        android:id="@+id/find_id_result_text_bottom"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/standard_height"
+
+        android:text="입니다."
+        android:textSize="25sp"
+        android:textColor="@color/black"
+        android:paddingStart="30dp"
+        android:gravity="center_vertical"/>
+
+    <TextView
+        android:id="@+id/find_id_result_information"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/standard_height"
+
+        android:text="· 로그인 후 서비스를 이용하실 수 있습니다."
+        android:textColor="@color/light_gray"
+        android:textSize="16sp"
+        android:gravity="center_vertical"
+        android:paddingStart="30dp"/>
+
+    <androidx.appcompat.widget.AppCompatButton
+        android:layout_width="@dimen/signup_password_and_warning_width"
+        android:layout_height="@dimen/standard_height"
+        android:background="@drawable/button_round"
+        android:backgroundTint="@color/orange"
+
+        android:layout_gravity="center"
+        android:gravity="center"
+        android:layout_marginTop="@dimen/standard_height"
+
+        android:text="돌아가기"
+        android:textColor="@color/white"
+        android:textStyle="bold"
+        android:textSize="18sp"/>
+
+
+
+
+</LinearLayout>
