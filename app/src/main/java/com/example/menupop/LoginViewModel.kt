@@ -9,14 +9,14 @@ import androidx.lifecycle.lifecycleScope
 class LoginViewModel : ViewModel() {
     private var loginInfomation = MutableLiveData<LoginResponseModel>()
     private var loginModel = LoginModel()
+    private  var callback:((LoginResponseModel) -> Unit) ?= null
     val loginResult: LiveData<LoginResponseModel>
         get() = loginInfomation
     fun requestLogin(id : String, password : String) {
-        val callback: (LoginResponseModel) -> Unit = { loginResponse ->
+        callback = { loginResponse ->
             loginInfomation.value = loginResponse
         }
-
-            val result = loginModel.requestLogin(id, password,callback)
+        loginModel.requestLogin(id, password, callback!!)
 
     }
     fun saveIdentifier(sharedPreferences: SharedPreferences,identifier : Int){
