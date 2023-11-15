@@ -14,5 +14,5 @@ interface RetrofitService {
     suspend fun checkUserIdDuplication(@Query("userId") userId: String): Response<SignupResponseModel>
     @POST("login.php")
     @FormUrlEncoded
-    suspend fun requestLogin(@Field("id") id: String,@Field("password") password : String): Call<LoginResponseModel>
+    fun requestLogin(@Field("id") id: String,@Field("password") password : String): Call<LoginResponseModel>
 }

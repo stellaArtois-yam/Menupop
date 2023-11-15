@@ -1,9 +1,11 @@
 package com.example.menupop
 
+import android.content.SharedPreferences
 import android.util.Log
 import com.google.gson.Gson
 import com.google.gson.GsonBuilder
 import com.google.gson.reflect.TypeToken
+import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import retrofit2.Call
@@ -26,28 +28,27 @@ class LoginModel  {
         .build()
 
     private val service = retrofit.create(RetrofitService::class.java)
+fun requestLogin(id: String, password: String, callback: (LoginResponseModel) -> Unit) {
+    val call: Call<LoginResponseModel> = service.requestLogin(id, password)
 
-     suspend fun requestLogin(id:String, password:String) : LoginResponseModel=
+    call.enqueue(object : Callback<LoginResponseModel> {
+        override fun onResponse(call: Call<LoginResponseModel>, response: Response<LoginResponseModel>) {
+            if (response.isSuccessful) {
+                callback(response.body()!!)
+            } else {
+                callback(LoginResponseModel(0, 0, "failed"))
+            }
+        }
 
-
-         withContext(Dispatchers.IO) {
-             Log.d(TAG, "requestLogin: 호출")
-             // 네트워크 요청을 IO 스레드에서 수행
-             val call: Call<LoginResponseModel> = service.requestLogin(id, password)
-             return@withContext try {
-                 val response = call.execute()
-                 Log.d(TAG, "requestLogin: ${response}")
-                 if (response.isSuccessful) {
-                     response.body() ?: LoginResponseModel(0, 0,"failed")
-                 } else {
-                     LoginResponseModel(0, 0,"failed")
-                 }
-             } catch (e: Exception) {
-                 Log.d(TAG, "requestLogin: ${e}")
-                 // 네트워크 호출 중 예외 발생 시
-                 LoginResponseModel(0, 0,"failed")
-             }
-         }
-
+        override fun onFailure(call: Call<LoginResponseModel>, t: Throwable) {
+            callback(LoginResponseModel(0, 0, "failed"))
+        }
+    })
+}
+    fun saveUserIdentifier(sharedPreferences: SharedPreferences,identifier : Int){
+        var editor = sharedPreferences.edit()
+        editor.putInt("identifier",identifier)
+        editor.apply()
     }
+}
 

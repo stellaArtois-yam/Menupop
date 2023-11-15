@@ -1,8 +1,11 @@
 package com.example.menupop
 
+import android.app.Dialog
+import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
+import android.view.Window
 import android.widget.ImageView
 import android.widget.Toast
 import androidx.databinding.DataBindingUtil
@@ -39,10 +42,33 @@ class LoginActivity : AppCompatActivity() {
             }
 
             loginViewModel.loginResult.observe(this, Observer { it ->
-                Log.d(TAG, "onCreate:  ${it.identifier} ${it.result}")
+                Log.d(TAG, "onCreate: ${it.isNewUser} ${it.identifier} ${it.result}")
+                if (it.result.equals("failed")){
+                    showCustomDialog()
+                } else {
+                    var sharedPreferences = getSharedPreferences("userInfo", MODE_PRIVATE)
+                    loginViewModel.saveIdentifier(sharedPreferences,it.identifier)
+                    isNewUserCheck(it.isNewUser)
+
+                }
             })
 
         }
+    }
+    private fun isNewUserCheck(isNewUser:Int){
+        if (isNewUser == 1){
+            Toast.makeText(this,"FoodPreferenceActivity 이동!",Toast.LENGTH_SHORT).show()
+//                        var intent = Intent(this,SignupActivity :: class.java)
+//                        startActivity(intent)
+            return
+        }
+        Toast.makeText(this,"MainActivity 이동!",Toast.LENGTH_SHORT).show()
+    }
+    private fun showCustomDialog() {
+        val dialog = Dialog(this)
+        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
+        dialog.setContentView(R.layout.dialog)
+        dialog.show()
     }
 }
 
