@@ -21,15 +21,44 @@ import kotlinx.coroutines.runBlocking
 class LoginActivity : AppCompatActivity() {
     private lateinit var loginViewModel: LoginViewModel
     private var TAG = "LoginActivity"
+    private lateinit var binding : LoginBinding
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.login)
-        val binding: LoginBinding = DataBindingUtil.setContentView(this, R.layout.login)
+
+        init()
+
+        initOnClickListener()
+
+
+        loginViewModel.loginResult.observe(this, Observer { it ->
+            Log.d(TAG, "onCreate: ${it.isNewUser} ${it.identifier} ${it.result}")
+            if (it.result == "failed"){
+                showCustomDialog()
+            } else {
+                var sharedPreferences = getSharedPreferences("userInfo", MODE_PRIVATE)
+                loginViewModel.saveIdentifier(sharedPreferences,it.identifier)
+                isNewUserCheck(it.isNewUser)
+            }
+        })
+    }
+    fun init() {
+        binding = DataBindingUtil.setContentView(this, R.layout.login)
 
         loginViewModel = ViewModelProvider(this).get(LoginViewModel::class.java)
         binding.loginViewModel = loginViewModel
         binding.lifecycleOwner = this
-
+    }
+    private fun isNewUserCheck(isNewUser:Int){
+        if (isNewUser == 1){
+            Toast.makeText(this,"FoodPreferenceActivity 이동!",Toast.LENGTH_SHORT).show()
+//                        var intent = Intent(this,SignupActivity :: class.java)
+//                        startActivity(intent)
+            return
+        }
+        Toast.makeText(this,"MainActivity 이동!",Toast.LENGTH_SHORT).show()
+    }
+    private fun initOnClickListener(){
         binding.loginButton.setOnClickListener {
             var id = binding.loginIdEditText.text.toString().replace(" ", "")
             var password = binding.loginPasswordEditText.text.toString().replace(" ", "")
@@ -40,29 +69,19 @@ class LoginActivity : AppCompatActivity() {
                     loginViewModel.requestLogin(id, password)
                 }
             }
-
-            loginViewModel.loginResult.observe(this, Observer { it ->
-                Log.d(TAG, "onCreate: ${it.isNewUser} ${it.identifier} ${it.result}")
-                if (it.result.equals("failed")){
-                    showCustomDialog()
-                } else {
-                    var sharedPreferences = getSharedPreferences("userInfo", MODE_PRIVATE)
-                    loginViewModel.saveIdentifier(sharedPreferences,it.identifier)
-                    isNewUserCheck(it.isNewUser)
-
-                }
-            })
-
         }
-    }
-    private fun isNewUserCheck(isNewUser:Int){
-        if (isNewUser == 1){
-            Toast.makeText(this,"FoodPreferenceActivity 이동!",Toast.LENGTH_SHORT).show()
-//                        var intent = Intent(this,SignupActivity :: class.java)
-//                        startActivity(intent)
-            return
+        binding.loginSignup.setOnClickListener {
+            val intent = Intent(this,SignupActivity::class.java)
+            startActivity(intent)
         }
-        Toast.makeText(this,"MainActivity 이동!",Toast.LENGTH_SHORT).show()
+        binding.loginFindId.setOnClickListener {
+//            val intent = Intent(this,::class.java)
+//            startActivity(intent)
+        }
+        binding.loginFindPassword.setOnClickListener {
+//            val intent = Intent(this,::class.java)
+//            startActivity(intent)
+        }
     }
     private fun showCustomDialog() {
         val dialog = Dialog(this)
