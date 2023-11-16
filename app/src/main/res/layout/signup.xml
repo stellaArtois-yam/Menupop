@@ -57,7 +57,7 @@
             android:layout_width="@dimen/signup_password_and_warning_width"
             android:layout_height="@dimen/signup_warning_height"
 
-            android:text="@string/id_rule"
+            android:text="@{viewModel.idWarning}"
             android:textColor="@color/red"
             android:textSize="15.5dp"
             android:gravity="center_vertical"
@@ -177,6 +177,8 @@
             android:background="@drawable/stroke"
             android:layout_marginTop="10dp"
 
+            android:entries="@array/spinner_items"
+
             app:layout_constraintTop_toBottomOf="@id/signup_password_confirm_warning"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toEndOf="@id/signup_email_at"/>
@@ -221,6 +223,8 @@
             android:textColor="@color/black"
             android:textSize="16sp"
             android:layout_marginTop="10dp"
+
+            android:enabled="@{viewModel.isEnableButton}"
 
             app:layout_constraintTop_toBottomOf="@id/signup_email_warning"
             app:layout_constraintStart_toEndOf="@id/signup_certification_edittext"
