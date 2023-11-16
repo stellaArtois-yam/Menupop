@@ -16,18 +16,7 @@ class SignupViewModel : ViewModel() {
     val TAG = "SignupViewModel"
     var signupModel  = SignupModel()
 
-    // 아이디
-    private val _isValidId = MutableLiveData<Int>().apply {
-        value = View.GONE }
 
-//    private val _isValidId = MutableLiveData<Int>()
-    val isValidId: LiveData<Int>
-        get() = _isValidId
-
-
-    private val _idWarning = MutableLiveData<String>()
-    val idWarning : LiveData<String>
-        get() = _idWarning
 
     val isIdDuplication = MutableLiveData<String>()
 
@@ -54,39 +43,38 @@ class SignupViewModel : ViewModel() {
 
 
 
+    // 아이디
+    private val _isValidId = MutableLiveData<String>()
+    val isValidId: LiveData<String>
+        get() = _isValidId
 
+    private val _idWarning = MutableLiveData<String>()
+    val idWarning : LiveData<String>
+        get() = _idWarning
 
     // view를 감지해서 view가 변화하면 실행한다...!
 
-    fun validateId(inputId: String)  {
+    fun setId(inputId : String){
+        _isValidId.value = inputId
+    }
+
+    fun validateId(inputId: String) : Boolean {
 
         val regex = Regex("^[a-zA-Z0-9]{6,12}\$")
 
-        var isValid = View.GONE
-        var validIdWarning = ""
+        var matcher = regex.matches(inputId)
 
-        if(!regex.matches(inputId)){
-            isValid = View.VISIBLE
-            Log.d(TAG, "validateId not match: $isValid")
-            validIdWarning = "아이디는 6-12자 이내, 영문, 숫자 사용 가능"
-        }else{
-            Log.d(TAG, "validateId match : $isValid")
-        }
-
-        _isValidId.value = isValid
-        _idWarning.value = validIdWarning
+        return matcher
     }
 
-
-
-//    fun onIdTextChanged(id: String) {
-//        if (validateId(id)) {
-//            _idWarning.value = null
-//            Log.d(TAG, "onIdTextChanged: null")
-//        } else {
-//            _idWarning.value = "아이디는 6-12자 이내, 영문, 숫자 사용 가능"
-//        }
-//    }
+    fun onIdTextChanged(id: String) {
+        if (validateId(id)) {
+            _idWarning.value = null
+            Log.d(TAG, "onIdTextChanged: null")
+        } else {
+            _idWarning.value = "아이디는 6-12자 이내, 영문, 숫자 사용 가능"
+        }
+    }
 
     //비밀번호
     private val _passwordError = MutableLiveData<String>()

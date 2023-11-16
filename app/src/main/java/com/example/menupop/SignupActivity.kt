@@ -33,6 +33,21 @@ class SignupActivity : AppCompatActivity() {
         binding.lifecycleOwner = this
 
 
+        // 아이디 입력 감지
+        binding.signupIdEdittext.addTextChangedListener{
+            signupViewModel.onIdTextChanged(it.toString())
+        }
+
+        signupViewModel.idWarning.observe(this, Observer { warning->
+            if(warning !=null){
+                binding.signupIdWarning.text = warning
+                binding.signupIdWarning.visibility = View.VISIBLE
+                binding.signupIdWarning.setTextColor(Color.RED)
+            }else{
+                binding.signupIdWarning.visibility = View.GONE
+            }
+        })
+
 
 
         binding.signupIdDuplicationButton.setOnClickListener {
@@ -44,9 +59,9 @@ class SignupActivity : AppCompatActivity() {
                     Toast.makeText(this, "아이디를 입력해주세요.", Toast.LENGTH_SHORT).show()
                 } else {
                     lifecycleScope.launch {
-                        signupViewModel.validateId(id)
-                        val sibal = binding.signupIdWarning.visibility
-                        Log.d(TAG, "^^ : $sibal")
+//                        signupViewModel.validateId(id)
+//                        val sibal = binding.signupIdWarning.visibility
+//                        Log.d(TAG, "^^ : $sibal")
 
                         if (binding.signupIdWarning.visibility == View.GONE) {
                             Log.d(TAG, "유효성 검사 완")
@@ -99,6 +114,7 @@ class SignupActivity : AppCompatActivity() {
             signupViewModel.onPasswordTextChanged(it.toString())
         }
 
+
         //비밀번호 확인 입력감지
         binding.signupPasswordConfirmEdittext.addTextChangedListener{
             val password = binding.signupPasswordEdittext.text.toString()
@@ -148,6 +164,8 @@ class SignupActivity : AppCompatActivity() {
             }
 
         }
+
+
 
         signupViewModel.warningMessage.observe(this, Observer { warning->
             if(warning != null){
