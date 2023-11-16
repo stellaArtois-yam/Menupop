@@ -12,10 +12,11 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-        <TextView
+        <ImageView
             android:layout_width="50dp"
             android:layout_height="40dp"
-            android:background="@drawable/baseline_arrow_back_24"/>
+            android:background="@drawable/arrow_left"
+            android:layout_gravity="left"/>
 
         <TextView
             android:id="@+id/appbar_status"

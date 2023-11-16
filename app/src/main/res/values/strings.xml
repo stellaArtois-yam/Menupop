@@ -15,4 +15,16 @@
 
     <string name="login_failed_warning">입력하신 아이디, 비밀번호와 일치하는 회원정보가 존재하지 않습니다.\n아이디, 비밀번호를 확인해주세요.</string>
 
+
+
+    <string-array name="spinner_items">
+        <item>선택</item>
+        <item>naver.com</item>
+        <item>hanmail.com</item>
+        <item>daum.net</item>
+        <item>nate.com</item>
+        <item>hotmail.com</item>
+        <item>gmail.com</item>
+        <item>icloud.com</item>
+    </string-array>
 </resources>

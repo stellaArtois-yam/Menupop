@@ -10,8 +10,14 @@ import retrofit2.http.Query
 
 interface RetrofitService {
 
-    @POST("checkDuplicationId.php")
-    fun checkDuplicateId(@Query("id") id: String): Call<Boolean>
+    @POST("checkUserIdDuplication.php")
+    @FormUrlEncoded
+    fun checkDuplicateId(@Field("userId") id: String): Call<String>
+
+    @POST("sendAuthCode.php")
+    @FormUrlEncoded
+    fun sendAuthCode(@Field("email") email : String) : Call<Int>
+
     @POST("login.php")
     @FormUrlEncoded
     fun requestLogin(@Field("id") id: String,@Field("password") password : String): Call<LoginResponseModel>
