@@ -63,7 +63,7 @@
             android:gravity="center_vertical"
             android:paddingStart="10dp"
 
-            android:visibility="@{viewModel.isValidId}"
+            android:visibility="gone"
 
             app:layout_constraintTop_toBottomOf="@id/signup_id_edittext"
             app:layout_constraintStart_toStartOf="parent"
