@@ -21,4 +21,8 @@ interface RetrofitService {
     @POST("login.php")
     @FormUrlEncoded
     fun requestLogin(@Field("id") id: String,@Field("password") password : String): Call<LoginResponseModel>
+
+    @POST("SendEmailVerifyCode.php")
+    @FormUrlEncoded
+    fun sendEmailVerifyCode(@Field("email") email: String): Call<String>
 }

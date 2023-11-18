@@ -6,17 +6,14 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
 import android.view.Window
-import android.widget.ImageView
 import android.widget.Toast
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
+import com.example.menupop.resetPassword.ResetPasswordActivity
 import com.example.menupop.databinding.LoginBinding
-import com.example.menupop.databinding.SignupBinding
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
 
 class LoginActivity : AppCompatActivity() {
     private lateinit var loginViewModel: LoginViewModel
@@ -79,8 +76,8 @@ class LoginActivity : AppCompatActivity() {
 //            startActivity(intent)
         }
         binding.loginFindPassword.setOnClickListener {
-//            val intent = Intent(this,::class.java)
-//            startActivity(intent)
+            val intent = Intent(this,ResetPasswordActivity::class.java)
+            startActivity(intent)
         }
     }
     private fun showCustomDialog() {
