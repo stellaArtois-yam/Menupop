@@ -14,6 +14,7 @@ class ResetPasswordActivity : AppCompatActivity(),ResetPasswordFragmentEvent {
     private lateinit var binding : ActivityResetPasswordBinding
     private lateinit var checkIdFragment : ResetPasswordCheckIdFragment
     private lateinit var verifyEamilFragment: ResetPasswordEamilFragment
+    private lateinit var conformFragment: ResetPasswordConformFragment
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -25,6 +26,7 @@ class ResetPasswordActivity : AppCompatActivity(),ResetPasswordFragmentEvent {
 
         checkIdFragment = ResetPasswordCheckIdFragment()
         verifyEamilFragment = ResetPasswordEamilFragment()
+        conformFragment = ResetPasswordConformFragment()
 
         binding = DataBindingUtil.setContentView(this, R.layout.activity_reset_password)
         resetPasswordViewModel = ViewModelProvider(this).get(ResetPasswordViewModel::class.java)
@@ -49,10 +51,15 @@ class ResetPasswordActivity : AppCompatActivity(),ResetPasswordFragmentEvent {
 
     override fun successVerifyEmail() {
         Log.d(TAG, "successVerifyEmail: 호출됨")
+        supportFragmentManager.beginTransaction().apply {
+            replace(R.id.resetPasswordContainer,conformFragment)
+            commit()
+        }
     }
 
     override fun successResetPassword() {
         Log.d(TAG, "successResetPassword: 호출됨")
+        finish()
     }
 
 }

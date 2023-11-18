@@ -32,6 +32,7 @@ class ResetPasswordModel {
             override fun onResponse(call: Call<String>, response: Response<String>) {
                 if(response.isSuccessful && response.body() != null) {
                     callback(response.body().toString())
+                    Log.d(TAG, "onResponse: ${response.body()}")
                 }else{
                     callback("ServerException")
                 }
@@ -44,11 +45,31 @@ class ResetPasswordModel {
         })
 
     }
+    fun checkEamil(id:String,email:String,callback: (String) -> Unit){
+        Log.d(TAG, "checkEamil: 호출됨")
+        service.checkEmail(email,id).enqueue(object : Callback<String>{
+            override fun onResponse(call: Call<String>, response: Response<String>) {
+                Log.d(TAG, "onResponse: ${response}")
+                if(response.isSuccessful && response.body() != null){
+                    callback(response.body().toString())
+                    Log.d(TAG, "onResponse: ${response.body()}")
+                }
+            }
+
+            override fun onFailure(call: Call<String>, t: Throwable) {
+                Log.d(TAG, "onFailure: ${t}")
+                callback("Exception")
+            }
+
+        })
+    }
     fun sendVerifyCode(email: String,callback: (String) -> Unit){
+        Log.d(TAG, "sendVerifyCode: ${email}")
         service.sendEmailVerifyCode(email).enqueue(object : Callback<String>{
             override fun onResponse(call: Call<String>, response: Response<String>) {
                 if (response.isSuccessful && response.body() != null){
                     callback(response.body().toString())
+                    Log.d(TAG, "onResponse: ${response}")
                 } else{
                     callback("Exception")
                 }
@@ -60,5 +81,26 @@ class ResetPasswordModel {
             }
 
         })
+    }
+
+    fun resetPassword(id:String,password:String,callback: (String) -> Unit){
+        Log.d(TAG, "resetPassword 호출")
+        service.resetPassword(id,password).enqueue(object : Callback<String>{
+            override fun onResponse(call: Call<String>, response: Response<String>) {
+                Log.d(TAG, "onResponse: ${response}")
+                if(response.isSuccessful && response.body() != null){
+                    callback("완료")
+                } else{
+                    callback("Exception")
+                }
+            }
+
+            override fun onFailure(call: Call<String>, t: Throwable) {
+                callback("Exception")
+                Log.d(TAG, "onFailure: ${t}")
+            }
+
+        })
+
     }
 }
