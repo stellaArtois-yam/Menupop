@@ -1,0 +1,196 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".ExchangeFragment">
+
+   <LinearLayout
+       android:layout_width="match_parent"
+       android:layout_height="match_parent"
+       android:orientation="vertical"
+       android:gravity="center">
+
+       <LinearLayout
+           android:layout_width="match_parent"
+           android:layout_height="wrap_content"
+           android:orientation="horizontal">
+
+           <ImageView
+               android:layout_width="60dp"
+               android:layout_height="60dp"
+               android:background="@drawable/exclamation"
+               android:layout_gravity="center"
+               android:layout_marginStart="20dp"/>
+
+           <TextView
+               android:layout_width="match_parent"
+               android:layout_height="wrap_content"
+               android:text="@string/exchange_warning"
+               android:textSize="18sp"
+               android:textColor="@color/black"
+               android:padding="15dp"/>
+
+
+       </LinearLayout>
+
+       <TextView
+           android:layout_width="wrap_content"
+           android:layout_height="wrap_content"
+
+           android:text="보유 화폐"
+           android:textColor="@color/light_gray"
+           android:textSize="20sp"
+           android:textStyle="bold"
+
+           android:layout_gravity="start"
+           android:layout_margin="30dp"/>
+
+       <LinearLayout
+           android:layout_width="match_parent"
+           android:layout_height="wrap_content"
+           android:orientation="horizontal">
+
+           <EditText
+               android:id="@+id/exchange_source_edittext"
+               android:layout_width="0dp"
+               android:layout_height="wrap_content"
+               android:layout_weight="1"
+               android:textStyle="bold"
+               android:text="1,000"
+               android:textSize="30sp"
+               android:textColor="@color/black"
+               android:layout_marginStart="30dp"
+               android:layout_marginEnd="30dp"/>
+
+           <Spinner
+               android:id="@+id/exchange_source_spinner"
+               android:layout_width="0dp"
+               android:layout_height="@dimen/standard_height"
+               android:layout_weight="0.5"
+               android:background="@drawable/profile_button"
+               android:backgroundTint="@color/button_gray"
+
+               android:entries="@array/country"
+
+               android:layout_marginEnd="30dp"/>
+       </LinearLayout>
+
+       <TextView
+           android:layout_width="wrap_content"
+           android:layout_height="wrap_content"
+
+           android:text="환전 화폐"
+           android:textColor="@color/light_gray"
+           android:textSize="20sp"
+           android:textStyle="bold"
+
+           android:layout_gravity="start"
+           android:layout_margin="30dp"/>
+
+       <LinearLayout
+           android:layout_width="match_parent"
+           android:layout_height="wrap_content"
+           android:orientation="horizontal">
+
+           <EditText
+               android:id="@+id/exchange_target_edittext"
+               android:layout_width="0dp"
+               android:layout_height="wrap_content"
+               android:layout_weight="1"
+               android:textStyle="bold"
+               android:text="1,000"
+               android:textSize="30sp"
+               android:textColor="@color/black"
+               android:layout_marginStart="30dp"
+               android:layout_marginEnd="30dp"/>
+
+           <Spinner
+               android:id="@+id/exchange_target_spinner"
+               android:layout_width="0dp"
+               android:layout_height="@dimen/standard_height"
+               android:layout_weight="0.5"
+               android:background="@drawable/profile_button"
+               android:backgroundTint="@color/button_gray"
+
+               android:entries="@array/country"
+
+               android:layout_marginEnd="30dp"/>
+       </LinearLayout>
+
+       <TextView
+           android:layout_width="wrap_content"
+           android:layout_height="wrap_content"
+
+           android:text="기준 환율"
+           android:textColor="@color/light_gray"
+           android:textSize="20sp"
+           android:textStyle="bold"
+
+           android:layout_gravity="start"
+           android:layout_margin="30dp"/>
+
+       <LinearLayout
+           android:layout_width="match_parent"
+           android:layout_height="wrap_content"
+           android:orientation="horizontal">
+
+           <EditText
+               android:id="@+id/exchange_standard_edittext"
+               android:layout_width="0dp"
+               android:layout_height="wrap_content"
+               android:layout_weight="1"
+               android:textStyle="bold"
+               android:text="0"
+               android:textSize="30sp"
+               android:textColor="@color/black"
+               android:layout_marginStart="30dp"
+               android:layout_marginEnd="30dp"/>
+
+           <Spinner
+               android:id="@+id/exchange_standard_spinner"
+               android:layout_width="0dp"
+               android:layout_height="@dimen/standard_height"
+               android:layout_weight="0.5"
+               android:background="@drawable/profile_button"
+               android:backgroundTint="@color/button_gray"
+
+               android:entries="@array/country"
+
+               android:layout_marginEnd="30dp"/>
+       </LinearLayout>
+
+       <LinearLayout
+           android:layout_width="@dimen/signup_with_button_edittext_width"
+           android:layout_height="wrap_content"
+           android:orientation="horizontal"
+           android:background="@drawable/profile_button"
+           android:gravity="center"
+           android:layout_marginTop="50dp">
+
+           <Switch
+               android:layout_width="50dp"
+               android:layout_height="@dimen/login_height"
+               android:layout_marginEnd="10dp"/>
+
+           <TextView
+               android:layout_width="wrap_content"
+               android:layout_height="wrap_content"
+               android:textColor="@color/white"
+               android:textSize="18sp"
+               android:text="메뉴판 번역 시 환율 적용"
+               android:textStyle="bold"/>
+
+
+       </LinearLayout>
+
+
+
+
+
+
+
+   </LinearLayout>
+
+
+</FrameLayout>
