@@ -12,20 +12,20 @@
         android:gravity="center">
 
         <androidx.appcompat.widget.SearchView
+            android:id="@+id/food_preference_searchview"
             android:layout_width="350dp"
             android:layout_height="@dimen/standard_height"
             android:background="@drawable/profile_button"
             android:backgroundTint="@color/pale_gray"
             android:layout_marginBottom="30dp"/>
 
-        <view class="androidx.appcompat.app.AlertController$RecycleListView"
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/food_preference_recyclerview"
             android:layout_width="350dp"
-            android:layout_height="match_parent">
+            android:layout_height="match_parent"/>
 
-        </view>
 
     </LinearLayout>
-
 
 
 </FrameLayout>

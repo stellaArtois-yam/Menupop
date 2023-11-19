@@ -24,7 +24,7 @@
             android:id="@+id/signup_id_edittext"
             android:layout_width="@dimen/signup_with_button_edittext_width"
             android:layout_height="@dimen/standard_height"
-            android:background="@drawable/stroke"
+            android:background="@drawable/stroke_pale_gray"
 
             android:hint="아이디(6-12자 이내, 영문, 숫자 사용 가능)"
 
@@ -41,7 +41,7 @@
             android:id="@+id/signup_id_duplication_button"
             android:layout_width="@dimen/signup_button_width"
             android:layout_height="@dimen/standard_height"
-            android:background="@drawable/button_round"
+            android:background="@drawable/button_gray_radius_10"
 
             android:text="중복확인"
             android:textColor="@color/black"
@@ -73,7 +73,7 @@
             android:id="@+id/signup_password_edittext"
             android:layout_width="@dimen/signup_password_and_warning_width"
             android:layout_height="@dimen/standard_height"
-            android:background="@drawable/stroke"
+            android:background="@drawable/stroke_pale_gray"
 
             android:hint="@string/password_rule"
             android:textColorHint="@color/light_gray"
@@ -108,7 +108,7 @@
             android:id="@+id/signup_password_confirm_edittext"
             android:layout_width="@dimen/signup_password_and_warning_width"
             android:layout_height="@dimen/standard_height"
-            android:background="@drawable/stroke"
+            android:background="@drawable/stroke_pale_gray"
 
             android:hint="비밀번호 확인"
             android:textColorHint="@color/light_gray"
@@ -143,7 +143,7 @@
             android:id="@+id/signup_email_id_edittext"
             android:layout_width="@dimen/email_width"
             android:layout_height="@dimen/standard_height"
-            android:background="@drawable/stroke"
+            android:background="@drawable/stroke_pale_gray"
 
             android:hint="이메일"
             android:textColorHint="@color/light_gray"
@@ -174,7 +174,7 @@
             android:id="@+id/signup_email_selection"
             android:layout_width="@dimen/email_width"
             android:layout_height="@dimen/standard_height"
-            android:background="@drawable/stroke"
+            android:background="@drawable/stroke_pale_gray"
             android:layout_marginTop="10dp"
 
             android:entries="@array/email_spinner_items"
@@ -204,7 +204,7 @@
             android:id="@+id/signup_certification_edittext"
             android:layout_width="@dimen/signup_with_button_edittext_width"
             android:layout_height="@dimen/standard_height"
-            android:background="@drawable/stroke"
+            android:background="@drawable/stroke_pale_gray"
             android:layout_marginTop="10dp"
 
             android:textColor="@color/black"
@@ -217,7 +217,7 @@
             android:id="@+id/signup_certification_button"
             android:layout_width="@dimen/signup_button_width"
             android:layout_height="@dimen/standard_height"
-            android:background="@drawable/button_round"
+            android:background="@drawable/button_gray_radius_10"
 
             android:text="인증번호"
             android:textColor="@color/black"
@@ -334,7 +334,7 @@
             android:id="@+id/signup_submit_button"
             android:layout_width="@dimen/signup_password_and_warning_width"
             android:layout_height="@dimen/standard_height"
-            android:background="@drawable/button_round"
+            android:background="@drawable/button_gray_radius_10"
             android:backgroundTint="@color/orange"
 
             android:text="가입하기"

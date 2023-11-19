@@ -43,7 +43,7 @@
             android:layout_height="200dp"
             android:orientation="vertical"
             android:layout_marginTop="30dp"
-            android:background="@drawable/profile_box"
+            android:background="@drawable/stroke_light_gray"
             android:gravity="center">
 
             <TextView
@@ -106,7 +106,7 @@
             android:layout_height="200dp"
             android:orientation="vertical"
             android:layout_marginTop="30dp"
-            android:background="@drawable/profile_box"
+            android:background="@drawable/stroke_light_gray"
             android:gravity="center">
 
             <TextView
@@ -190,7 +190,7 @@
             android:layout_height="200dp"
             android:orientation="vertical"
             android:layout_marginTop="30dp"
-            android:background="@drawable/profile_box"
+            android:background="@drawable/stroke_light_gray"
             android:gravity="center">
 
             <TextView
@@ -235,6 +235,34 @@
                 android:textSize="18sp"/>
 
         </LinearLayout>
+
+
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/profile_logout_button"
+            android:layout_width="@dimen/login_width"
+            android:layout_height="@dimen/standard_height"
+            android:background="@drawable/radius_30_stroke_light_gray"
+
+            android:layout_marginTop="50dp"
+            android:text="로그아웃"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            android:textColor="@color/light_gray"/>
+
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/profile_withdrawal_button"
+            android:layout_width="@dimen/login_width"
+            android:layout_height="@dimen/standard_height"
+            android:background="@drawable/profile_button"
+            android:backgroundTint="@color/pale_gray"
+
+            android:layout_marginTop="30dp"
+            android:layout_marginBottom="50dp"
+            android:text="회원탈퇴"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            android:textColor="@color/black"/>
+
 
 
     </LinearLayout>
