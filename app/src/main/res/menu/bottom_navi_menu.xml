@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item
+        android:id="@+id/tab_food"
+        android:enabled="true"
+        android:icon="@drawable/food_unselected"
+        android:title="food"/>
+
+    <item
+        android:id="@+id/tab_camera"
+        android:enabled="true"
+        android:icon="@drawable/camera_unselected"
+        android:title="camera"/>
+
+    <item
+        android:id="@+id/tab_exchange"
+        android:enabled="true"
+        android:icon="@drawable/exchange_unselected"
+        android:title="exchange"/>
+
+    <item
+        android:id="@+id/tab_profile"
+        android:enabled="true"
+        android:icon="@drawable/profile_unselected"
+        android:title="profile"/>
+
+</menu>

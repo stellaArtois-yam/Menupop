@@ -1,0 +1,273 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".ProfileFragment">
+    <ScrollView
+        android:id="@+id/profile_scroll"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:gravity="center">
+
+        <ImageView
+            android:id="@+id/profile_image"
+            android:layout_width="150dp"
+            android:layout_height="150dp"
+            android:src="@drawable/profile_unselected"/>
+
+        <TextView
+            android:id="@+id/profile_id"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:layout_marginBottom="20dp"
+
+            android:textSize="20sp"
+            android:text="taron"
+            android:textColor="@color/light_gray"
+            android:gravity="center"/>
+
+        <View
+            android:layout_width="@dimen/login_width"
+            android:layout_height="2dp"
+            android:background="@color/light_gray"/>
+
+        <LinearLayout
+            android:layout_width="@dimen/login_width"
+            android:layout_height="200dp"
+            android:orientation="vertical"
+            android:layout_marginTop="30dp"
+            android:background="@drawable/profile_box"
+            android:gravity="center">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Today"
+                android:textColor="@color/yellow"
+                android:textSize="20sp"
+                android:textStyle="bold"
+                android:padding="10dp"
+                android:layout_gravity="start"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="무료 번역"
+                android:textColor="@color/black"
+                android:textStyle="bold"
+                android:textSize="20sp"/>
+
+            <TextView
+                android:id="@+id/profile_translation_count"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+
+                android:layout_marginTop="10dp"
+                android:layout_marginBottom="10dp"
+
+                android:textColor="@color/black"
+                android:textSize="17sp"
+                android:text="1/3"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="호불호 음식"
+                android:textSize="20sp"
+                android:textColor="@color/black"
+                android:textStyle="bold"
+                />
+
+            <TextView
+                android:id="@+id/profile_food_count"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+
+                android:layout_marginTop="10dp"
+                android:layout_marginBottom="10dp"
+
+                android:text="1/3"
+                android:textColor="@color/black"
+                android:textSize="17sp"/>
+
+
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="@dimen/login_width"
+            android:layout_height="200dp"
+            android:orientation="vertical"
+            android:layout_marginTop="30dp"
+            android:background="@drawable/profile_box"
+            android:gravity="center">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Ticket"
+                android:textColor="@color/orange"
+                android:textSize="20sp"
+                android:textStyle="bold"
+                android:padding="10dp"
+                android:layout_gravity="start"/>
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="음식 티켓"
+                    android:textColor="@color/black"
+                    android:textStyle="bold"
+                    android:textSize="20sp"/>
+
+                <TextView
+                    android:id="@+id/profile_food_ticket"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="10dp"
+
+                    android:textColor="@color/black"
+                    android:textSize="20sp"
+                    android:text=": 01 개"/>
+
+            </LinearLayout>
+
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="번역 티켓"
+                    android:textColor="@color/black"
+                    android:textStyle="bold"
+                    android:textSize="20sp"/>
+
+                <TextView
+                    android:id="@+id/profile_translation_ticket"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="10dp"
+
+                    android:textColor="@color/black"
+                    android:textSize="20sp"
+                    android:text=": 00 개"/>
+
+            </LinearLayout>
+
+            <androidx.appcompat.widget.AppCompatButton
+                android:id="@+id/profile_buy_ticket_button"
+                android:layout_width="150dp"
+                android:layout_height="@dimen/signup_warning_height"
+                android:background="@drawable/profile_button"
+                android:layout_marginTop="30dp"
+                android:layout_marginBottom="20dp"
+                android:text="티켓 구매"
+                android:textColor="@color/white"
+                android:textStyle="bold"
+                android:textSize="18sp"/>
+
+        </LinearLayout>
+
+
+        <LinearLayout
+            android:layout_width="@dimen/login_width"
+            android:layout_height="200dp"
+            android:orientation="vertical"
+            android:layout_marginTop="30dp"
+            android:background="@drawable/profile_box"
+            android:gravity="center">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="AD"
+                android:textColor="@color/yellow"
+                android:textSize="20sp"
+                android:textStyle="bold"
+                android:padding="10dp"
+                android:layout_gravity="start"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Reword"
+                android:textColor="@color/black"
+                android:textStyle="bold"
+                android:textSize="20sp"/>
+
+            <TextView
+                android:id="@+id/profile_ad_count"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+
+
+                android:textColor="@color/black"
+                android:textSize="17sp"
+                android:text="1/3"/>
+
+            <androidx.appcompat.widget.AppCompatButton
+                android:id="@+id/profile_ad_button"
+                android:layout_width="150dp"
+                android:layout_height="@dimen/signup_warning_height"
+                android:background="@drawable/profile_button"
+                android:backgroundTint="@color/yellow"
+                android:layout_marginTop="30dp"
+                android:layout_marginBottom="20dp"
+                android:text="광고 보러가기"
+                android:textColor="@color/white"
+                android:textStyle="bold"
+                android:textSize="18sp"/>
+
+        </LinearLayout>
+
+
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/profile_logout_button"
+            android:layout_width="@dimen/login_width"
+            android:layout_height="@dimen/standard_height"
+            android:background="@drawable/radius_30_stroke_light_gray"
+
+            android:layout_marginTop="50dp"
+            android:text="로그아웃"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            android:textColor="@color/light_gray"/>
+
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/profile_withdrawal_button"
+            android:layout_width="@dimen/login_width"
+            android:layout_height="@dimen/standard_height"
+            android:background="@drawable/profile_button"
+            android:backgroundTint="@color/pale_gray"
+
+            android:layout_marginTop="30dp"
+            android:layout_marginBottom="50dp"
+            android:text="회원탈퇴"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            android:textColor="@color/black"/>
+
+
+
+    </LinearLayout>
+
+    </ScrollView>
+
+
+</FrameLayout>

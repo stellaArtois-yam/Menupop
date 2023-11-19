@@ -83,7 +83,7 @@ class LoginActivity : AppCompatActivity() {
     private fun showCustomDialog() {
         val dialog = Dialog(this)
         dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
-        dialog.setContentView(R.layout.dialog)
+        dialog.setContentView(R.layout.dialog_warning)
         dialog.show()
     }
 }
