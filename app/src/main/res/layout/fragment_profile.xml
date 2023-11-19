@@ -43,7 +43,7 @@
             android:layout_height="200dp"
             android:orientation="vertical"
             android:layout_marginTop="30dp"
-            android:background="@drawable/stroke_light_gray"
+            android:background="@drawable/profile_box"
             android:gravity="center">
 
             <TextView
@@ -106,7 +106,7 @@
             android:layout_height="200dp"
             android:orientation="vertical"
             android:layout_marginTop="30dp"
-            android:background="@drawable/stroke_light_gray"
+            android:background="@drawable/profile_box"
             android:gravity="center">
 
             <TextView
@@ -190,7 +190,7 @@
             android:layout_height="200dp"
             android:orientation="vertical"
             android:layout_marginTop="30dp"
-            android:background="@drawable/stroke_light_gray"
+            android:background="@drawable/profile_box"
             android:gravity="center">
 
             <TextView

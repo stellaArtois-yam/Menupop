@@ -27,7 +27,7 @@
         android:id="@+id/find_id_email"
         android:layout_width="@dimen/email_width"
         android:layout_height="@dimen/standard_height"
-        android:background="@drawable/stroke_pale_gray"
+        android:background="@drawable/stroke"
 
         android:hint="이메일"
         android:textSize="16sp"
@@ -84,7 +84,7 @@
         android:id="@+id/find_id_comfirm_button"
         android:layout_width="@dimen/signup_password_and_warning_width"
         android:layout_height="@dimen/standard_height"
-        android:background="@drawable/button_gray_radius_10"
+        android:background="@drawable/button_round"
         android:backgroundTint="@color/orange"
 
         android:text="확인하기"
