@@ -1,7 +1,6 @@
 package com.example.menupop
 
 import android.os.Bundle
-import android.util.Log
 import android.view.MenuItem
 import android.widget.FrameLayout
 import androidx.appcompat.app.AppCompatActivity
@@ -18,7 +17,7 @@ class MainActivity : AppCompatActivity() {
 
         init()
 
-        bottomNavigation.selectedItemId = R.id.tab_home
+        bottomNavigation.selectedItemId = R.id.tab_food
 
         settingListener()
 
@@ -40,9 +39,9 @@ class MainActivity : AppCompatActivity() {
     inner class TabSelectedListener : BottomNavigationView.OnNavigationItemSelectedListener {
         override fun onNavigationItemSelected(menuItem: MenuItem): Boolean {
             when (menuItem.itemId) {
-                R.id.tab_home -> {
+                R.id.tab_food -> {
                     supportFragmentManager.beginTransaction()
-                        .replace(R.id.home_frame_layout, HomeFragment())
+                        .replace(R.id.home_frame_layout, FoodPreferenceFragment())
                         .commit()
                     return true
                 }

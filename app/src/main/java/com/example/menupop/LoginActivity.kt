@@ -6,17 +6,13 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
 import android.view.Window
-import android.widget.ImageView
 import android.widget.Toast
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import com.example.menupop.databinding.LoginBinding
-import com.example.menupop.databinding.SignupBinding
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
 
 class LoginActivity : AppCompatActivity() {
     private lateinit var loginViewModel: LoginViewModel
@@ -86,7 +82,7 @@ class LoginActivity : AppCompatActivity() {
     private fun showCustomDialog() {
         val dialog = Dialog(this)
         dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
-        dialog.setContentView(R.layout.dialog)
+        dialog.setContentView(R.layout.dialog_warning)
         dialog.show()
     }
 }
