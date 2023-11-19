@@ -13,7 +13,6 @@ import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.ViewModelProvider
 import com.example.menupop.R
 import com.example.menupop.databinding.FragmentResetPasswordConformBinding
-import com.example.menupop.databinding.FragmentResetPasswordEamilBinding
 
 class ResetPasswordConformFragment : Fragment() {
     private var TAG = "ResetPasswordConformFragment"
@@ -40,7 +39,7 @@ class ResetPasswordConformFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        binding =  DataBindingUtil.inflate(inflater, R.layout.fragment_reset_password_conform, container, false)
+        binding =  DataBindingUtil.inflate(inflater, R.layout.fragment_reset_password_confirm, container, false)
         // Inflate the layout for this fragment
         return binding.root
     }
