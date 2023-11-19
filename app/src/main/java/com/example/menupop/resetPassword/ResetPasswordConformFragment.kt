@@ -12,11 +12,12 @@ import androidx.core.widget.addTextChangedListener
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.ViewModelProvider
 import com.example.menupop.R
-import com.example.menupop.databinding.FragmentResetPasswordConformBinding
+import com.example.menupop.databinding.FragmentResetPasswordConfirmBinding
+
 
 class ResetPasswordConformFragment : Fragment() {
     private var TAG = "ResetPasswordConformFragment"
-    lateinit var binding : FragmentResetPasswordConformBinding
+    lateinit var binding : FragmentResetPasswordConfirmBinding
     private lateinit var resetPasswordViewModel: ResetPasswordViewModel
     private var event: ResetPasswordFragmentEvent? = null
     private var context : Context?=null
