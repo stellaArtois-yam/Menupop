@@ -27,17 +27,7 @@
         <item>icloud.com</item>
     </string-array>
 
-    <string-array name="country">
-        <item>선택</item>
-        <item>한국(KRW)</item>
-        <item>미국(USD)</item>
-        <item>일본(JPY)</item>
-        <item>중국(CNY)</item>
-        <item>대만(TWD)</item>
-        <item>베트남(VND_</item>
-        <item>태국(THB)</item>
-        <item>홍콩(HKD)</item>
-    </string-array>
+
 
 
     <string name="exchange_warning">기준 환율을 등록하지 않으면 실시간 환율이 적용됩니다.</string>
