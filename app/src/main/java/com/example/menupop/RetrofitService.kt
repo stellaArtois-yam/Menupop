@@ -14,9 +14,14 @@ interface RetrofitService {
     @FormUrlEncoded
     fun checkDuplicateId(@Field("userId") id: String): Call<String>
 
-    @POST("sendAuthCode.php")
+    @POST("Signup.php")
     @FormUrlEncoded
-    fun sendAuthCode(@Field("email") email : String) : Call<Int>
+    fun saveUserInformation
+                (@Field("id") id: String,
+                 @Field("password") password: String,
+                 @Field("email") email :String,
+                 @Field("identifier") identifier : Int)
+    : Call<String>
 
     @POST("login.php")
     @FormUrlEncoded
