@@ -1,10 +1,9 @@
-package com.example.menupop
+package com.example.menupop.Login
 
 import android.content.SharedPreferences
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.lifecycleScope
 
 class LoginViewModel : ViewModel() {
     private var loginInfomation = MutableLiveData<LoginResponseModel>()
@@ -12,6 +11,7 @@ class LoginViewModel : ViewModel() {
     private  var callback:((LoginResponseModel) -> Unit) ?= null
     val loginResult: LiveData<LoginResponseModel>
         get() = loginInfomation
+    val socialLoginResult = MutableLiveData<LoginResponseModel>()
     fun requestLogin(id : String, password : String) {
         callback = { loginResponse ->
             loginInfomation.value = loginResponse
@@ -21,6 +21,12 @@ class LoginViewModel : ViewModel() {
     }
     fun saveIdentifier(sharedPreferences: SharedPreferences,identifier : Int){
         loginModel.saveUserIdentifier(sharedPreferences,identifier)
+    }
+    fun socialLoginRequest(email:String){
+        callback = {socialloginResponse ->
+            socialLoginResult.value = socialloginResponse
+        }
+        loginModel.socialLoginRequest(email,callback!!)
     }
 
 }

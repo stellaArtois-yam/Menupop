@@ -1,13 +1,9 @@
-package com.example.menupop
+package com.example.menupop.Login
 
 import android.content.SharedPreferences
-import android.util.Log
+import com.example.menupop.RetrofitService
 import com.google.gson.Gson
 import com.google.gson.GsonBuilder
-import com.google.gson.reflect.TypeToken
-import kotlinx.coroutines.Deferred
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -45,6 +41,25 @@ fun requestLogin(id: String, password: String, callback: (LoginResponseModel) ->
         }
     })
 }
+    fun socialLoginRequest(email:String , callback: (LoginResponseModel) -> Unit){
+        service.socialLoginRequest(email,email.hashCode()).equals(object : Callback<LoginResponseModel>{
+            override fun onResponse(
+                call: Call<LoginResponseModel>,
+                response: Response<LoginResponseModel>
+            ) {
+                if (response.isSuccessful) {
+                    callback(response.body()!!)
+                } else {
+                    callback(LoginResponseModel(0, 0, "failed"))
+                }
+            }
+
+            override fun onFailure(call: Call<LoginResponseModel>, t: Throwable) {
+                callback(LoginResponseModel(0, 0, "failed"))
+            }
+
+        })
+    }
     fun saveUserIdentifier(sharedPreferences: SharedPreferences,identifier : Int){
         var editor = sharedPreferences.edit()
         editor.putInt("identifier",identifier)

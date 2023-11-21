@@ -1,19 +1,21 @@
-package com.example.menupop
+package com.example.menupop.Login
 
 import android.app.Dialog
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
-import android.view.View
 import android.view.Window
 import android.widget.Toast
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
+import com.example.menupop.R
+import com.example.menupop.SignupActivity
 import com.example.menupop.resetPassword.ResetPasswordActivity
 import com.example.menupop.databinding.LoginBinding
+import com.example.menupop.findId.FindIdActivity
 import com.kakao.sdk.auth.model.OAuthToken
 import com.kakao.sdk.common.KakaoSdk
 import com.kakao.sdk.common.model.AuthErrorCause
@@ -46,6 +48,9 @@ class LoginActivity : AppCompatActivity() {
                 isNewUserCheck(it.isNewUser)
             }
         })
+        loginViewModel.socialLoginResult.observe(this){ result ->
+            Log.d(TAG, "onCreate: ${result.isNewUser} ${result.identifier} ${result.result}")
+        }
     }
     fun init() {
         binding = DataBindingUtil.setContentView(this, R.layout.login)
@@ -56,7 +61,7 @@ class LoginActivity : AppCompatActivity() {
     }
     private fun isNewUserCheck(isNewUser:Int){
         if (isNewUser == 1){
-            var intent = Intent(this,SignupActivity :: class.java)
+            var intent = Intent(this, SignupActivity :: class.java)
             startActivity(intent)
             return
         }
@@ -69,17 +74,17 @@ class LoginActivity : AppCompatActivity() {
                 Toast.makeText(this, "아이디 또는 비밀번호를 입력해주세요.", Toast.LENGTH_SHORT).show()
             } else {
                 lifecycleScope.launch {
-                    loginViewModel.requestLogin(id, password)
+                    loginViewModel.requestLogin(id, password.hashCode().toString())
                 }
             }
         }
         binding.loginSignup.setOnClickListener {
-            val intent = Intent(this,SignupActivity::class.java)
+            val intent = Intent(this, SignupActivity::class.java)
             startActivity(intent)
         }
         binding.loginFindId.setOnClickListener {
-//            val intent = Intent(this,::class.java)
-//            startActivity(intent)
+            val intent = Intent(this,FindIdActivity::class.java)
+            startActivity(intent)
         }
         binding.loginFindPassword.setOnClickListener {
             val intent = Intent(this,ResetPasswordActivity::class.java)
@@ -112,6 +117,9 @@ class LoginActivity : AppCompatActivity() {
         dialog.show()
     }
 
+    private fun socialLoginRequest(email : String){
+        loginViewModel.socialLoginRequest(email)
+    }
     fun btnKakaoLogin() {
         // 카카오톡이 설치되어 있으면 카카오톡으로 로그인, 아니면 카카오계정으로 로그인
         if(UserApiClient.instance.isKakaoTalkLoginAvailable(this)){
@@ -124,48 +132,23 @@ class LoginActivity : AppCompatActivity() {
     fun setKakaoCallback() {
         kakaoCallback = { token, error ->
             if (error != null) {
-                when {
-                    error.toString() == AuthErrorCause.AccessDenied.toString() -> {
-                        Log.d(TAG,"접근이 거부 됨(동의 취소)")
-                    }
-                    error.toString() == AuthErrorCause.InvalidClient.toString() -> {
-                        Log.d(TAG,"유효하지 않은 앱")
-                    }
-                    error.toString() == AuthErrorCause.InvalidGrant.toString() -> {
-                        Log.d(TAG,"인증 수단이 유효하지 않아 인증할 수 없는 상태")
-                    }
-                    error.toString() == AuthErrorCause.InvalidRequest.toString() -> {
-                        Log.d(TAG,"요청 파라미터 오류")
-                    }
-                    error.toString() == AuthErrorCause.InvalidScope.toString() -> {
-                        Log.d(TAG,"유효하지 않은 scope ID")
-                    }
-                    error.toString() == AuthErrorCause.Misconfigured.toString() -> {
-                        Log.d(TAG,"설정이 올바르지 않음(android key hash)")
-                    }
-                    error.toString() == AuthErrorCause.ServerError.toString() -> {
-                        Log.d(TAG,"서버 내부 에러")
-                    }
-                    error.toString() == AuthErrorCause.Unauthorized.toString() -> {
-                        Log.d(TAG,"앱이 요청 권한이 없음")
-                    }
-                    else -> { // Unknown
-                        Log.d(TAG,error.toString())
-                    }
-                }
+                Log.d(TAG, "setKakaoCallback: ${error.toString()}")
             }
             else if (token != null) {
                 Log.d("[카카오로그인]","로그인에 성공하였습니다.\n${token.accessToken}")
                 UserApiClient.instance.accessTokenInfo { tokenInfo, error ->
                     UserApiClient.instance.me { user, error ->
                         Log.d(TAG, "setKakaoCallback: 닉네임: ${user?.kakaoAccount?.profile?.nickname} 이메일 : ${user?.kakaoAccount?.email}")
+                        socialLoginRequest(user?.kakaoAccount?.email.toString())
                     }
                 }
             }
             else {
-                Log.d("카카오로그인", "토큰==null error==null")
+                Log.d(TAG, "setKakaoCallback: 토큰==null")
             }
         }
     }
+
+
 }
 
