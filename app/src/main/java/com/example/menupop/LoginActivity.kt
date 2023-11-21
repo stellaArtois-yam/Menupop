@@ -13,7 +13,9 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import com.example.menupop.resetPassword.ResetPasswordActivity
 import com.example.menupop.databinding.LoginBinding
+import com.kakao.sdk.common.KakaoSdk
 import kotlinx.coroutines.launch
+
 
 class LoginActivity : AppCompatActivity() {
     private lateinit var loginViewModel: LoginViewModel
@@ -48,12 +50,10 @@ class LoginActivity : AppCompatActivity() {
     }
     private fun isNewUserCheck(isNewUser:Int){
         if (isNewUser == 1){
-            Toast.makeText(this,"FoodPreferenceActivity 이동!",Toast.LENGTH_SHORT).show()
-//                        var intent = Intent(this,SignupActivity :: class.java)
-//                        startActivity(intent)
+            var intent = Intent(this,SignupActivity :: class.java)
+            startActivity(intent)
             return
         }
-        Toast.makeText(this,"MainActivity 이동!",Toast.LENGTH_SHORT).show()
     }
     private fun initOnClickListener(){
         binding.loginButton.setOnClickListener {
@@ -79,6 +79,17 @@ class LoginActivity : AppCompatActivity() {
             val intent = Intent(this,ResetPasswordActivity::class.java)
             startActivity(intent)
         }
+        binding.googleLoginButton.setOnClickListener {
+
+        }
+        binding.naverLoginButton.setOnClickListener {
+
+        }
+        binding.kakaoLoginButton.setOnClickListener {
+
+        }
+    }
+    private fun kakaoLoginRequest(){
     }
     private fun showCustomDialog() {
         val dialog = Dialog(this)
