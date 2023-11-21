@@ -1,6 +1,7 @@
-package com.example.menupop.Login
+package com.example.menupop.login
 
 import android.content.SharedPreferences
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -9,6 +10,7 @@ class LoginViewModel : ViewModel() {
     private var loginInfomation = MutableLiveData<LoginResponseModel>()
     private var loginModel = LoginModel()
     private  var callback:((LoginResponseModel) -> Unit) ?= null
+    val TAG = "LoginViewModel"
     val loginResult: LiveData<LoginResponseModel>
         get() = loginInfomation
     val socialLoginResult = MutableLiveData<LoginResponseModel>()
@@ -24,6 +26,7 @@ class LoginViewModel : ViewModel() {
     }
     fun socialLoginRequest(email:String){
         callback = {socialloginResponse ->
+            Log.d(TAG, "socialLoginRequest: 들어옴")
             socialLoginResult.value = socialloginResponse
         }
         loginModel.socialLoginRequest(email,callback!!)

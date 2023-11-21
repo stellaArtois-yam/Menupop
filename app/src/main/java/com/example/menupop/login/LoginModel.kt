@@ -1,6 +1,7 @@
-package com.example.menupop.Login
+package com.example.menupop.login
 
 import android.content.SharedPreferences
+import android.util.Log
 import com.example.menupop.RetrofitService
 import com.google.gson.Gson
 import com.google.gson.GsonBuilder
@@ -42,11 +43,12 @@ fun requestLogin(id: String, password: String, callback: (LoginResponseModel) ->
     })
 }
     fun socialLoginRequest(email:String , callback: (LoginResponseModel) -> Unit){
-        service.socialLoginRequest(email,email.hashCode()).equals(object : Callback<LoginResponseModel>{
+        service.socialLoginRequest(email,email.hashCode()).enqueue(object : Callback<LoginResponseModel>{
             override fun onResponse(
                 call: Call<LoginResponseModel>,
                 response: Response<LoginResponseModel>
             ) {
+                Log.d(TAG, "onResponse: 요청 보냄 ${response.toString()}")
                 if (response.isSuccessful) {
                     callback(response.body()!!)
                 } else {
@@ -55,6 +57,7 @@ fun requestLogin(id: String, password: String, callback: (LoginResponseModel) ->
             }
 
             override fun onFailure(call: Call<LoginResponseModel>, t: Throwable) {
+                Log.d(TAG, "onFailure: ${t.toString()}")
                 callback(LoginResponseModel(0, 0, "failed"))
             }
 

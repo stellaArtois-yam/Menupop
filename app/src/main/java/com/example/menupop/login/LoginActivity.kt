@@ -1,4 +1,4 @@
-package com.example.menupop.Login
+package com.example.menupop.login
 
 import android.app.Dialog
 import android.content.Intent
@@ -11,6 +11,8 @@ import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
+import com.example.menupop.FoodPreferenceFragment
+import com.example.menupop.MainActivity
 import com.example.menupop.R
 import com.example.menupop.SignupActivity
 import com.example.menupop.resetPassword.ResetPasswordActivity
@@ -18,7 +20,6 @@ import com.example.menupop.databinding.LoginBinding
 import com.example.menupop.findId.FindIdActivity
 import com.kakao.sdk.auth.model.OAuthToken
 import com.kakao.sdk.common.KakaoSdk
-import com.kakao.sdk.common.model.AuthErrorCause
 import com.kakao.sdk.common.util.Utility
 import com.kakao.sdk.user.UserApiClient
 import kotlinx.coroutines.launch
@@ -50,6 +51,9 @@ class LoginActivity : AppCompatActivity() {
         })
         loginViewModel.socialLoginResult.observe(this){ result ->
             Log.d(TAG, "onCreate: ${result.isNewUser} ${result.identifier} ${result.result}")
+            var sharedPreferences = getSharedPreferences("userInfo", MODE_PRIVATE)
+            loginViewModel.saveIdentifier(sharedPreferences,result.identifier)
+            isNewUserCheck(result.isNewUser)
         }
     }
     fun init() {
@@ -65,6 +69,8 @@ class LoginActivity : AppCompatActivity() {
             startActivity(intent)
             return
         }
+        var intent = Intent(this, MainActivity :: class.java)
+        startActivity(intent)
     }
     private fun initOnClickListener(){
         binding.loginButton.setOnClickListener {
