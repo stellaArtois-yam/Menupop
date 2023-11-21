@@ -142,6 +142,7 @@
             android:text="회원가입"
             android:layout_marginTop="@dimen/login_margin_top"
             android:layout_marginEnd="@dimen/login_margin_side"
+            android:textSize="15.5sp"
 
             app:layout_constraintTop_toBottomOf="@id/login_button"
             app:layout_constraintLeft_toRightOf="@id/login_slash2"
@@ -206,11 +207,13 @@
             app:layout_constraintBottom_toBottomOf="parent">
 
             <androidx.appcompat.widget.AppCompatButton
+                android:id="@+id/googleLoginButton"
                 android:layout_width="@dimen/standard_height"
                 android:layout_height="@dimen/standard_height"
                 android:background="@drawable/google_logo" />
 
             <androidx.appcompat.widget.AppCompatButton
+                android:id="@+id/kakaoLoginButton"
                 android:layout_width="@dimen/standard_height"
                 android:layout_height="@dimen/standard_height"
                 android:background="@drawable/kakao_logo"
@@ -219,6 +222,7 @@
                 android:layout_marginEnd="60dp"/>
 
             <androidx.appcompat.widget.AppCompatButton
+                android:id="@+id/naverLoginButton"
                 android:layout_width="@dimen/standard_height"
                 android:layout_height="@dimen/standard_height"
                 android:background="@drawable/naver_logo"
