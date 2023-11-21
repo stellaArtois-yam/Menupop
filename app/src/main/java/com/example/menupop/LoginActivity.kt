@@ -13,6 +13,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import com.example.menupop.resetPassword.ResetPasswordActivity
 import com.example.menupop.databinding.LoginBinding
+import com.example.menupop.findId.FindIdActivity
 import kotlinx.coroutines.launch
 
 class LoginActivity : AppCompatActivity() {
@@ -72,8 +73,8 @@ class LoginActivity : AppCompatActivity() {
             startActivity(intent)
         }
         binding.loginFindId.setOnClickListener {
-//            val intent = Intent(this,::class.java)
-//            startActivity(intent)
+            val intent = Intent(this,FindIdActivity::class.java)
+            startActivity(intent)
         }
         binding.loginFindPassword.setOnClickListener {
             val intent = Intent(this,ResetPasswordActivity::class.java)

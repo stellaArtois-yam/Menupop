@@ -36,6 +36,9 @@
             android:exported="true">
         </activity>
 
+        <activity android:name=".findId.FindIdActivity"
+            android:exported="false"/>
+
     </application>
 
 
