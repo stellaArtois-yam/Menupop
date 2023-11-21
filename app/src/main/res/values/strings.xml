@@ -41,6 +41,8 @@
 
     <string name="exchange_warning">기준 환율을 등록하지 않으면 실시간 환율이 적용됩니다.</string>
     <string name="payment_type">사용할 수 있는 리워드가 있습니다.\n리워드로 티켓을 구매할까요?</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
 
 
 </resources>

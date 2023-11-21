@@ -1,5 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<layout xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <data>
+        <variable
+            name="findIdViewModel"
+            type="com.example.menupop.findId.FindIdViewModel" />
+    </data>
+
+
+<LinearLayout
     android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
@@ -28,7 +37,6 @@
         android:textColor="@color/orange"
         android:textSize="25sp"
         android:textStyle="bold"
-        android:text="어쩌구"
         android:paddingStart="30dp"
         android:gravity="center_vertical"/>
 
@@ -55,6 +63,7 @@
         android:paddingStart="30dp"/>
 
     <androidx.appcompat.widget.AppCompatButton
+        android:id="@+id/find_id_result_button"
         android:layout_width="@dimen/signup_password_and_warning_width"
         android:layout_height="@dimen/standard_height"
         android:background="@drawable/button_round"
@@ -70,6 +79,6 @@
         android:textSize="18sp"/>
 
 
-
-
 </LinearLayout>
+
+</layout>

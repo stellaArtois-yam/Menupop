@@ -11,7 +11,6 @@ import android.widget.AdapterView
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.view.get
 import androidx.core.widget.addTextChangedListener
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.Observer
@@ -19,8 +18,6 @@ import androidx.lifecycle.ViewModelProvider
 import com.example.menupop.databinding.SignupBinding
 import androidx.lifecycle.lifecycleScope
 import kotlinx.coroutines.launch
-import kotlin.math.log
-import kotlin.math.sign
 
 class SignupActivity : AppCompatActivity() {
 
