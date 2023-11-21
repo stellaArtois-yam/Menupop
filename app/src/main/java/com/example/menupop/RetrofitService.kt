@@ -1,6 +1,7 @@
 package com.example.menupop
 
 import com.example.menupop.findId.FindIdResponseModel
+import com.example.menupop.login.LoginResponseModel
 import retrofit2.Call
 import retrofit2.http.Field
 import retrofit2.http.FormUrlEncoded
@@ -40,4 +41,8 @@ interface RetrofitService {
     @POST("ResetPassword.php")
     @FormUrlEncoded
     fun resetPassword(@Field("id") id : String,@Field("password") password : String) : Call<String>
+    @POST("socialLogin.php")
+    @FormUrlEncoded
+    fun socialLoginRequest(@Field("email") email : String,@Field("identifier") identifier: Int) : Call<LoginResponseModel>
+
 }

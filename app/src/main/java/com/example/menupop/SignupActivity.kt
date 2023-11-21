@@ -17,6 +17,7 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import com.example.menupop.databinding.SignupBinding
 import androidx.lifecycle.lifecycleScope
+import com.example.menupop.login.LoginActivity
 import kotlinx.coroutines.launch
 
 class SignupActivity : AppCompatActivity() {
@@ -289,7 +290,7 @@ class SignupActivity : AppCompatActivity() {
 
         if(success){
             dialog.setOnDismissListener{
-                var intent = Intent(this,LoginActivity :: class.java)
+                var intent = Intent(this, LoginActivity :: class.java)
                 startActivity(intent)
             }
         }

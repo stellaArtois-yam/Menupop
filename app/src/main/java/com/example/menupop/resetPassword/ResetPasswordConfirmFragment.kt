@@ -15,7 +15,7 @@ import com.example.menupop.R
 import com.example.menupop.databinding.FragmentResetPasswordConfirmBinding
 
 
-class ResetPasswordConformFragment : Fragment() {
+class ResetPasswordConfirmFragment : Fragment() {
     private var TAG = "ResetPasswordConformFragment"
     lateinit var binding : FragmentResetPasswordConfirmBinding
     private lateinit var resetPasswordViewModel: ResetPasswordViewModel
@@ -99,12 +99,12 @@ class ResetPasswordConformFragment : Fragment() {
         binding.passwordResetConfirmEdittext.addTextChangedListener{
             val password = binding.passwordResetEdittext.text.toString()
             val confrimPassword = it.toString()
-            resetPasswordViewModel.onConfirmPasswordTextChanged(password, confrimPassword)
+            resetPasswordViewModel.onConfirmPasswordTextChanged(password.hashCode().toString(), confrimPassword.hashCode().toString())
         }
 
         binding.passwordResetConfirmButton.setOnClickListener {
             val password = binding.passwordResetEdittext.text.toString()
-            resetPasswordViewModel.resetPassword(password)
+            resetPasswordViewModel.resetPassword(password.hashCode().toString())
         }
     }
 

@@ -12,7 +12,6 @@ import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
-import com.example.menupop.LoginViewModel
 import com.example.menupop.R
 import com.example.menupop.databinding.FragmentResetPasswordCheckIdBinding
 
