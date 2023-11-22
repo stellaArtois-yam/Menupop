@@ -7,7 +7,7 @@
     <data>
         <variable
             name="viewModel"
-            type="com.example.menupop.SignupViewModel" />
+            type="com.example.menupop.signup.SignupViewModel" />
     </data>
 
 

@@ -1,10 +1,10 @@
-package com.example.menupop
+package com.example.menupop.mainActivity
 
 import android.os.Bundle
 import android.view.MenuItem
 import android.widget.FrameLayout
 import androidx.appcompat.app.AppCompatActivity
-import com.example.menupop.mainActivity.ExchangeFragment
+import com.example.menupop.R
 import com.google.android.material.bottomnavigation.BottomNavigationView
 
 class MainActivity : AppCompatActivity() {

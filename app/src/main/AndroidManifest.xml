@@ -28,11 +28,11 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".SignupActivity"
+            android:name=".signup.SignupActivity"
             android:exported="true">
         </activity>
 
-        <activity android:name=".MainActivity"
+        <activity android:name=".mainActivity.MainActivity"
             android:exported="true">
         </activity>
         <activity

@@ -1,4 +1,4 @@
-package com.example.menupop
+package com.example.menupop.signup
 
 import android.app.Dialog
 import android.content.Intent
@@ -19,9 +19,9 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import com.example.menupop.databinding.SignupBinding
 import androidx.lifecycle.lifecycleScope
+import com.example.menupop.R
 import com.example.menupop.login.LoginActivity
 import kotlinx.coroutines.launch
-import kotlin.math.log
 
 class SignupActivity : AppCompatActivity() {
 
@@ -37,6 +37,8 @@ class SignupActivity : AppCompatActivity() {
         signupViewModel = ViewModelProvider(this).get(SignupViewModel::class.java)
         binding.viewModel = signupViewModel
         binding.lifecycleOwner = this
+
+
 
 
         /**

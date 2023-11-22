@@ -1,6 +1,5 @@
 package com.example.menupop.login
 
-import android.R.attr.data
 import android.app.Dialog
 import android.content.Intent
 import android.os.Bundle
@@ -14,9 +13,9 @@ import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
-import com.example.menupop.MainActivity
+import com.example.menupop.mainActivity.MainActivity
 import com.example.menupop.R
-import com.example.menupop.SignupActivity
+import com.example.menupop.signup.SignupActivity
 import com.example.menupop.databinding.LoginBinding
 import com.example.menupop.findId.FindIdActivity
 import com.example.menupop.resetPassword.ResetPasswordActivity
