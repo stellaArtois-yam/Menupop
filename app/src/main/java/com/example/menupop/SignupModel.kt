@@ -51,7 +51,7 @@ class SignupModel {
     fun sendUserInformation(id : String, password : String, email :String,
                             identifier : Int, callback: (String) -> Unit){
         val call : Call<String> = service.saveUserInformation(id, password, email, identifier)
-        Log.d(TAG, "Model $id, $password, $email, $identifier")
+        Log.d(TAG, "$id, $password, $email, $identifier")
         call.enqueue(object  : Callback<String>{
             override fun onResponse(call: Call<String>, response: Response<String>) {
                 if(response.isSuccessful){
@@ -88,6 +88,28 @@ class SignupModel {
             override fun onFailure(call: Call<String>, t: Throwable) {
                 callback("Exception")
                 Log.d(TAG, "onFailure: ${t}")
+            }
+
+        })
+    }
+
+    fun checkEmailExistence(email:String,callback: (String) -> Unit){
+
+        service.checkEmailExistence(email).enqueue(object : Callback<String>{
+
+            override fun onResponse(call: Call<String>, response: Response<String>) {
+
+                if(response.isSuccessful && response.body() != null){
+                    callback(response.body().toString())
+                    Log.d(TAG, "onResponse: ${response.body()}")
+                }else{
+                    Log.d(TAG, "!isSuccessful: ${response.body()}")
+                }
+            }
+
+            override fun onFailure(call: Call<String>, t: Throwable) {
+                Log.d(TAG, "onFailure: ${t}")
+                callback("Exception")
             }
 
         })

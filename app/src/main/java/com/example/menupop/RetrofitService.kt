@@ -26,6 +26,10 @@ interface RetrofitService {
     @FormUrlEncoded
     fun requestFindID(@Field("email") email: String): Call<FindIdResponseModel>
 
+    @POST("SignupCheckEmail.php")
+    @FormUrlEncoded
+    fun checkEmailExistence(@Field("email") email: String): Call<String>
+
     @POST("login.php")
     @FormUrlEncoded
     fun requestLogin(@Field("id") id: String,@Field("password") password : String): Call<LoginResponseModel>
