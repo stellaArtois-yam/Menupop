@@ -67,6 +67,7 @@
         android:id="@+id/find_id_email_selection"
         android:layout_width="@dimen/email_width"
         android:layout_height="@dimen/standard_height"
+        android:background="@drawable/stroke"
 
         android:entries="@array/spinner_items"
 
@@ -81,6 +82,7 @@
         android:layout_height="@dimen/signup_warning_height"
 
         android:text="@string/email_rule_warning"
+        android:visibility="gone"
         android:textColor="@color/red"
         android:textSize="15.5sp"
         android:gravity="center_vertical"

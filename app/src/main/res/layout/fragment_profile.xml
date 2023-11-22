@@ -3,7 +3,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".ProfileFragment">
+    tools:context=".mainActivity.ProfileFragment">
+
     <ScrollView
         android:id="@+id/profile_scroll"
         android:layout_width="match_parent"
@@ -82,8 +83,7 @@
                 android:text="호불호 음식"
                 android:textSize="20sp"
                 android:textColor="@color/black"
-                android:textStyle="bold"
-                />
+                android:textStyle="bold"/>
 
             <TextView
                 android:id="@+id/profile_food_count"

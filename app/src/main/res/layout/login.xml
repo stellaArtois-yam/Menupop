@@ -140,6 +140,7 @@
             android:layout_width="wrap_content"
             android:layout_height="@dimen/login_find_text"
             android:text="회원가입"
+            android:textColor="@color/black"
             android:layout_marginTop="@dimen/login_margin_top"
             android:layout_marginEnd="@dimen/login_margin_side"
             android:textSize="15.5sp"
