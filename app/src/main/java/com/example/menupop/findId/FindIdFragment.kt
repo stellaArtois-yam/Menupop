@@ -116,11 +116,19 @@ class FindIdFragment : Fragment() {
                 val domainSelection = binding.findIdEmailSelection.selectedItem.toString()
                 findIdViewModel.checkUserId(emailId, domainSelection)
 
-                // 통신 후에 넘겨?
-                event?.successFindId()
+
 
             }
         }
+
+
+        findIdViewModel.userIdExistence.observe(viewLifecycleOwner, Observer{ result ->
+            Log.d(TAG, "findId Result: ${result.result} ${result.id}")
+
+            // observe 되고 넘겨
+            event?.successFindId()
+
+        })
 
 
     }
