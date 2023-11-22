@@ -92,7 +92,7 @@
             android:layout_width="@dimen/signup_password_and_warning_width"
             android:layout_height="@dimen/signup_warning_height"
 
-            android:text="@string/password_rule_warning"
+            android:text="@{viewModel.passwordWarning}"
             android:textColor="@color/red"
             android:textSize="15sp"
             android:gravity="center_vertical"
@@ -127,7 +127,7 @@
             android:layout_width="@dimen/signup_password_and_warning_width"
             android:layout_height="@dimen/signup_warning_height"
 
-            android:text="@string/password_confirm_warning"
+            android:text="@{viewModel.confirmPasswordWarning}"
             android:textSize="15.5sp"
             android:textColor="@color/red"
             android:gravity="center_vertical"
@@ -188,7 +188,7 @@
             android:layout_width="@dimen/signup_password_and_warning_width"
             android:layout_height="@dimen/signup_warning_height"
 
-            android:text="@string/email_rule_warning"
+            android:text="@{viewModel.emailWarning}"
             android:textColor="@color/red"
             android:textSize="15.5sp"
             android:paddingStart="10dp"
