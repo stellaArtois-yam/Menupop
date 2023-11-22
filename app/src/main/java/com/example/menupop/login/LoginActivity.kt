@@ -7,6 +7,7 @@ import android.os.Bundle
 import android.util.Log
 import android.view.Window
 import android.widget.Toast
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
@@ -18,6 +19,11 @@ import com.example.menupop.SignupActivity
 import com.example.menupop.resetPassword.ResetPasswordActivity
 import com.example.menupop.databinding.LoginBinding
 import com.example.menupop.findId.FindIdActivity
+import com.google.android.gms.auth.api.signin.GoogleSignIn
+import com.google.android.gms.auth.api.signin.GoogleSignInClient
+import com.google.android.gms.auth.api.signin.GoogleSignInOptions
+import com.google.android.gms.common.api.ApiException
+import com.google.android.gms.common.api.Scope
 import com.kakao.sdk.auth.model.OAuthToken
 import com.kakao.sdk.common.KakaoSdk
 import com.kakao.sdk.common.util.Utility
@@ -30,6 +36,27 @@ class LoginActivity : AppCompatActivity() {
     private  val TAG = "LoginActivity"
     private lateinit var binding : LoginBinding
     lateinit var kakaoCallback: (OAuthToken?, Throwable?) -> Unit
+    private val googleSignInClient: GoogleSignInClient by lazy { getGoogleClient() }
+    private val googleAuthLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+        val task = GoogleSignIn.getSignedInAccountFromIntent(result.data)
+
+        try {
+            val account = task.getResult(ApiException::class.java)
+
+            // 이름, 이메일 등이 필요하다면 아래와 같이 account를 통해 각 메소드를 불러올 수 있다.
+            val email = account.email
+            val serverAuth = account.serverAuthCode
+            Log.d(TAG, "구글 로그인 실패: ")
+            if (email != null) {
+                socialLoginRequest(email)
+            } else{
+                Log.d(TAG, "구글 로그인 실패: ")
+            }
+
+        } catch (e: ApiException) {
+            Log.e(LoginActivity::class.java.simpleName, e.stackTraceToString())
+        }
+    }
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.login)
@@ -97,7 +124,7 @@ class LoginActivity : AppCompatActivity() {
             startActivity(intent)
         }
         binding.googleLoginButton.setOnClickListener {
-
+            requestGoogleLogin()
         }
         binding.naverLoginButton.setOnClickListener {
 
@@ -154,7 +181,21 @@ class LoginActivity : AppCompatActivity() {
             }
         }
     }
+    private fun requestGoogleLogin() {
+        googleSignInClient.signOut()
+        val signInIntent = googleSignInClient.signInIntent
+        googleAuthLauncher.launch(signInIntent)
+    }
 
+    private fun getGoogleClient(): GoogleSignInClient {
+        val googleSignInOption = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+            .requestScopes(Scope("https://www.googleapis.com/auth/pubsub"))
+            .requestServerAuthCode(getString(R.string.GOOGLE_API_KEY)) // string 파일에 저장해둔 client id 를 이용해 server authcode를 요청한다.
+            .requestEmail() // 이메일도 요청할 수 있다.
+            .build()
+
+        return GoogleSignIn.getClient(applicationContext, googleSignInOption)
+    }
 
 }
 
