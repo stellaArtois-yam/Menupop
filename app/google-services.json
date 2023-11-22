@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "449200691212",
+    "project_id": "menupop-405900",
+    "storage_bucket": "menupop-405900.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:449200691212:android:da11071f61eb3b90393629",
+        "android_client_info": {
+          "package_name": "com.example.menupop"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "449200691212-0te0712ciupk7q3kguabnr34aclb5opm.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.menupop",
+            "certificate_hash": "832e0372f099771e7aa90bea9cfc7de33aca50c6"
+          }
+        },
+        {
+          "client_id": "449200691212-qh37imbkld085r2d0aks63ci7nq63g28.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAYUa717Mduf3OowyrCzQNei_Dx0iruTCw"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "449200691212-qh37imbkld085r2d0aks63ci7nq63g28.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

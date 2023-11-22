@@ -68,5 +68,26 @@ fun requestLogin(id: String, password: String, callback: (LoginResponseModel) ->
         editor.putInt("identifier",identifier)
         editor.apply()
     }
+    fun socialAccountMergeLocalAccount(identifier: Int,callback: (LoginResponseModel) -> Unit){
+        service.socialAccountMergeLocalAccount(identifier).enqueue(object : Callback<LoginResponseModel>{
+            override fun onResponse(
+                call: Call<LoginResponseModel>,
+                response: Response<LoginResponseModel>
+            ) {
+                if (response.isSuccessful) {
+                    callback(response.body()!!)
+                } else {
+                    callback(LoginResponseModel(0, 0, "failed"))
+                }
+            }
+
+            override fun onFailure(call: Call<LoginResponseModel>, t: Throwable) {
+                Log.d(TAG, "onFailure: ${t.toString()}")
+                callback(LoginResponseModel(0, 0, "failed"))
+
+            }
+
+        })
+    }
 }
 

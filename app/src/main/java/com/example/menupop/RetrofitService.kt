@@ -48,5 +48,8 @@ interface RetrofitService {
     @POST("socialLogin.php")
     @FormUrlEncoded
     fun socialLoginRequest(@Field("email") email : String,@Field("identifier") identifier: Int) : Call<LoginResponseModel>
+    @POST("socialAccountMergeLocalAccount.php")
+    @FormUrlEncoded
+    fun socialAccountMergeLocalAccount(@Field("identifier") identifier : Int) : Call<LoginResponseModel>
 
 }

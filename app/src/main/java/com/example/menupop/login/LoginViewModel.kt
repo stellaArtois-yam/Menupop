@@ -10,6 +10,7 @@ class LoginViewModel : ViewModel() {
     private var loginInfomation = MutableLiveData<LoginResponseModel>()
     private var loginModel = LoginModel()
     private  var callback:((LoginResponseModel) -> Unit) ?= null
+    val mergeAccount = MutableLiveData<LoginResponseModel>()
     val TAG = "LoginViewModel"
     val loginResult: LiveData<LoginResponseModel>
         get() = loginInfomation
@@ -30,6 +31,13 @@ class LoginViewModel : ViewModel() {
             socialLoginResult.value = socialloginResponse
         }
         loginModel.socialLoginRequest(email,callback!!)
+    }
+    fun socialAccountMergeLocalAccount(identifier: Int){
+        callback = {mergeAccountResponse ->
+            Log.d(TAG, "socialLoginRequest: 들어옴")
+            mergeAccount.value = mergeAccountResponse
+        }
+        loginModel.socialAccountMergeLocalAccount(identifier,callback!!)
     }
 
 }

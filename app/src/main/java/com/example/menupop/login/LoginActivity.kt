@@ -1,33 +1,43 @@
 package com.example.menupop.login
 
+import android.R.attr.data
 import android.app.Dialog
 import android.content.Intent
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
 import android.view.Window
+import android.widget.Button
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
-import com.example.menupop.FoodPreferenceFragment
 import com.example.menupop.MainActivity
 import com.example.menupop.R
 import com.example.menupop.SignupActivity
-import com.example.menupop.resetPassword.ResetPasswordActivity
 import com.example.menupop.databinding.LoginBinding
 import com.example.menupop.findId.FindIdActivity
+import com.example.menupop.resetPassword.ResetPasswordActivity
 import com.google.android.gms.auth.api.signin.GoogleSignIn
+import com.google.android.gms.auth.api.signin.GoogleSignInAccount
 import com.google.android.gms.auth.api.signin.GoogleSignInClient
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.android.gms.common.api.ApiException
 import com.google.android.gms.common.api.Scope
+import com.google.android.gms.tasks.Task
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.GoogleAuthProvider
 import com.kakao.sdk.auth.model.OAuthToken
 import com.kakao.sdk.common.KakaoSdk
 import com.kakao.sdk.common.util.Utility
 import com.kakao.sdk.user.UserApiClient
+import com.navercorp.nid.NaverIdLoginSDK
+import com.navercorp.nid.oauth.NidOAuthLogin
+import com.navercorp.nid.oauth.OAuthLoginCallback
+import com.navercorp.nid.profile.NidProfileCallback
+import com.navercorp.nid.profile.data.NidProfileResponse
 import kotlinx.coroutines.launch
 
 
@@ -37,33 +47,38 @@ class LoginActivity : AppCompatActivity() {
     private lateinit var binding : LoginBinding
     lateinit var kakaoCallback: (OAuthToken?, Throwable?) -> Unit
     private val googleSignInClient: GoogleSignInClient by lazy { getGoogleClient() }
+    private var mGoogleSignInClient: GoogleSignInClient? = null
+    private var mAuth: FirebaseAuth? = null
     private val googleAuthLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
-        val task = GoogleSignIn.getSignedInAccountFromIntent(result.data)
-
+        val task: Task<GoogleSignInAccount> = GoogleSignIn.getSignedInAccountFromIntent(result.data)
         try {
-            val account = task.getResult(ApiException::class.java)
-
-            // 이름, 이메일 등이 필요하다면 아래와 같이 account를 통해 각 메소드를 불러올 수 있다.
-            val email = account.email
-            val serverAuth = account.serverAuthCode
-            Log.d(TAG, "구글 로그인 실패: ")
-            if (email != null) {
-                socialLoginRequest(email)
-            } else{
-                Log.d(TAG, "구글 로그인 실패: ")
-            }
-
+            // Google Sign In was successful, authenticate with Firebase
+            val account: GoogleSignInAccount = task.getResult(ApiException::class.java)
+            firebaseAuthWithGoogle(account)
         } catch (e: ApiException) {
-            Log.e(LoginActivity::class.java.simpleName, e.stackTraceToString())
+            // Google Sign In failed, update UI appropriately
+            Log.w(TAG, "Google sign in failed", e)
+            Toast.makeText(applicationContext, "Google sign in Failed", Toast.LENGTH_LONG).show()
         }
     }
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.login)
 
+        IdentitySaveCheck()
+
         init()
 
         initOnClickListener()
+
+        loginViewModel.mergeAccount.observe(this){ result ->
+            Log.d(TAG, "onCreate: ${result}")
+            if(result.result == "success"){
+                var sharedPreferences = getSharedPreferences("userInfo", MODE_PRIVATE)
+                loginViewModel.saveIdentifier(sharedPreferences,result.identifier)
+                isNewUserCheck(result.isNewUser)
+            }
+        }
 
 
         loginViewModel.loginResult.observe(this, Observer { it ->
@@ -78,9 +93,15 @@ class LoginActivity : AppCompatActivity() {
         })
         loginViewModel.socialLoginResult.observe(this){ result ->
             Log.d(TAG, "onCreate: ${result.isNewUser} ${result.identifier} ${result.result}")
-            var sharedPreferences = getSharedPreferences("userInfo", MODE_PRIVATE)
-            loginViewModel.saveIdentifier(sharedPreferences,result.identifier)
-            isNewUserCheck(result.isNewUser)
+            if(result.result == "local_login"){
+                showSocialWarningDialog(result.identifier)
+            } else if(result.result == "failed"){
+                Toast.makeText(this,"잠시 후 다시 시도해주세요.",Toast.LENGTH_SHORT).show()
+            } else {
+                var sharedPreferences = getSharedPreferences("userInfo", MODE_PRIVATE)
+                loginViewModel.saveIdentifier(sharedPreferences,result.identifier)
+                isNewUserCheck(result.isNewUser)
+            }
         }
     }
     fun init() {
@@ -98,6 +119,16 @@ class LoginActivity : AppCompatActivity() {
         }
         var intent = Intent(this, MainActivity :: class.java)
         startActivity(intent)
+        finish()
+    }
+    private fun IdentitySaveCheck(){
+        var sharedPreferences = getSharedPreferences("userInfo", MODE_PRIVATE)
+        val identifier = sharedPreferences.getInt("identifier",0)
+        if(identifier != 0){
+            var intent = Intent(this, MainActivity :: class.java)
+            startActivity(intent)
+            finish()
+        }
     }
     private fun initOnClickListener(){
         binding.loginButton.setOnClickListener {
@@ -124,10 +155,10 @@ class LoginActivity : AppCompatActivity() {
             startActivity(intent)
         }
         binding.googleLoginButton.setOnClickListener {
-            requestGoogleLogin()
+            signIn()
         }
         binding.naverLoginButton.setOnClickListener {
-
+            requestNaverLogin()
         }
         binding.kakaoLoginButton.setOnClickListener {
             kakaoLoginRequest()
@@ -142,6 +173,18 @@ class LoginActivity : AppCompatActivity() {
         KakaoSdk.init(this,getString(R.string.KAKAO_NATIVE_APP_KEY))
         setKakaoCallback()
         btnKakaoLogin()
+    }
+    private fun showSocialWarningDialog(identifier:Int) {
+        val dialog = Dialog(this)
+        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
+        dialog.setContentView(R.layout.dialog_account_merge)
+        dialog.show()
+        dialog.findViewById<Button>(R.id.account_merge_agree).setOnClickListener {
+            loginViewModel.socialAccountMergeLocalAccount(identifier)
+        }
+        dialog.findViewById<Button>(R.id.account_merge_disagree).setOnClickListener {
+            dialog.dismiss()
+        }
     }
     private fun showCustomDialog() {
         val dialog = Dialog(this)
@@ -196,6 +239,78 @@ class LoginActivity : AppCompatActivity() {
 
         return GoogleSignIn.getClient(applicationContext, googleSignInOption)
     }
+    private fun signIn() {
+        val gso = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+            .requestIdToken(getString(R.string.GOOGLE_API_KEY))
+            .requestProfile()
+            .requestEmail()
+            .build()
+        mGoogleSignInClient = GoogleSignIn.getClient(this, gso)
+        // [END config_signin]
 
-}
+        // [START initialize_auth]
+        // Initialize Firebase Auth
+        mAuth = FirebaseAuth.getInstance()
+        val signInIntent: Intent = mGoogleSignInClient!!.getSignInIntent()
+        googleAuthLauncher.launch(signInIntent)
+    }
+    private fun firebaseAuthWithGoogle(acct:GoogleSignInAccount ) {
+        Log.d(TAG, "firebaseAuthWithGoogle:" + acct.getId());
+        // [START_EXCLUDE silent]
+        //showProgressDialog();
+        // [END_EXCLUDE]
+
+        var  credential = GoogleAuthProvider.getCredential(acct.getIdToken(), null);
+        mAuth?.signInWithCredential(credential)?.addOnCompleteListener { result ->
+            if(result.isSuccessful){
+                Log.d(TAG, "signInWithCredential:success")
+                val user = mAuth!!.currentUser
+                Log.d(TAG, "onComplete: " + user!!.email)
+            }
+        }
+            }
+    private fun requestNaverLogin(){
+        val naverClientId = getString(R.string.social_login_info_naver_client_id)
+        val naverClientSecret = getString(R.string.social_login_info_naver_client_secret)
+        val naverClientName = getString(R.string.social_login_info_naver_client_name)
+        NaverIdLoginSDK.initialize(this, naverClientId, naverClientSecret , naverClientName)
+        var naverToken :String? = ""
+
+        val profileCallback = object : NidProfileCallback<NidProfileResponse> {
+            override fun onSuccess(response: NidProfileResponse) {
+                val email = response.profile?.email
+                loginViewModel.socialLoginRequest(email!!)
+            }
+            override fun onFailure(httpStatus: Int, message: String) {
+                val errorCode = NaverIdLoginSDK.getLastErrorCode().code
+                val errorDescription = NaverIdLoginSDK.getLastErrorDescription()
+                Log.d(TAG, "onFailure: ${errorCode} ${errorDescription}")
+            }
+            override fun onError(errorCode: Int, message: String) {
+                onFailure(errorCode, message)
+            }
+        }
+
+        /** OAuthLoginCallback을 authenticate() 메서드 호출 시 파라미터로 전달하거나 NidOAuthLoginButton 객체에 등록하면 인증이 종료되는 것을 확인할 수 있습니다. */
+        val oauthLoginCallback = object : OAuthLoginCallback {
+            override fun onSuccess() {
+                // 네이버 로그인 인증이 성공했을 때 수행할 코드 추가
+                naverToken = NaverIdLoginSDK.getAccessToken()
+
+                //로그인 유저 정보 가져오기
+                NidOAuthLogin().callProfileApi(profileCallback)
+            }
+            override fun onFailure(httpStatus: Int, message: String) {
+                val errorCode = NaverIdLoginSDK.getLastErrorCode().code
+                val errorDescription = NaverIdLoginSDK.getLastErrorDescription()
+                Log.d(TAG, "onFailure: ${errorCode} ${errorDescription}")
+            }
+            override fun onError(errorCode: Int, message: String) {
+                onFailure(errorCode, message)
+            }
+        }
+
+        NaverIdLoginSDK.authenticate(this, oauthLoginCallback)
+    }
+    }
 
