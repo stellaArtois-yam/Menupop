@@ -280,6 +280,7 @@ class LoginActivity : AppCompatActivity() {
             override fun onSuccess(response: NidProfileResponse) {
                 val email = response.profile?.email
                 loginViewModel.socialLoginRequest(email!!)
+                Log.d(TAG, "onSuccess: ${email}")
             }
             override fun onFailure(httpStatus: Int, message: String) {
                 val errorCode = NaverIdLoginSDK.getLastErrorCode().code

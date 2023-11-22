@@ -70,6 +70,7 @@
                android:layout_weight="0.5"
                android:background="@drawable/profile_button"
                android:backgroundTint="@color/button_gray"
+               android:textAlignment="center"
 
                android:entries="@array/country"
 
@@ -112,6 +113,7 @@
                android:layout_weight="0.5"
                android:background="@drawable/profile_button"
                android:backgroundTint="@color/button_gray"
+               android:textAlignment="center"
 
                android:entries="@array/country"
 
@@ -147,15 +149,17 @@
                android:layout_marginStart="30dp"
                android:layout_marginEnd="30dp"/>
 
-           <Spinner
-               android:id="@+id/exchange_standard_spinner"
+           <TextView
+               android:id="@+id/exchange_standard_textview"
                android:layout_width="0dp"
                android:layout_height="@dimen/standard_height"
                android:layout_weight="0.5"
                android:background="@drawable/profile_button"
                android:backgroundTint="@color/button_gray"
-
-               android:entries="@array/country"
+               android:text="기준 환율"
+               android:textColor="@color/black"
+               android:textAlignment="center"
+               android:gravity="center"
 
                android:layout_marginEnd="30dp"/>
        </LinearLayout>
