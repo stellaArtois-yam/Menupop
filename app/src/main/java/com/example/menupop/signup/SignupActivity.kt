@@ -278,7 +278,8 @@ class SignupActivity : AppCompatActivity() {
             if(binding.signupSubmitButton.isEnabled){
 
                 val id = binding.signupIdEdittext.text.toString().trim()
-                val password = binding.signupPasswordEdittext.toString().trim().hashCode().toString()
+                val password = binding.signupPasswordEdittext.text.toString().trim().hashCode().toString()
+                Log.d(TAG, "password: $password")
                 val email = "${binding.signupEmailIdEdittext.text.toString().trim()}@${binding.signupEmailSelection.selectedItem}"
                 val identifier = id.hashCode()
 
