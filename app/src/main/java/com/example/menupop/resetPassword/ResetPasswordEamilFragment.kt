@@ -80,8 +80,8 @@ class ResetPasswordEamilFragment : Fragment() {
             binding.passwordResetEmailCertificationWarningText.text = "시간 제한 : ${time}"
             if(time == "00:00"){
                 Log.d(TAG, "init: 종료 됨")
-                binding.certificationButton.text = "인증번호"
-                Toast.makeText(context,"인증번호가 만료되었습니다.",Toast.LENGTH_SHORT).show()
+                binding.certificationButton.text = "재인증"
+                binding.passwordResetEmailCertificationWarningText.text = "인증번호가 만료되었습니다."
             }
 
         })
@@ -148,7 +148,7 @@ class ResetPasswordEamilFragment : Fragment() {
             if(resetPasswordViewModel.checkEamilForm.value == false){
                 Toast.makeText(context,"이메일을 제대로 입력해주세요!",Toast.LENGTH_SHORT).show()
             }else {
-                if (binding.certificationButton.text == "인증번호") {
+                if (binding.certificationButton.text == "인증번호" || binding.certificationButton.text == "재인증") {
                     val email =
                         "${binding.passwordResetEmailId.text}@${binding.passwordResetEmailSelection.selectedItem.toString()}"
                     resetPasswordViewModel.checkEmail(email)

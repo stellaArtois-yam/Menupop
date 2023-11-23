@@ -104,7 +104,7 @@ class ResetPasswordConfirmFragment : Fragment() {
 
         binding.passwordResetConfirmButton.setOnClickListener {
             val password = binding.passwordResetEdittext.text.toString()
-            resetPasswordViewModel.resetPassword(password.hashCode().toString())
+            resetPasswordViewModel.resetPassword(password.trim().hashCode().toString())
         }
     }
 
