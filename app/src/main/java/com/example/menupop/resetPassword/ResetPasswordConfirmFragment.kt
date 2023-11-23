@@ -98,8 +98,8 @@ class ResetPasswordConfirmFragment : Fragment() {
         //비밀번호 확인 입력감지
         binding.passwordResetConfirmEdittext.addTextChangedListener{
             val password = binding.passwordResetEdittext.text.toString()
-            val confrimPassword = it.toString()
-            resetPasswordViewModel.onConfirmPasswordTextChanged(password.hashCode().toString(), confrimPassword.hashCode().toString())
+            val confirmPassword = it.toString()
+            resetPasswordViewModel.onConfirmPasswordTextChanged(password, confirmPassword)
         }
 
         binding.passwordResetConfirmButton.setOnClickListener {
