@@ -137,7 +137,7 @@ class LoginActivity : AppCompatActivity() {
                 Toast.makeText(this, "아이디 또는 비밀번호를 입력해주세요.", Toast.LENGTH_SHORT).show()
             } else {
                 lifecycleScope.launch {
-                    loginViewModel.requestLogin(id, password.hashCode().toString())
+                    loginViewModel.requestLogin(id, password.trim().hashCode().toString().toString())
                 }
             }
         }

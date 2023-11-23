@@ -84,7 +84,7 @@ class ResetPasswordModel {
     }
 
     fun resetPassword(id:String,password:String,callback: (String) -> Unit){
-        Log.d(TAG, "resetPassword 호출")
+        Log.d(TAG, "resetPassword 호출 ${id} ${password} ")
         service.resetPassword(id,password).enqueue(object : Callback<String>{
             override fun onResponse(call: Call<String>, response: Response<String>) {
                 Log.d(TAG, "onResponse: ${response}")

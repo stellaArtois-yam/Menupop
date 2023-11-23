@@ -27,11 +27,13 @@ class LoginModel  {
     private val service = retrofit.create(RetrofitService::class.java)
 fun requestLogin(id: String, password: String, callback: (LoginResponseModel) -> Unit) {
     val call: Call<LoginResponseModel> = service.requestLogin(id, password)
+    Log.d(TAG, "requestLogin: ${password}")
 
     call.enqueue(object : Callback<LoginResponseModel> {
         override fun onResponse(call: Call<LoginResponseModel>, response: Response<LoginResponseModel>) {
             if (response.isSuccessful) {
                 callback(response.body()!!)
+                Log.d(TAG, "onResponse: ${response}")
             } else {
                 callback(LoginResponseModel(0, 0, "failed"))
             }
