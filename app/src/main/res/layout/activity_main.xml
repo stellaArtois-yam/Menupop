@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout>
+
+    <data>
+        <variable
+            name="mainActivityViewModel"
+            type="com.example.menupop.mainActivity.MainActivityViewModel" />
+    </data>
+
+
+    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:background="@color/orange">
+
+
+        <include
+            android:id="@+id/appbar_menu"
+            layout="@layout/appbar"
+            android:visibility="gone"/>
+
+        <ProgressBar
+            android:id="@+id/main_progressbar"
+            android:layout_width="@dimen/login_width"
+            android:layout_height="wrap_content"
+            android:layout_weight="0.5"
+            android:layout_gravity="center"
+            style="?android:attr/progressBarStyleHorizontal"/>
+
+
+        <FrameLayout
+            android:id="@+id/home_frame_layout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:visibility="gone"/>
+
+        <com.google.android.material.bottomnavigation.BottomNavigationView
+            android:id="@+id/bottom_navigation"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom"
+            android:background="@color/pale_gray"
+            app:menu="@menu/bottom_navi_menu"
+            android:visibility="gone"/>
+
+
+    </LinearLayout>
+
+</layout>

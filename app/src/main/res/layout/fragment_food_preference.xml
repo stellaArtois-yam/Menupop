@@ -1,32 +1,45 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    tools:context=".mainActivity.FoodPreferenceFragment">
 
-    <LinearLayout
+<layout>
+
+    <data>
+
+        <variable
+            name="mainActivityViewModel"
+            type="com.example.menupop.mainActivity.MainActivityViewModel" />
+    </data>
+
+
+    <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:tools="http://schemas.android.com/tools"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:orientation="vertical"
-        android:gravity="center">
+        tools:context=".mainActivity.FoodPreferenceFragment">
 
-        <androidx.appcompat.widget.SearchView
-            android:id="@+id/food_preference_searchview"
-            android:layout_width="350dp"
-            android:layout_height="@dimen/standard_height"
-            android:background="@drawable/profile_button"
-            android:backgroundTint="@color/pale_gray"
-            android:layout_marginBottom="30dp"
-            android:layout_marginTop="30dp"/>
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:gravity="center"
+            android:orientation="vertical">
 
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/food_preference_recyclerview"
-            android:layout_width="350dp"
-            android:layout_height="match_parent"/>
+            <androidx.appcompat.widget.SearchView
+                android:id="@+id/food_preference_searchview"
+                android:layout_width="350dp"
+                android:layout_height="@dimen/standard_height"
+                android:layout_marginTop="30dp"
+                android:layout_marginBottom="30dp"
+                android:background="@drawable/profile_button"
+                android:backgroundTint="@color/pale_gray" />
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/food_preference_recyclerview"
+                android:layout_width="350dp"
+                android:layout_height="match_parent" />
 
 
-    </LinearLayout>
+        </LinearLayout>
 
 
-</FrameLayout>
+    </FrameLayout>
+
+</layout>

@@ -23,5 +23,9 @@ class FoodPreferenceFragment : Fragment() {
         return inflater.inflate(R.layout.fragment_food_preference, container, false)
     }
 
+    fun init(){
+
+    }
+
 
 }

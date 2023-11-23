@@ -2,6 +2,7 @@ package com.example.menupop
 
 import com.example.menupop.findId.FindIdResponseModel
 import com.example.menupop.login.LoginResponseModel
+import com.example.menupop.mainActivity.UserInformationData
 import retrofit2.Call
 import retrofit2.http.Field
 import retrofit2.http.FormUrlEncoded
@@ -21,6 +22,10 @@ interface RetrofitService {
                  @Field("email") email :String,
                  @Field("identifier") identifier : Int)
     : Call<String>
+
+    @POST("GetUserInformation.php")
+    @FormUrlEncoded
+    fun requestUserInformation(@Field("identifier") identifier: Int) : Call<UserInformationData>
 
     @POST("CheckUserId.php")
     @FormUrlEncoded

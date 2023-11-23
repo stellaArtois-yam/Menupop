@@ -14,9 +14,6 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <include
-        android:id="@+id/appbar_menu"
-        layout="@layout/appbar"/>
 
 
     <TextView
@@ -26,7 +23,7 @@
         android:text="@string/find_id"
 
 
-        app:layout_constraintTop_toBottomOf="@+id/appbar_menu"
+        app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         android:textSize="20dp"
