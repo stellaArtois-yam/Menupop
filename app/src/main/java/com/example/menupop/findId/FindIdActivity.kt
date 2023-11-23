@@ -53,4 +53,8 @@ class FindIdActivity : AppCompatActivity(),FindIdFragmentEvent {
         Log.d(TAG, "finishFindId: 호출")
         finish()
     }
+
+    override fun backButtonClick() {
+        finish()
+    }
 }

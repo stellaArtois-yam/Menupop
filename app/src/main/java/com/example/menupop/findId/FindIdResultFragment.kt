@@ -8,6 +8,8 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageView
+import android.widget.TextView
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
@@ -61,6 +63,8 @@ class FindIdResultFragment : Fragment() {
         binding.findIdViewModel = findIdViewModel
         binding.lifecycleOwner = this
 
+        binding.appbarMenu.findViewById<TextView>(R.id.appbar_status).text = "아이디 확인"
+
 
         findIdViewModel.userIdExistence.observe(viewLifecycleOwner, Observer{ result ->
             Log.d(TAG, "findId Result: ${result.result} ${result.id}")
@@ -89,6 +93,9 @@ class FindIdResultFragment : Fragment() {
     fun setListener(){
         binding.findIdResultButton.setOnClickListener{
             event?.finishFindId()
+        }
+        binding.appbarMenu.findViewById<ImageView>(R.id.appbar_back).setOnClickListener {
+            event?.backButtonClick()
         }
     }
 

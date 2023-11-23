@@ -9,6 +9,8 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.AdapterView
+import android.widget.ImageView
+import android.widget.TextView
 import androidx.core.widget.addTextChangedListener
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.Observer
@@ -64,6 +66,8 @@ class FindIdFragment : Fragment() {
         findIdViewModel = ViewModelProvider(requireActivity()).get(FindIdViewModel::class.java)
         binding.findIdViewModel = findIdViewModel
         binding.lifecycleOwner = this
+
+        binding.appbarMenu.findViewById<TextView>(R.id.appbar_status).text = "아이디 찾기"
 
         Log.d(TAG, "init textview visibility: ${binding.findIdInfoText.visibility}")
 
@@ -134,6 +138,9 @@ class FindIdFragment : Fragment() {
             event?.successFindId()
 
         })
+        binding.appbarMenu.findViewById<ImageView>(R.id.appbar_back).setOnClickListener {
+            event?.backButtonClick()
+        }
 
 
     }
