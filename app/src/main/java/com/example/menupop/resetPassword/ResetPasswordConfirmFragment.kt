@@ -7,6 +7,8 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageView
+import android.widget.TextView
 import android.widget.Toast
 import androidx.core.widget.addTextChangedListener
 import androidx.databinding.DataBindingUtil
@@ -56,6 +58,7 @@ class ResetPasswordConfirmFragment : Fragment() {
     }
 
     fun init() {
+        binding.appbarMenu.findViewById<TextView>(R.id.appbar_status).text = "비밀번호 재설정"
         resetPasswordViewModel =
             ViewModelProvider(requireActivity()).get(ResetPasswordViewModel::class.java)
         binding.resetPasswordViewModel = resetPasswordViewModel
@@ -105,6 +108,9 @@ class ResetPasswordConfirmFragment : Fragment() {
         binding.passwordResetConfirmButton.setOnClickListener {
             val password = binding.passwordResetEdittext.text.toString()
             resetPasswordViewModel.resetPassword(password.trim().hashCode().toString())
+        }
+        binding.appbarMenu.findViewById<ImageView>(R.id.appbar_back).setOnClickListener {
+            event?.backBtnClick()
         }
     }
 

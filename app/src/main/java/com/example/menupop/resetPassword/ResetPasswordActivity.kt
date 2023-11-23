@@ -62,4 +62,9 @@ class ResetPasswordActivity : AppCompatActivity(),ResetPasswordFragmentEvent {
         finish()
     }
 
+    override fun backBtnClick() {
+        Log.d(TAG, "backBtnClick: 호출됨")
+        finish()
+    }
+
 }
