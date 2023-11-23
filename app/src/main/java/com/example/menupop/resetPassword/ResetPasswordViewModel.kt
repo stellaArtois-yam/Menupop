@@ -48,7 +48,7 @@ class ResetPasswordViewModel : ViewModel() {
     // 타이머를 시작하는 메서드
     fun startTimer() {
         // 3분(180초)으로 초기화
-        val initialTime = TimeUnit.MINUTES.toMillis(3)
+        val initialTime = TimeUnit.MINUTES.toMillis(1)
 
         timer = object : CountDownTimer(initialTime, 1000) {
             override fun onTick(millisUntilFinished: Long) {

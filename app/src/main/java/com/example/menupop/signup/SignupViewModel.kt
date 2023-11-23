@@ -264,7 +264,7 @@ class SignupViewModel : ViewModel() {
         Log.d(TAG, "checkEmailForm: ${checkEmailForm.value}")
         Log.d(TAG, "password: ${_isValidPassword.value}")
         Log.d(TAG, "passwordConfirm: ${_isValidPasswordConfirm.value}")
-        Log.d(TAG, "verifyComplete: ${verifyCompleted.value}")
+        Log.d(TAG, "verifyCompleted: ")
 
         if(isValidId.value == true && _checkEmailForm.value == true &&
             _passwordWarning.value == null && _confirmPasswordWarning.value == null &&
