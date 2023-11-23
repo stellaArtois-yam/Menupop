@@ -60,9 +60,14 @@ class FindIdFragment : Fragment() {
     }
 
     fun init(){
+        Log.d(TAG, "init: 호출")
         findIdViewModel = ViewModelProvider(requireActivity()).get(FindIdViewModel::class.java)
         binding.findIdViewModel = findIdViewModel
         binding.lifecycleOwner = this
+
+        Log.d(TAG, "init textview visibility: ${binding.findIdInfoText.visibility}")
+
+
 
         findIdViewModel.checkEmailForm.observe(viewLifecycleOwner, Observer {
             Log.d(TAG, "이메일 유효성 검사: $it")

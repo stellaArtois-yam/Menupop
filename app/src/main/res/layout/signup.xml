@@ -225,7 +225,7 @@
             android:textSize="16sp"
             android:layout_marginTop="10dp"
 
-            android:enabled="@{viewModel.isEnableButton}"
+            android:enabled="@{viewModel.isEmailButton}"
 
             app:layout_constraintTop_toBottomOf="@id/signup_email_warning"
             app:layout_constraintStart_toEndOf="@id/signup_certification_edittext"
@@ -236,7 +236,6 @@
             android:layout_width="@dimen/signup_password_and_warning_width"
             android:layout_height="@dimen/signup_warning_height"
 
-            android:text="시간 제한 3:00"
             android:textColor="@color/red"
             android:textSize="15.5sp"
             android:gravity="center_vertical"
@@ -338,10 +337,12 @@
             android:background="@drawable/button_round"
             android:backgroundTint="@color/orange"
 
+
             android:text="가입하기"
             android:textColor="@color/white"
             android:textStyle="bold"
             android:textSize="18sp"
+
 
             app:layout_constraintTop_toBottomOf="@id/signup_marketing_information"
             app:layout_constraintStart_toStartOf="parent"

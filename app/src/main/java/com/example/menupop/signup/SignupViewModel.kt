@@ -18,7 +18,7 @@ class SignupViewModel : ViewModel() {
     var signupModel  = SignupModel()
     private var callback: ((String) -> Unit) ?= null // 콜백
 
-    private val _isSignupEnabled = MutableLiveData<Boolean>().apply { value = false }
+//    private val _isSignupEnabled = MutableLiveData<Boolean>().apply { value = false }
 
 
     /**
@@ -145,7 +145,7 @@ class SignupViewModel : ViewModel() {
      */
 
     private val _isEmailButton = MutableLiveData<Boolean>()
-    val isEnableButton : LiveData<Boolean>
+    val isEmailButton : LiveData<Boolean>
         get() = _isEmailButton
 
     val _checkEmailForm = MutableLiveData<Boolean>()
@@ -212,7 +212,6 @@ class SignupViewModel : ViewModel() {
         val result = this.verifyCode == verifyCode
         Log.d(TAG, "result : $result")
         verifyCompleted.value = result
-//        _emailWarning.value = "인증 완료"
 
     }
 
@@ -224,8 +223,7 @@ class SignupViewModel : ViewModel() {
     // 타이머를 시작하는 메서드
     fun startTimer() {
         // 3분(180초)으로 초기화
-        val initialTime = TimeUnit.MINUTES.toMillis(3)
-
+        val initialTime = TimeUnit.MINUTES.toMillis(1)
         timer = object : CountDownTimer(initialTime, 1000) {
             override fun onTick(millisUntilFinished: Long) {
                 // 남은 시간을 LiveData에 업데이트
@@ -235,9 +233,8 @@ class SignupViewModel : ViewModel() {
             }
 
             override fun onFinish() {
-                // 타이머가 종료되면 남은 시간을 00:00으로 설정
-                remainingTime.value = "00:00"
-                _emailWarning.value = "인증번호가 만료되었습니다."
+                // 타이머가 종료되면 인증번호 만료
+                remainingTime.value = "인증번호가 만료되었습니다."
 
             }
         }
@@ -256,19 +253,27 @@ class SignupViewModel : ViewModel() {
         super.onCleared()
     }
 
-    init {
-        // 기본적으로 가입 버튼 비활성화
-        _isSignupEnabled.value = false
+//    init {
+//        // 기본적으로 가입 버튼 비활성화
+//        _isSignupEnabled.value = false
+//
+//    }
 
-    }
+    fun checkUserInformation() : Boolean{
+        Log.d(TAG, "isValidId: ${isValidId.value}")
+        Log.d(TAG, "checkEmailForm: ${checkEmailForm.value}")
+        Log.d(TAG, "password: ${_isValidPassword.value}")
+        Log.d(TAG, "passwordConfirm: ${_isValidPasswordConfirm.value}")
+        Log.d(TAG, "verifyComplete: ${verifyCompleted.value}")
 
-    fun checkUserInformation(){
-        if(_idWarning.value == null && _checkEmailForm.value == true &&
+        if(isValidId.value == true && _checkEmailForm.value == true &&
             _passwordWarning.value == null && _confirmPasswordWarning.value == null &&
             verifyCompleted.value == true){
             
-            _isSignupEnabled.value = true
-            Log.d(TAG, "checkUserInformation: true")
+//            _isSignupEnabled.value = true
+            return true
+        }else{
+            return false
         }
 
     }

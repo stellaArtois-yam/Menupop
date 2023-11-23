@@ -15,9 +15,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-        <include
-            android:id="@+id/appbar_menu"
-            layout="@layout/appbar"/>
+
 
         <FrameLayout
             android:id="@+id/find_id_frame_layout"

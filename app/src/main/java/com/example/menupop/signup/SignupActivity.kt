@@ -251,12 +251,14 @@ class SignupActivity : AppCompatActivity() {
         })
 
         signupViewModel.remainingTime.observe(this, Observer { time ->
-            binding.signupCertificationWarning.text = "시간 제한 : ${time}"
 
-            if (time == "00:00") {
+            if (time.contains("만료")) {
                 Log.d(TAG, "timer 종료")
+                binding.signupCertificationWarning.text = "인증번호가 만료되었습니다."
                 binding.signupCertificationButton.text = "재인증"
                 binding.signupSubmitButton.isEnabled = false
+            }else{
+                binding.signupCertificationWarning.text = "시간 제한 : ${time}"
             }
 
         })
@@ -273,9 +275,9 @@ class SignupActivity : AppCompatActivity() {
 
         // 가입 버튼 리스너 설정
         binding.signupSubmitButton.setOnClickListener {
-            signupViewModel.checkUserInformation()
 
-            if(binding.signupSubmitButton.isEnabled){
+            if(signupViewModel.checkUserInformation()){
+                Log.d(TAG, "checkUserInfo true")
 
                 val id = binding.signupIdEdittext.text.toString().trim()
                 val password = binding.signupPasswordEdittext.text.toString().trim().hashCode().toString()
@@ -285,6 +287,8 @@ class SignupActivity : AppCompatActivity() {
 
                 signupViewModel.sendUserInformation(id, password, email, identifier)
             }else{
+                Log.d(TAG, "checkUserInfo false")
+
                 Toast.makeText(this, "입력하지 않은 항목이 있습니다.",Toast.LENGTH_LONG).show()
             }
         }
