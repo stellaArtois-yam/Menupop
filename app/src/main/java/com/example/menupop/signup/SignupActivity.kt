@@ -41,7 +41,9 @@ class SignupActivity : AppCompatActivity() {
 
         binding.appbarMenu.findViewById<TextView>(R.id.appbar_status).text="회원가입"
 
-        binding.appbarMenu.findViewById<ImageView>(R.id.appbar_back).visibility = View.GONE
+        binding.appbarMenu.findViewById<ImageView>(R.id.appbar_back).setOnClickListener {
+            finish()
+        }
 
 
 
