@@ -4,4 +4,5 @@ interface ResetPasswordFragmentEvent {
     fun existId()
     fun successVerifyEmail()
     fun successResetPassword()
+    fun backBtnClick()
 }

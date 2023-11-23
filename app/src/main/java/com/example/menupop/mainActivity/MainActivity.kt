@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.util.Log
 import android.view.MenuItem
 import android.view.View
+import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.Observer
@@ -60,6 +61,7 @@ class MainActivity : AppCompatActivity(){
                 supportFragmentManager.beginTransaction().apply {
                     replace(R.id.home_frame_layout,foodPreferenceFragment)
                     commit()
+                    binding.appbarMenu.findViewById<TextView>(R.id.appbar_status).text = "음식 등록"
                 }
 
             }else{
@@ -83,6 +85,7 @@ class MainActivity : AppCompatActivity(){
                     supportFragmentManager.beginTransaction()
                         .replace(R.id.home_frame_layout, FoodPreferenceFragment())
                         .commit()
+                    binding.appbarMenu.findViewById<TextView>(R.id.appbar_status).text = "음식 등록"
                     return true
                 }
 //                R.id.camera -> {
@@ -95,12 +98,14 @@ class MainActivity : AppCompatActivity(){
                     supportFragmentManager.beginTransaction()
                         .replace(R.id.home_frame_layout, ExchangeFragment())
                         .commit()
+                    binding.appbarMenu.findViewById<TextView>(R.id.appbar_status).text = "환율"
                     return true
                 }
                 R.id.tab_profile -> {
                     supportFragmentManager.beginTransaction()
                         .replace(R.id.home_frame_layout, ProfileFragment())
                         .commit()
+                    binding.appbarMenu.findViewById<TextView>(R.id.appbar_status).text = "프로필 확인"
                     return true
                 }
             }

@@ -6,6 +6,8 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageView
+import android.widget.TextView
 import android.widget.Toast
 import androidx.core.widget.addTextChangedListener
 import androidx.databinding.DataBindingUtil
@@ -59,6 +61,7 @@ class ResetPasswordCheckIdFragment : Fragment() {
 
     }
     fun init() {
+        binding.appbarMenu.findViewById<TextView>(R.id.appbar_status).text = "아이디 확인"
         resetPasswordViewModel = ViewModelProvider(requireActivity()).get(ResetPasswordViewModel::class.java)
         binding.resetPasswordViewModel = resetPasswordViewModel
         binding.lifecycleOwner = this
@@ -88,6 +91,9 @@ class ResetPasswordCheckIdFragment : Fragment() {
         }
         binding.passwordResetIdCheckEdittext.addTextChangedListener{
             binding.passwordResetCheckIdWarning.visibility = View.GONE
+        }
+        binding.appbarMenu.findViewById<ImageView>(R.id.appbar_back).setOnClickListener {
+            event?.backBtnClick()
         }
     }
 }

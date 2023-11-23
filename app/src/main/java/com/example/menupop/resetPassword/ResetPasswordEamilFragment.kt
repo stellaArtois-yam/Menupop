@@ -8,6 +8,8 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.AdapterView
+import android.widget.ImageView
+import android.widget.TextView
 import android.widget.Toast
 import androidx.core.widget.addTextChangedListener
 import androidx.databinding.DataBindingUtil
@@ -64,6 +66,7 @@ class ResetPasswordEamilFragment : Fragment() {
         resetPasswordViewModel = ViewModelProvider(requireActivity()).get(ResetPasswordViewModel::class.java)
         binding.resetPasswordViewModel = resetPasswordViewModel
         binding.lifecycleOwner = this
+        binding.appbarMenu.findViewById<TextView>(R.id.appbar_status).text = "비밀번호 재설정"
 
         resetPasswordViewModel.checkEamilForm.observe(viewLifecycleOwner, Observer { result ->
             Log.d(TAG, "이메일 형식 확인 ${result}")
@@ -142,6 +145,9 @@ class ResetPasswordEamilFragment : Fragment() {
                 // Nothing to do
             }
 
+        }
+        binding.appbarMenu.findViewById<ImageView>(R.id.appbar_back).setOnClickListener {
+            event?.backBtnClick()
         }
 
         binding.certificationButton.setOnClickListener {
