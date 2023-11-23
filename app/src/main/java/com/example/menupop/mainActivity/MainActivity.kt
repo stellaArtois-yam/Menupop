@@ -53,7 +53,6 @@ class MainActivity : AppCompatActivity(){
 
         mainActivityViewModel.isLoading.observe(this, Observer {
             if(it){
-                //로딩을 멈추고 넘어간다
 
                 binding.appbarMenu.visibility = View.VISIBLE
                 binding.homeFrameLayout.visibility = View.VISIBLE

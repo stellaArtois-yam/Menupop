@@ -12,30 +12,27 @@
         xmlns:app="http://schemas.android.com/apk/res-auto"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:orientation="vertical"
-        android:background="@color/orange">
+        android:orientation="vertical">
 
 
         <include
             android:id="@+id/appbar_menu"
-            layout="@layout/appbar"
-            android:visibility="gone"/>
+            layout="@layout/appbar"/>
 
-        <ProgressBar
-            android:id="@+id/main_progressbar"
-            android:layout_width="@dimen/login_width"
-            android:layout_height="wrap_content"
-            android:layout_weight="0.5"
-            android:layout_gravity="center"
-            style="?android:attr/progressBarStyleHorizontal"/>
+<!--        <ProgressBar-->
+<!--            android:id="@+id/main_progressbar"-->
+<!--            android:layout_width="@dimen/login_width"-->
+<!--            android:layout_height="wrap_content"-->
+<!--            android:layout_weight="0.5"-->
+<!--            android:layout_gravity="center"-->
+<!--            style="?android:attr/progressBarStyleHorizontal"/>-->
 
 
         <FrameLayout
             android:id="@+id/home_frame_layout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:visibility="gone"/>
+            android:layout_weight="1" />
 
         <com.google.android.material.bottomnavigation.BottomNavigationView
             android:id="@+id/bottom_navigation"
@@ -43,8 +40,7 @@
             android:layout_height="wrap_content"
             android:layout_gravity="bottom"
             android:background="@color/pale_gray"
-            app:menu="@menu/bottom_navi_menu"
-            android:visibility="gone"/>
+            app:menu="@menu/bottom_navi_menu"/>
 
 
     </LinearLayout>
