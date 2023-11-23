@@ -19,6 +19,9 @@ class MainActivityViewModel: ViewModel() {
         get() = _isLoading
 
     private val _userInformation = MutableLiveData<UserInformationData>()
+    val userInformation : LiveData<UserInformationData>
+        get() = _userInformation
+
 
     fun getUserInfo(sharedPreferences: SharedPreferences) : Int{
         val identifier = mainActivityModel.getUserInfo(sharedPreferences)
