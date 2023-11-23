@@ -10,6 +10,7 @@ import android.util.Log
 import android.view.View
 import android.view.Window
 import android.widget.AdapterView
+import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
@@ -38,6 +39,9 @@ class SignupActivity : AppCompatActivity() {
         binding.viewModel = signupViewModel
         binding.lifecycleOwner = this
 
+        binding.appbarMenu.findViewById<TextView>(R.id.appbar_status).text="회원가입"
+
+        binding.appbarMenu.findViewById<ImageView>(R.id.appbar_back).visibility = View.GONE
 
 
 

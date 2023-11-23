@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.util.Log
 import android.view.MenuItem
 import android.view.View
+import android.widget.ImageView
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
@@ -45,7 +46,9 @@ class MainActivity : AppCompatActivity(){
         binding.mainActivityViewModel = mainActivityViewModel
         binding.lifecycleOwner = this
 
+        binding.appbarMenu.findViewById<ImageView>(R.id.appbar_back).visibility = View.GONE
 
+        binding.appbarMenu.findViewById<TextView>(R.id.appbar_status).text = "음식 등록"
 
         var sharedPreferences = getSharedPreferences("userInfo", MODE_PRIVATE)
         val identifier = mainActivityViewModel.getUserInfo(sharedPreferences)
@@ -61,7 +64,6 @@ class MainActivity : AppCompatActivity(){
                 supportFragmentManager.beginTransaction().apply {
                     replace(R.id.home_frame_layout,foodPreferenceFragment)
                     commit()
-                    binding.appbarMenu.findViewById<TextView>(R.id.appbar_status).text = "음식 등록"
                 }
 
             }else{
