@@ -13,9 +13,13 @@ class ExchangeViewModel : ViewModel() {
     val isPossible = MutableLiveData<Boolean>()
     var data = ArrayList<ExchangeDataClass.ExchangeDataClassItem>()
     val exchangeModel : ExchangeModel = ExchangeModel()
-    var result = MutableLiveData<String>()
+    private var _result = MutableLiveData<String>()
+    val result :LiveData<String>
+        get() = _result
 
-    val formattedNumber = MutableLiveData<String>()
+    private var _formattedNumber = MutableLiveData<String>()
+    val formattedNumber:LiveData<String>
+        get() = _formattedNumber
     var checkCurrency = false
     fun requestExchangeRate(authKey : String){
         callback = {
@@ -23,8 +27,8 @@ class ExchangeViewModel : ViewModel() {
             Log.d(TAG, "requestExchangeRate: ${data}")
 //            isPossible.value = data != null
         }
-        result.value = "0.0"
-        formattedNumber.value = "1000"
+        _result.value = "0"
+        _formattedNumber.value = "1000"
         exchangeModel.requestExchangeRate(authKey, callback!!)
 
     }
@@ -54,7 +58,7 @@ class ExchangeViewModel : ViewModel() {
         Log.d(TAG, "calculateExchange:${baseRate} ${targetRate} ")
 
         if (baseRate != null && targetRate != null && amount != null) {
-            result.value = String.format("%.1f",amount / baseRate.toDouble() * targetRate.toDouble())
+            _result.value = String.format("%.1f",amount / baseRate.toDouble() * targetRate.toDouble())
             Log.d(TAG, "calculateExchange: ${(amount / baseRate.toDouble() * targetRate.toDouble()).toString()}")
         }
     }
@@ -63,7 +67,7 @@ class ExchangeViewModel : ViewModel() {
         Log.d(TAG, "updateFormattedNumber: ${input}")
         val number = input.replace(",", "")
         val formattedText = formatNumberWithCommas(number)
-        formattedNumber.value = formattedText
+        _formattedNumber.value = formattedText
     }
 
     private fun formatNumberWithCommas(number: String): String {
