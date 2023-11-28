@@ -27,45 +27,45 @@ class SignupModel {
 
 
 
-    fun requestIdDuplication(id : String, callback: (String)-> Unit){
-        val call: Call<String> = service.checkDuplicateId(id)
+    fun requestIdDuplication(id : String, callback: (ResultModel)-> Unit){
+        val call: Call<ResultModel> = service.checkDuplicateId(id)
 
-        call.enqueue(object  : Callback<String>{
-            override fun onResponse(call: Call<String>, response: Response<String>) {
+        call.enqueue(object  : Callback<ResultModel>{
+            override fun onResponse(call: Call<ResultModel>, response: Response<ResultModel>) {
                 if(response.isSuccessful){
                     Log.d(TAG, "onResponse: ${response.body()}")
                     callback(response.body()!!)
                 }else{
                     Log.d(TAG, "onResponse: ${response.body()}")
-                    callback("!isSuccessful")
+                    callback(ResultModel("isNotSuccessful"))
                 }
             }
 
-            override fun onFailure(call: Call<String>, t: Throwable) {
+            override fun onFailure(call: Call<ResultModel>, t: Throwable) {
                 Log.d(TAG, "onFailure: ${t.message}")
-                callback("onFailure")
+                callback(ResultModel("onFailure"))
             }
         })
     }
 
     fun sendUserInformation(id : String, password : String, email :String,
-                            identifier : Int, callback: (String) -> Unit){
-        val call : Call<String> = service.saveUserInformation(id, password, email, identifier)
+                            identifier : Int, callback: (ResultModel) -> Unit){
+        val call : Call<ResultModel> = service.saveUserInformation(id, password, email, identifier)
         Log.d(TAG, "$id, $password, $email, $identifier")
-        call.enqueue(object  : Callback<String>{
-            override fun onResponse(call: Call<String>, response: Response<String>) {
+        call.enqueue(object  : Callback<ResultModel>{
+            override fun onResponse(call: Call<ResultModel>, response: Response<ResultModel>) {
                 if(response.isSuccessful){
                     Log.d(TAG, "onResponse: ${response.body()}")
                     callback(response.body()!!)
                 }else{
                     Log.d(TAG, "onResponse: ${response}")
-                    callback("!isSuccessful")
+                    callback(ResultModel("!isSuccessful"))
                 }
             }
 
-            override fun onFailure(call: Call<String>, t: Throwable) {
+            override fun onFailure(call: Call<ResultModel>, t: Throwable) {
                 Log.d(TAG, "onFailure: ${t.message}")
-                callback("onFailure")
+                callback(ResultModel("onFailure"))
             }
         })
     }
@@ -93,23 +93,23 @@ class SignupModel {
         })
     }
 
-    fun checkEmailExistence(email:String,callback: (String) -> Unit){
+    fun checkEmailExistence(email:String,callback: (ResultModel) -> Unit){
 
-        service.checkEmailExistence(email).enqueue(object : Callback<String>{
+        service.checkEmailExistence(email).enqueue(object : Callback<ResultModel>{
 
-            override fun onResponse(call: Call<String>, response: Response<String>) {
+            override fun onResponse(call: Call<ResultModel>, response: Response<ResultModel>) {
 
                 if(response.isSuccessful && response.body() != null){
-                    callback(response.body().toString())
+                    callback(response.body()!!)
                     Log.d(TAG, "onResponse: ${response.body()}")
                 }else{
                     Log.d(TAG, "!isSuccessful: ${response.body()}")
                 }
             }
 
-            override fun onFailure(call: Call<String>, t: Throwable) {
+            override fun onFailure(call: Call<ResultModel>, t: Throwable) {
                 Log.d(TAG, "onFailure: ${t}")
-                callback("Exception")
+                callback(ResultModel("Exception"))
             }
 
         })

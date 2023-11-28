@@ -6,6 +6,7 @@ import android.util.Patterns
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import com.example.menupop.signup.ResultModel
 import java.util.concurrent.TimeUnit
 import java.util.regex.Pattern
 
@@ -14,6 +15,7 @@ class ResetPasswordViewModel : ViewModel() {
     private val id = MutableLiveData<String>()
     private val resetPasswordModel = ResetPasswordModel() //뷰모델
     private var callback: ((String) -> Unit) ?= null // 콜백
+    private var callbackList : ((ResultModel) -> Unit) ?= null
 
     var verifiedEmail = MutableLiveData<Boolean>()
 
@@ -79,16 +81,16 @@ class ResetPasswordViewModel : ViewModel() {
     }
 
     fun checkId(id : String){
-        callback = { result ->
-            Log.d(TAG, "checkId: ${result}")
-            if (result == "exist"){
+        callbackList = { response ->
+            Log.d(TAG, "checkId: ${response.result}")
+            if (response.result == "exist"){
                 _checkIdResult.value = true
                  this.id.value = id
             } else{
                 _checkIdResult.value = false
             }
         }
-        resetPasswordModel.checkId(id,callback!!)
+        resetPasswordModel.checkId(id,callbackList!!)
     }
 
     fun sendVerifyCode(email :String){

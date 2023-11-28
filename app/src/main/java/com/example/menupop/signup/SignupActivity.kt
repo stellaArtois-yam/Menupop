@@ -185,14 +185,10 @@ class SignupActivity : AppCompatActivity() {
                     if(domainSelection != "선택"){
                         signupViewModel.checkEmailForm(emailId, domainSelection)
                     }
-
-
                 }
 
                 override fun onNothingSelected(parent: AdapterView<*>?) {
-
                 }
-
             }
 
 
@@ -256,26 +252,25 @@ class SignupActivity : AppCompatActivity() {
             }
         })
 
-        signupViewModel.remainingTime.observe(this, Observer { time ->
+        signupViewModel.isTimeExpired.observe(this, Observer {
 
-            if (time.contains("만료")) {
+            if (it) {
                 Log.d(TAG, "timer 종료")
-                binding.signupCertificationWarning.text = "인증번호가 만료되었습니다."
                 binding.signupCertificationButton.text = "재인증"
                 binding.signupSubmitButton.isEnabled = false
-            }else{
-                binding.signupCertificationWarning.text = "시간 제한 : ${time}"
             }
-
         })
+
 
         signupViewModel.verifyCompleted.observe(this, Observer { result ->
             if (result) {
                 signupViewModel.stopTimer()
                 binding.signupCertificationEdittext.isEnabled = false
-                binding.signupCertificationWarning.text = "인증 완료"
+                binding.signupCertificationButton.isEnabled = false
                 binding.signupCertificationWarning.setTextColor(Color.BLUE)
 
+            }else{
+                showCustomDialog("인증번호 불일치", "인증번호가 일치하지 않습니다. \n다시 입력해주세요.", false)
             }
         })
 
