@@ -57,7 +57,7 @@ class ExchangeFragment : Fragment() {
             Log.d(TAG, "init: ${result}")
             binding.exchangeSourceEdittext.isFocusable = result
         })
-        exchangeViewModel.requestExchangeRate(getString(R.string.BANK_API_KEY))
+        exchangeViewModel.init()
 
     }
     fun setListener(){
@@ -68,8 +68,11 @@ class ExchangeFragment : Fragment() {
             binding.exchangeSourceEdittext.setSelection( binding.exchangeSourceEdittext.text.length)
             Log.d(TAG, "setListener: ${binding.exchangeSourceSpinner.selectedItem.toString() != "선택" && binding.exchangeTargetSpinner.selectedItem.toString() != "선택"}")
             if(binding.exchangeSourceSpinner.selectedItem.toString() != "선택" && binding.exchangeTargetSpinner.selectedItem.toString() != "선택"){
-                exchangeViewModel.exchange(text.toString(),binding.exchangeTargetSpinner.selectedItem.toString(),binding.exchangeSourceSpinner.selectedItem.toString())
+                exchangeViewModel.exchange(text.toString(),binding.exchangeTargetSpinner.selectedItem.toString(),binding.exchangeStandardEdittext.text.toString())
             }
+        }
+        binding.exchangeStandardEdittext.addTextChangedListener {text ->
+            exchangeViewModel.exchange(binding.exchangeSourceEdittext.text.toString(),binding.exchangeTargetSpinner.selectedItem.toString(),binding.exchangeStandardEdittext.text.toString())
         }
         binding.exchangeRateApplicationStatus.setOnCheckedChangeListener {_, status ->
             Log.d(TAG, "setListener: ${status}")
@@ -84,12 +87,8 @@ class ExchangeFragment : Fragment() {
                 id: Long
             ) {
                 val targetSpinner = parent?.getItemAtPosition(position).toString()
-                val baseSpinner = binding.exchangeSourceSpinner.selectedItem.toString()
                 val amount = binding.exchangeSourceEdittext.text.toString()
-                // 선택된 항목에 대한 처리 로직을 작성합니다.
-                // 예: 선택된 항목을 출력합니다.
-                exchangeViewModel.selection(targetSpinner,baseSpinner)
-                exchangeViewModel.exchange(amount,targetSpinner,baseSpinner)
+                exchangeViewModel.exchange(amount,targetSpinner,binding.exchangeStandardEdittext.text.toString())
 
             }
 
@@ -105,13 +104,14 @@ class ExchangeFragment : Fragment() {
                 id: Long
             ) {
                 val baseSpinner = parent?.getItemAtPosition(position).toString()
-                val targetSpinner = binding.exchangeTargetSpinner.selectedItem.toString()
-                val amount = binding.exchangeSourceEdittext.text.toString()
-                // 선택된 항목에 대한 처리 로직을 작성합니다.
-                // 예: 선택된 항목을 출력합니다.
-
-                exchangeViewModel.selection(targetSpinner,baseSpinner)
-                exchangeViewModel.exchange(amount,targetSpinner,baseSpinner)
+                if(baseSpinner != "선택") {
+                    Log.d(TAG, "onItemSelected: 요청 보냄")
+                    exchangeViewModel.requestExchangeRate(
+                        getString(R.string.BANK_API_KEY),
+                        baseSpinner
+                    )
+                    binding.exchangeStandardTextview.text = baseSpinner
+                }
             }
 
             override fun onNothingSelected(parent: AdapterView<*>?) {
