@@ -20,33 +20,51 @@ class ExchangeModel {
         .setLenient()
         .create()
     private val retrofit = Retrofit.Builder()
-        .baseUrl("https://www.koreaexim.go.kr/site/program/financial/") // 실제 서버의 기본 URL로 대체해야 합니다.
+        .baseUrl("https://v6.exchangerate-api.com/") // 실제 서버의 기본 URL로 대체해야 합니다.
         .addConverterFactory(GsonConverterFactory.create(gson))
         .addConverterFactory(ScalarsConverterFactory.create())
         .build()
 
     private val service = retrofit.create(RetrofitService::class.java)
-    fun requestExchangeRate(authkey: String,callback: (ArrayList<ExchangeDataClass.ExchangeDataClassItem>) -> Unit){
-        service.requestExchangeRate(authkey,"20231123","AP01")
-//        service.requestExchangeRate(authkey,"AP01")
-        .enqueue(object : Callback<ArrayList<ExchangeDataClass.ExchangeDataClassItem>>{
+    fun requestExchangeRate(
+        authkey: String,
+        baseRate: String,
+        callback: (ExchangeRateDataClass) -> Unit){
+        service.requestExchangeRates(authkey,baseRate).enqueue(object : Callback<ExchangeRateDataClass>{
             override fun onResponse(
-                call: Call<ArrayList<ExchangeDataClass.ExchangeDataClassItem>>,
-                response: Response<ArrayList<ExchangeDataClass.ExchangeDataClassItem>>
+                call: Call<ExchangeRateDataClass>,
+                response: Response<ExchangeRateDataClass>
             ) {
-                if(response.isSuccessful){
+                if(response.isSuccessful && response.body() != null){
                     callback(response.body()!!)
                 }
             }
 
-            override fun onFailure(
-                call: Call<ArrayList<ExchangeDataClass.ExchangeDataClassItem>>,
-                t: Throwable
-            ) {
-                Log.d(TAG, "onFailure: ${t}")
+            override fun onFailure(call: Call<ExchangeRateDataClass>, t: Throwable) {
+                Log.d(TAG, "onFailure: ${t.toString()}")
             }
 
         })
+//        service.requestExchangeRate(authkey,"20231123","AP01")
+////        service.requestExchangeRate(authkey,"AP01")
+//        .enqueue(object : Callback<ArrayList<ExchangeDataClass.ExchangeDataClassItem>>{
+//            override fun onResponse(
+//                call: Call<ArrayList<ExchangeDataClass.ExchangeDataClassItem>>,
+//                response: Response<ArrayList<ExchangeDataClass.ExchangeDataClassItem>>
+//            ) {
+//                if(response.isSuccessful){
+//                    callback(response.body()!!)
+//                }
+//            }
+//
+//            override fun onFailure(
+//                call: Call<ArrayList<ExchangeDataClass.ExchangeDataClassItem>>,
+//                t: Throwable
+//            ) {
+//                Log.d(TAG, "onFailure: ${t}")
+//            }
+//
+//        })
     }
     fun exchangeRateApplicationStatus(sharedPreferences: SharedPreferences, status : Boolean){
         var editor = sharedPreferences.edit()

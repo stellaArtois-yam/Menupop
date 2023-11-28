@@ -1,15 +1,24 @@
 package com.example.menupop.mainActivity
 
+import com.google.gson.annotations.SerializedName
+
 data class ExchangeRateDataClass(
-    var base_code: String,
-    var conversion_rates: ConversionRates,
-    var documentation: String,
-    var result: String,
-    var terms_of_use: String,
-    var time_last_update_unix: Int,
-    var time_last_update_utc: String,
-    var time_next_update_unix: Int,
-    var time_next_update_utc: String
+    @SerializedName("base_code")
+    val baseCode: String,
+    @SerializedName("conversion_rates")
+    val conversionRates: Map<String, Double>,
+    val documentation: String,
+    val result: String,
+    @SerializedName("terms_of_use")
+    val termsOfUse: String,
+    @SerializedName("time_last_update_unix")
+    val timeLastUpdateUnix: Int,
+    @SerializedName("time_last_update_utc")
+    val timeLastUpdateUtc: String,
+    @SerializedName("time_next_update_unix")
+    val timeNextUpdateUnix: Int,
+    @SerializedName("time_next_update_utc")
+    val timeNextUpdateUtc: String
 ) {
     data class ConversionRates(
         var AED: Double,
