@@ -17,13 +17,8 @@ class SignupViewModel : ViewModel() {
     val TAG = "SignupViewModel"
     var signupModel  = SignupModel()
     private var callback: ((String) -> Unit) ?= null // 콜백
+    private var callbackList : ((ResultModel) -> Unit) ?= null
 
-//    private val _isSignupEnabled = MutableLiveData<Boolean>().apply { value = false }
-
-
-    /**
-     * 아이디 경고 문구
-     */
 
     private val _idWarning = MutableLiveData<String>()
     val idWarning : LiveData<String>
@@ -54,27 +49,25 @@ class SignupViewModel : ViewModel() {
 
 
 
+    private val _isIdDuplication = MutableLiveData<Boolean>()
+    val isIdDuplication : LiveData<Boolean>
+        get() = _isIdDuplication
 
-
-    /**
-     * 아이디 중복 여부
-     */
-    val isIdDuplication = MutableLiveData<Boolean>()
 
 
     fun checkUserIdDuplication(id : String) {
-        callback = {isDuplicate ->
+        callbackList = {isDuplicate ->
             Log.d(TAG, "checkUserIdDuplication: ${isDuplicate}")
-            if(isDuplicate == "exist"){
-                isIdDuplication.value = true
+            if(isDuplicate.result == "exist"){
+                _isIdDuplication.value = true
                 _idWarning.value = "이미 사용 중인 아이디 입니다."
             }else{
-                isIdDuplication.value = false
+                _isIdDuplication.value = false
                 _idWarning.value = "사용 가능한 아이디 입니다."
             }
 
         }
-        signupModel.requestIdDuplication(id, callback!!)
+        signupModel.requestIdDuplication(id, callbackList!!)
     }
 
 
@@ -183,9 +176,9 @@ class SignupViewModel : ViewModel() {
 
     fun checkEmailExistence(email: String) {
         Log.d(TAG, "checkEmailExistence")
-        callback = {result ->
-            Log.d(TAG, "checkEmailExistence: $result")
-            if(result == "exist"){
+        callbackList = {response ->
+            Log.d(TAG, "checkEmailExistence: ${response.result}")
+            if(response.result == "exist"){
                 _isEmailExistence.value = true
                 _emailWarning.value = "해당 이메일로 가입된 계정이 존재합니다."
 
@@ -193,11 +186,14 @@ class SignupViewModel : ViewModel() {
                 _isEmailExistence.value = false
             }
         }
-        signupModel.checkEmailExistence(email, callback!!)
+        signupModel.checkEmailExistence(email, callbackList!!)
     }
 
     private var verifyCode : String = ""
-    val verifyCompleted = MutableLiveData<Boolean>() //인증 완료
+    private val _verifyCompleted = MutableLiveData<Boolean>()
+    val verifyCompleted : LiveData<Boolean>
+        get() = _verifyCompleted
+
 
     fun requestEmailAuth(email : String) {
         callback = { result ->
@@ -211,30 +207,42 @@ class SignupViewModel : ViewModel() {
         Log.d(TAG, "checkVerifyCode: ${verifyCode} 인증코드 ${this.verifyCode}")
         val result = this.verifyCode == verifyCode
         Log.d(TAG, "result : $result")
-        verifyCompleted.value = result
+        _verifyCompleted.value = result
+
+        if(_verifyCompleted.value == true){
+            _certificationWarning.value = "인증 완료"
+        }
 
     }
 
 
-    val remainingTime = MutableLiveData<String>() //타이머 시간
+    private val _certificationWarning = MutableLiveData<String>()
+    val certificationWarning : LiveData<String>
+        get() = _certificationWarning
+
+    private val _isTimeExpired = MutableLiveData<Boolean>()
+    val isTimeExpired : LiveData<Boolean>
+        get() = _isTimeExpired
 
     private var timer: CountDownTimer? = null // 타이머 객체
 
     // 타이머를 시작하는 메서드
     fun startTimer() {
         // 3분(180초)으로 초기화
-        val initialTime = TimeUnit.MINUTES.toMillis(1)
+        val initialTime = TimeUnit.MINUTES.toMillis(3)
         timer = object : CountDownTimer(initialTime, 1000) {
             override fun onTick(millisUntilFinished: Long) {
                 // 남은 시간을 LiveData에 업데이트
                 val minutes = TimeUnit.MILLISECONDS.toMinutes(millisUntilFinished)
                 val seconds = TimeUnit.MILLISECONDS.toSeconds(millisUntilFinished) % 60
-                remainingTime.value = String.format("%02d:%02d", minutes, seconds)
+                _certificationWarning.value = "시간 제한 : " + String.format("%02d:%02d", minutes, seconds)
+                _isTimeExpired.value = false
             }
 
             override fun onFinish() {
                 // 타이머가 종료되면 인증번호 만료
-                remainingTime.value = "인증번호가 만료되었습니다."
+                _isTimeExpired.value = true
+                _certificationWarning.value = "인증번호가 만료되었습니다."
 
             }
         }
@@ -253,24 +261,18 @@ class SignupViewModel : ViewModel() {
         super.onCleared()
     }
 
-//    init {
-//        // 기본적으로 가입 버튼 비활성화
-//        _isSignupEnabled.value = false
-//
-//    }
 
     fun checkUserInformation() : Boolean{
-        Log.d(TAG, "isValidId: ${isValidId.value}")
-        Log.d(TAG, "checkEmailForm: ${checkEmailForm.value}")
+        Log.d(TAG, "isValidId: ${_isValidId.value}")
+        Log.d(TAG, "checkEmailForm: ${_checkEmailForm.value}")
         Log.d(TAG, "password: ${_isValidPassword.value}")
         Log.d(TAG, "passwordConfirm: ${_isValidPasswordConfirm.value}")
-        Log.d(TAG, "verifyCompleted: ")
+        Log.d(TAG, "verifyCompleted: ${_verifyCompleted.value}")
 
-        if(isValidId.value == true && _checkEmailForm.value == true &&
-            _passwordWarning.value == null && _confirmPasswordWarning.value == null &&
-            verifyCompleted.value == true){
-            
-//            _isSignupEnabled.value = true
+        if(_isValidId.value == true && _checkEmailForm.value == true &&
+            _isValidPassword.value == true && _isValidPasswordConfirm.value == true &&
+            _verifyCompleted.value == true){
+
             return true
         }else{
             return false
@@ -283,17 +285,17 @@ class SignupViewModel : ViewModel() {
 
 
     fun sendUserInformation(id : String, password : String, email :String, identifier : Int){
-        callback = {result ->
-            Log.d(TAG, "sendUserInformation: $result")
+        callbackList = {response ->
+            Log.d(TAG, "sendUserInformation: ${response.result}")
 
-            if(result == "success"){
+            if(response.result == "success"){
                 _saveResult.value = true
             }else{
                 _saveResult.value = false
             }
 
         }
-        signupModel.sendUserInformation(id, password, email, identifier, callback!!)
+        signupModel.sendUserInformation(id, password, email, identifier, callbackList!!)
     }
 
 

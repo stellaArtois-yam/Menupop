@@ -4,6 +4,7 @@ import com.example.menupop.findId.FindIdResponseModel
 import com.example.menupop.login.LoginResponseModel
 import com.example.menupop.mainActivity.ExchangeRateDataClass
 import com.example.menupop.mainActivity.UserInformationData
+import com.example.menupop.signup.ResultModel
 import retrofit2.Call
 import retrofit2.http.Field
 import retrofit2.http.FormUrlEncoded
@@ -15,7 +16,7 @@ interface RetrofitService {
 
     @POST("checkUserIdDuplication.php")
     @FormUrlEncoded
-    fun checkDuplicateId(@Field("userId") id: String): Call<String>
+    fun checkDuplicateId(@Field("userId") id: String): Call<ResultModel>
 
     @POST("Signup.php")
     @FormUrlEncoded
@@ -24,19 +25,19 @@ interface RetrofitService {
                  @Field("password") password: String,
                  @Field("email") email :String,
                  @Field("identifier") identifier : Int)
-    : Call<String>
+    : Call<ResultModel>
 
     @POST("GetUserInformation.php")
     @FormUrlEncoded
     fun requestUserInformation(@Field("identifier") identifier: Int) : Call<UserInformationData>
 
-    @POST("CheckUserId.php")
+    @POST("FindId.php")
     @FormUrlEncoded
     fun requestFindID(@Field("email") email: String): Call<FindIdResponseModel>
 
     @POST("SignupCheckEmail.php")
     @FormUrlEncoded
-    fun checkEmailExistence(@Field("email") email: String): Call<String>
+    fun checkEmailExistence(@Field("email") email: String): Call<ResultModel>
 
     @POST("login.php")
     @FormUrlEncoded

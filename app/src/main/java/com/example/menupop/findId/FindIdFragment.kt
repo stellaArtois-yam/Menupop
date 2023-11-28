@@ -80,7 +80,6 @@ class FindIdFragment : Fragment() {
                 binding.findIdEmailWarning.visibility = View.GONE
             }else{
                 binding.findIdEmailWarning.visibility = View.VISIBLE
-                binding.findIdEmailWarning.text = "올바른 이메일 형식이 아닙니다."
                 binding.findIdEmailWarning.setTextColor(Color.RED)
             }
         })

@@ -70,11 +70,8 @@ class FindIdResultFragment : Fragment() {
             Log.d(TAG, "findId Result: ${result.result} ${result.id}")
 
             if(result.result == "exist"){
-                var id = maskLastTwoChars(result.id)
-                binding.findIdResultId.text = id
                 binding.findIdResultInformation.text = "로그인 후 사용이 가능합니다."
             }else{
-                binding.findIdResultId.text= "존재하지 않습니다."
                 binding.findIdResultTextBottom.visibility = View.GONE
                 binding.findIdResultInformation.visibility = View.GONE
             }
@@ -82,13 +79,7 @@ class FindIdResultFragment : Fragment() {
         })
     }
 
-    fun maskLastTwoChars(inputString: String): String {
-        if (inputString.length >= 2) {
-            val maskedPart = inputString.substring(0, inputString.length - 2) + "**"
-            return maskedPart
-        }
-        return inputString
-    }
+
 
     fun setListener(){
         binding.findIdResultButton.setOnClickListener{
