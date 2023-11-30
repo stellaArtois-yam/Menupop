@@ -14,14 +14,17 @@ import com.example.menupop.R
 import com.example.menupop.databinding.ActivityMainBinding
 import com.google.android.material.bottomnavigation.BottomNavigationView
 
-class MainActivity : AppCompatActivity(){
+class MainActivity : AppCompatActivity(), MainActivityEvent{
     val TAG = "MainActivity"
 
     lateinit var mainActivityViewModel: MainActivityViewModel
     lateinit var binding : ActivityMainBinding
+
     lateinit var foodPreferenceFragment: FoodPreferenceFragment
     lateinit var exchangeFragment: ExchangeFragment
     lateinit var profileFragment: ProfileFragment
+
+    lateinit var ticketPurchaseFragment: TicketPurchaseFragment
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -40,6 +43,7 @@ class MainActivity : AppCompatActivity(){
         foodPreferenceFragment = FoodPreferenceFragment()
         exchangeFragment = ExchangeFragment()
         profileFragment = ProfileFragment()
+        ticketPurchaseFragment = TicketPurchaseFragment()
 
         binding = DataBindingUtil.setContentView(this, R.layout.activity_main)
         mainActivityViewModel = ViewModelProvider(this).get(MainActivityViewModel::class.java)
@@ -114,4 +118,36 @@ class MainActivity : AppCompatActivity(){
             return false
         }
     }
+
+    override fun moveToTicketPurchase() {
+        Log.d(TAG, "moveToTicketPurchase: 호출")
+        supportFragmentManager.beginTransaction().apply {
+            replace(R.id.home_frame_layout, TicketPurchaseFragment())
+            commit()
+            binding.appbarMenu.findViewById<TextView>(R.id.appbar_status).text = "티켓 구매"
+            binding.appbarMenu.findViewById<ImageView>(R.id.appbar_back).visibility = View.VISIBLE
+
+            binding.appbarMenu.findViewById<ImageView>(R.id.appbar_back).setOnClickListener{
+                supportFragmentManager.beginTransaction().apply {
+                    replace(R.id.home_frame_layout, ProfileFragment())
+                    commit()
+                    binding.appbarMenu.findViewById<TextView>(R.id.appbar_status).text = "프로필 확인"
+                    binding.appbarMenu.findViewById<ImageView>(R.id.appbar_back).visibility = View.GONE
+
+                }
+            }
+
+            Log.d(TAG, "moveToTicketPurchase Main: ")
+        }
+    }
+
+    override fun moveToAdvertisement() {
+        //광고보러 가기
+    }
+
+    override fun accountWithdrawal() {
+      //회원 탈퇴
+    }
+
+
 }

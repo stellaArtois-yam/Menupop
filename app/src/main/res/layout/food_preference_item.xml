@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="horizontal"
+    android:layout_width="match_parent"
+    android:layout_height="70dp"
+    android:gravity="center">
+
+    <TextView
+        android:id="@+id/food_preference_favorite"
+        android:layout_width="0dp"
+        android:layout_height="50dp"
+        android:layout_weight="0.2"
+        android:background="@drawable/radius_30_stroke_light_gray"
+        android:text="호"
+        android:gravity="center"/>
+
+    <TextView
+        android:id="@+id/food_preference_name"
+        android:layout_width="0dp"
+        android:layout_height="50dp"
+        android:layout_weight="1"
+        android:text="고수"
+        android:gravity="center"/>
+
+    <TextView
+        android:id="@+id/food_preference_delete_button"
+        android:layout_width="0dp"
+        android:layout_weight="0.2"
+        android:layout_height="50dp"
+        android:gravity="center"
+        android:text="X"/>
+
+</LinearLayout>

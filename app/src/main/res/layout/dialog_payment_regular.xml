@@ -3,11 +3,11 @@
 <layout>
 
     <data>
-
         <variable
             name="ticketPurchaseViewModel"
             type="com.example.menupop.mainActivity.MainActivityViewModel" />
     </data>
+
 
     <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:app="http://schemas.android.com/apk/res-auto"
@@ -17,7 +17,7 @@
         android:orientation="vertical">
 
         <androidx.appcompat.widget.AppCompatButton
-            android:id="@+id/payment_reword_cancel"
+            android:id="@+id/payment_regular_cancel"
             android:layout_width="30dp"
             android:layout_height="30dp"
             android:layout_gravity="end"
@@ -25,13 +25,11 @@
             android:background="@drawable/cancel" />
 
         <LinearLayout
-            android:id="@+id/reword_translation_ticket_purchase_box"
-            android:layout_width="350dp"
+            android:id="@+id/regular_translation_ticket_purchase_box"
+            android:layout_width="300dp"
             android:layout_height="150dp"
-
             android:layout_marginStart="30dp"
             android:layout_marginEnd="30dp"
-
             android:background="@drawable/radius_30_stroke_light_gray"
             android:backgroundTint="@color/pale_gray"
             android:gravity="center"
@@ -61,7 +59,7 @@
                     android:textStyle="bold" />
 
                 <ImageView
-                    android:id="@+id/reword_translation_ticket_purchase_plus_button"
+                    android:id="@+id/regular_translation_ticket_purchase_plus_button"
                     android:layout_width="30dp"
                     android:layout_height="30dp"
                     android:layout_marginStart="50dp"
@@ -69,16 +67,16 @@
                     android:src="@drawable/add_circle_24" />
 
                 <TextView
-                    android:id="@+id/reword_translation_ticket_purchase_amount"
+                    android:id="@+id/regular_translation_ticket_purchase_amount"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="01"
+                    android:text="@{ticketPurchaseViewModel.regularTranslationAmount}"
                     android:textColor="@color/black"
                     android:textSize="20sp"
                     android:textStyle="bold" />
 
                 <ImageView
-                    android:id="@+id/reword_translation_ticket_purchase_minus_button"
+                    android:id="@+id/regular_translation_ticket_purchase_minus_button"
                     android:layout_width="30dp"
                     android:layout_height="30dp"
                     android:layout_marginStart="20dp"
@@ -87,12 +85,24 @@
 
             </LinearLayout>
 
+            <TextView
+                android:id="@+id/regular_translation_ticket_purchase_price"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="end"
+                android:layout_marginTop="10dp"
+                android:layout_marginEnd="55dp"
+                android:text="@{ticketPurchaseViewModel.regularTranslationPrice}"
+                android:textColor="@color/black"
+                android:textSize="20sp"
+                android:textStyle="bold" />
+
 
         </LinearLayout>
 
         <LinearLayout
-            android:id="@+id/reword_food_ticket_purchase_box"
-            android:layout_width="350dp"
+            android:id="@+id/regular_food_ticket_purchase_box"
+            android:layout_width="300dp"
             android:layout_height="150dp"
             android:layout_marginTop="30dp"
             android:layout_marginBottom="30dp"
@@ -125,7 +135,7 @@
                     android:textStyle="bold" />
 
                 <ImageView
-                    android:id="@+id/reword_food_ticket_purchase_plus_button"
+                    android:id="@+id/regular_food_ticket_purchase_plus_button"
                     android:layout_width="30dp"
                     android:layout_height="30dp"
                     android:layout_marginStart="50dp"
@@ -133,16 +143,16 @@
                     android:src="@drawable/add_circle_24" />
 
                 <TextView
-                    android:id="@+id/reword_food_ticket_purchase_amount"
+                    android:id="@+id/regular_food_ticket_purchase_amount"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="01"
+                    android:text="@{ticketPurchaseViewModel.regularFoodAmount}"
                     android:textColor="@color/black"
                     android:textSize="20sp"
                     android:textStyle="bold" />
 
                 <ImageView
-                    android:id="@+id/reword_food_ticket_purchase_minus_button"
+                    android:id="@+id/regular_food_ticket_purchase_minus_button"
                     android:layout_width="30dp"
                     android:layout_height="30dp"
                     android:layout_marginStart="20dp"
@@ -151,21 +161,33 @@
 
             </LinearLayout>
 
+            <TextView
+                android:id="@+id/regular_food_ticket_purchase_price"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="end"
+                android:layout_marginTop="10dp"
+                android:layout_marginEnd="55dp"
+                android:text="@{ticketPurchaseViewModel.regularFoodPrice}"
+                android:textColor="@color/black"
+                android:textSize="20sp"
+                android:textStyle="bold" />
+
 
         </LinearLayout>
 
         <TextView
-            android:id="@+id/reword_ticket_purchase_available_rewords"
+            android:id="@+id/regular_ticket_purchase_total_price"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="사용 가능 리워드 : 2/3"
+            android:text="@{ticketPurchaseViewModel.regularTotalPrice}"
             android:textColor="@color/black"
             android:textSize="20sp"
             android:textStyle="bold" />
 
         <androidx.appcompat.widget.AppCompatButton
-            android:id="@+id/reword_ticket_purchase_button"
-            android:layout_width="350dp"
+            android:id="@+id/regular_ticket_purchase_button"
+            android:layout_width="300dp"
             android:layout_height="wrap_content"
             android:layout_marginTop="30dp"
             android:layout_marginBottom="30dp"
@@ -173,10 +195,11 @@
             android:background="@drawable/radius_30_stroke_light_gray"
             android:backgroundTint="@color/orange"
 
-            android:text="리워드 결제"
+            android:text="카카오 페이 결제"
             android:textColor="@color/white"
             android:textSize="20sp"
             android:textStyle="bold" />
+
 
     </LinearLayout>
 
