@@ -70,6 +70,7 @@
                     android:id="@+id/regular_translation_ticket_purchase_amount"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+
                     android:text="@{ticketPurchaseViewModel.regularTranslationAmount}"
                     android:textColor="@color/black"
                     android:textSize="20sp"

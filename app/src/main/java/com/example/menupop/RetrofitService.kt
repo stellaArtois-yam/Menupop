@@ -64,4 +64,10 @@ interface RetrofitService {
     @GET("v6/{authKey}/latest/{baseRate}")
     fun requestExchangeRates(@Path("authKey") authKey:String,@Path("baseRate")baseRate : String) : Call<ExchangeRateDataClass>
 
+
+    @POST("v1/payment/ready")
+    @FormUrlEncoded
+    fun createPaymentRequest()
+
+
 }

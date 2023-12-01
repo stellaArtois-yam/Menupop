@@ -3,24 +3,22 @@ package com.example.menupop.mainActivity
 import android.app.Dialog
 import android.content.Context
 import android.os.Bundle
-import android.text.Layout
 import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.Window
-import android.widget.Button
-import android.widget.ImageView
+import android.view.WindowManager
+
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.findViewTreeViewModelStoreOwner
+import com.example.menupop.BuildConfig
 import com.example.menupop.R
 import com.example.menupop.databinding.DialogPaymentRegularBinding
+import com.example.menupop.databinding.DialogPaymentRewordBinding
 import com.example.menupop.databinding.DialogSelectPaymentTypeBinding
-import com.example.menupop.databinding.FragmentProfileBinding
 import com.example.menupop.databinding.FragmentTicketPurchaseBinding
-import com.example.menupop.mainActivity.MainActivityEvent
 
 class TicketPurchaseFragment : Fragment() {
     val TAG = "TicketPurchaseFragment"
@@ -92,86 +90,128 @@ class TicketPurchaseFragment : Fragment() {
     }
 
     fun paymentTypeDialog() {
-        val dialog = Dialog(requireActivity())
+        val dialog = Dialog(context)
 
-//        val dialogBinding: DialogSelectPaymentTypeBinding = DataBindingUtil.inflate(
-//            LayoutInflater.from(requireActivity()),
-//            R.layout.dialog_select_payment_type,
-//            null,
-//            false
-//        )
+        val dialogBinding: DialogSelectPaymentTypeBinding = DataBindingUtil.inflate(
+            LayoutInflater.from(context),
+            R.layout.dialog_select_payment_type,
+            null,
+            false
+        )
 
         dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
-        dialog.setContentView(R.layout.dialog_select_payment_type)
+        dialog.setContentView(dialogBinding.root)
+        dialog.window!!.setLayout(WindowManager.LayoutParams.MATCH_PARENT, WindowManager.LayoutParams.WRAP_CONTENT)
         dialog.show()
 
-        val cancel = dialog.findViewById<Button>(R.id.payment_type_cancel)
-        cancel.setOnClickListener{
+
+        dialogBinding.paymentTypeCancel.setOnClickListener {
             dialog.dismiss()
         }
 
-        val regular = dialog.findViewById<Button>(R.id.payment_type_regular)
-        regular.setOnClickListener{
+        dialogBinding.paymentTypeRegular.setOnClickListener {
+            Log.d(TAG, "regular click")
             dialog.dismiss()
             paymentRegularDialog()
         }
 
-        val reword = dialog.findViewById<Button>(R.id.payment_type_reword)
-        reword.setOnClickListener{
+        dialogBinding.paymentTypeReword.setOnClickListener {
+            Log.d(TAG, "reword click")
             dialog.dismiss()
             paymentRewordDialog()
         }
-
-//        dialogBinding.paymentTypeCancel.setOnClickListener {
-//            dialog.dismiss()
-//        }
-//
-//        dialogBinding.paymentTypeRegular.setOnClickListener {
-//            dialog.dismiss()
-//            paymentRegularDialog()
-//        }
-//
-//        dialogBinding.paymentTypeReword.setOnClickListener {
-//            dialog.dismiss()
-//            paymentRewordDialog()
-//        }
 
     }
 
     fun paymentRegularDialog() {
 
-        Log.d(TAG, "paymentRegularDialog: 호출")
+        val dataBindingRegular: DialogPaymentRegularBinding = DataBindingUtil.inflate(
+            LayoutInflater.from(context),
+            R.layout.dialog_payment_regular,
+            null,
+            false
+        )
 
-//        val dataBinding: DialogPaymentRegularBinding = DataBindingUtil.inflate(
-//            LayoutInflater.from(requireActivity()),
-//            R.layout.dialog_payment_regular,
-//            null,
-//            false
-//        )
+        dataBindingRegular.ticketPurchaseViewModel = ticketPurchaseViewModel
+        dataBindingRegular.lifecycleOwner = this
 
-        val dialog = Dialog(requireActivity())
-        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
-        dialog.setContentView(R.layout.dialog_payment_regular)
-        dialog.show()
+        val dialogRegular = Dialog(context)
+        dialogRegular.requestWindowFeature(Window.FEATURE_NO_TITLE)
+        dialogRegular.setContentView(dataBindingRegular.root)
+        dialogRegular.show()
 
-        val cancel = dialog.findViewById<Button>(R.id.payment_regular_cancel)
-        cancel.setOnClickListener{dialog.dismiss()}
+        dataBindingRegular.paymentRegularCancel.setOnClickListener{
+            dialogRegular.dismiss()
+        }
 
-        dialog.findViewById<ImageView>(R.id.regular_translation_ticket_purchase_plus_button).setOnClickListener{
+        dataBindingRegular.regularTranslationTicketPurchasePlusButton.setOnClickListener{
             ticketPurchaseViewModel.addTranslationTicket()
         }
 
-        dialog.findViewById<ImageView>(R.id.regular_translation_ticket_purchase_minus_button).setOnClickListener{
+        dataBindingRegular.regularTranslationTicketPurchaseMinusButton.setOnClickListener{
             ticketPurchaseViewModel.removeTranslationTicket()
         }
+
+        dataBindingRegular.regularFoodTicketPurchasePlusButton.setOnClickListener{
+            ticketPurchaseViewModel.addFoodTicket()
+        }
+
+        dataBindingRegular.regularFoodTicketPurchaseMinusButton.setOnClickListener{
+            ticketPurchaseViewModel.removeFoodTicket()
+        }
+
+        dataBindingRegular.regularTicketPurchaseButton.setOnClickListener {
+            //카카오페이 결제 요청
+            ticketPurchaseViewModel.createPaymentRequest()
+
+        }
+
 
 
     }
 
     fun paymentRewordDialog() {
-        val dialog = Dialog(requireActivity())
-        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
-        dialog.setContentView(R.layout.dialog_payment_reword)
-        dialog.show()
+        val dialogReword = Dialog(context)
+
+        val dataBindingReword: DialogPaymentRewordBinding = DataBindingUtil.inflate(
+            LayoutInflater.from(context),
+            R.layout.dialog_payment_reword,
+            null,
+            false
+        )
+
+        dataBindingReword.ticketPurchaseViewModel = ticketPurchaseViewModel
+        dataBindingReword.lifecycleOwner = this
+
+
+
+        dialogReword.requestWindowFeature(Window.FEATURE_NO_TITLE)
+        dialogReword.setContentView(dataBindingReword.root)
+        dialogReword.show()
+
+
+        dataBindingReword.paymentRewordCancel.setOnClickListener {
+            dialogReword.dismiss()
+        }
+
+        dataBindingReword.rewordTranslationTicketPurchasePlusButton.setOnClickListener{
+            ticketPurchaseViewModel.addTranslationTicket()
+        }
+
+        dataBindingReword.rewordTranslationTicketPurchaseMinusButton.setOnClickListener{
+            ticketPurchaseViewModel.removeTranslationTicket()
+        }
+
+        dataBindingReword.rewordFoodTicketPurchasePlusButton.setOnClickListener{
+            ticketPurchaseViewModel.addFoodTicket()
+        }
+
+        dataBindingReword.rewordFoodTicketPurchaseMinusButton.setOnClickListener{
+            ticketPurchaseViewModel.removeFoodTicket()
+        }
+
+        dataBindingReword.rewordTicketPurchaseButton.setOnClickListener {
+            //가능한 리워드 내에서 결제하기
+        }
     }
 }

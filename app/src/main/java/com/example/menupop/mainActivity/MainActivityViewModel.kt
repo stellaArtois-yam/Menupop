@@ -5,6 +5,7 @@ import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import java.text.DecimalFormat
 
 class MainActivityViewModel: ViewModel() {
     val TAG = "MainActivityViewModel"
@@ -46,16 +47,16 @@ class MainActivityViewModel: ViewModel() {
     /**
      * 티켓 구매 + 다이얼로그
      */
-    private val _regularTranslationAmount = MutableLiveData<Int>()
-    val regularTranslationAmount : LiveData<Int>
+    private val _regularTranslationAmount = MutableLiveData<String>()
+    val regularTranslationAmount : LiveData<String>
         get() = _regularTranslationAmount
 
     private val _regularTranslationPrice = MutableLiveData<String>()
     val regularTranslationPrice : LiveData<String>
         get() = _regularTranslationPrice
 
-    private val _regularFoodAmount = MutableLiveData<Int>()
-    val regularFoodAmount : LiveData<Int>
+    private val _regularFoodAmount = MutableLiveData<String>()
+    val regularFoodAmount : LiveData<String>
         get() = _regularFoodAmount
 
     private val _regularFoodPrice = MutableLiveData<String>()
@@ -68,55 +69,60 @@ class MainActivityViewModel: ViewModel() {
         get() = _regularTotalPrice
 
 
-    fun addTranslationTicket(){
-        Log.d(TAG, "addTranslationTicket: 호출")
-       _regularTranslationAmount.value  = _regularTranslationAmount.value!! + 1
-        Log.d(TAG, "개수 : ${_regularTranslationAmount.value}")
-        val price = _regularTranslationAmount.value!! * 2000
-        _regularTranslationPrice.value = "${price}원"
-        Log.d(TAG, "price: ${price}")
-        val totalPrice = _regularTranslationPrice.value + _regularFoodPrice
-        _regularTotalPrice.value = "총 결제 금액 : ${totalPrice}원"
+    fun addTranslationTicket() {
+        changeTicketAmount(_regularTranslationAmount, _regularTranslationPrice, _regularFoodAmount)
     }
 
-    fun removeTranslationTicket(){
-
-        if(_regularFoodAmount.value!! > 0){
-            _regularTranslationAmount.value  = _regularTranslationAmount.value!! - 1
-            val price = _regularTranslationAmount.value!! * 2000
-            _regularTranslationPrice.value = "${price}원"
-            val totalPrice = _regularTranslationPrice.value + _regularFoodPrice
-            _regularTotalPrice.value = "총 결제 금액 : ${totalPrice}원"
-        }
-
-    }
-
-    fun addFoodTicket(){
-        _regularFoodAmount.value = _regularFoodAmount.value!! + 1
-        val price = _regularFoodAmount.value!! * 2000
-        _regularFoodPrice.value = "${price}원"
-        val totalPrice = _regularTranslationPrice.value + _regularFoodPrice
-        _regularTotalPrice.value = "총 결제 금액 : ${totalPrice}원"
-
-
-    }
-
-    fun removeFoodTicket(){
-        if(_regularFoodAmount.value!! > 0){
-            _regularFoodAmount.value = _regularFoodAmount.value!! - 1
-            val price = _regularFoodAmount.value!! * 2000
-            _regularFoodPrice.value = "${price}원"
-            val totalPrice = _regularTranslationPrice.value + _regularFoodPrice
-            _regularTotalPrice.value = "총 결제 금액 : ${totalPrice}원"
+    fun removeTranslationTicket() {
+        if (_regularTranslationAmount.value!!.toInt() > 0) {
+            changeTicketAmount(_regularTranslationAmount, _regularTranslationPrice, _regularFoodAmount, -1)
         }
     }
+
+    fun addFoodTicket() {
+        changeTicketAmount(_regularFoodAmount, _regularFoodPrice, _regularTranslationAmount)
+    }
+
+    fun removeFoodTicket() {
+        if (_regularFoodAmount.value!!.toInt() > 0) {
+            changeTicketAmount(_regularFoodAmount, _regularFoodPrice, _regularTranslationAmount, -1)
+        }
+    }
+
+    private fun changeTicketAmount(ticketAmount: MutableLiveData<String>,
+                                   ticketPrice: MutableLiveData<String>,
+                                   otherTicketAmount: MutableLiveData<String>,
+                                   change: Int = 1) {
+        val quantity = ticketAmount.value!!.toInt() + change
+        ticketAmount.value = quantity.toString()
+
+        val dec = DecimalFormat("#,###")
+
+        val price = quantity * 2000
+        ticketPrice.value = "${dec.format(price)}원"
+
+        val otherTicketPrice = otherTicketAmount.value!!.toInt() * 2000
+
+        val totalPrice = price + otherTicketPrice
+
+        _regularTotalPrice.value = "총 결제 금액 : ${dec.format(totalPrice)}원"
+    }
+
+    fun createPaymentRequest(){
+
+    }
+
+    fun completePayment(){
+
+    }
+
 
 
 
     init {
-        _regularTranslationAmount.value = 1
-        Log.d(TAG, "엥 : ${_regularTranslationAmount.value}")
-        _regularFoodAmount.value = 1
+        _regularTranslationAmount.value = "1"
+        Log.d(TAG, "엥 : ${regularTranslationAmount.value}")
+        _regularFoodAmount.value = "1"
         _regularTranslationPrice.value = "2,000원"
         _regularFoodPrice.value = "2,000원"
         _regularTotalPrice.value = "총 결제 금액 : 4,000원"

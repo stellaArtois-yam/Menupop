@@ -1,8 +1,16 @@
+import org.jetbrains.kotlin.konan.properties.Properties
+import java.io.FileInputStream
+
 plugins {
     id("com.android.application")
     id("org.jetbrains.kotlin.android")
     id("com.google.gms.google-services")
 }
+
+//선언 및 키 값 가져오기
+val localProperties = Properties()
+localProperties.load(FileInputStream(rootProject.file("local.properties")))
+
 
 android {
     namespace = "com.example.menupop"
@@ -16,6 +24,11 @@ android {
         versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+        buildConfigField("String", "KAKAOPAY_ADMIN_KEY", localProperties.getProperty("KAKAOPAY_ADMIN_KEY"))
+    }
+
+    buildFeatures{
+        buildConfig = true
     }
 
     buildTypes {
