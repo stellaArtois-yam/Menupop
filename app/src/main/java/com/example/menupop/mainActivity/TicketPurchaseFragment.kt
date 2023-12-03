@@ -2,6 +2,7 @@ package com.example.menupop.mainActivity
 
 import android.app.Dialog
 import android.content.Context
+import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import androidx.fragment.app.Fragment
@@ -10,10 +11,10 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.Window
 import android.view.WindowManager
+import androidx.annotation.RequiresApi
 
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.ViewModelProvider
-import com.example.menupop.BuildConfig
 import com.example.menupop.R
 import com.example.menupop.databinding.DialogPaymentRegularBinding
 import com.example.menupop.databinding.DialogPaymentRewordBinding
@@ -26,6 +27,7 @@ class TicketPurchaseFragment : Fragment() {
     private lateinit var ticketPurchaseViewModel: MainActivityViewModel
     var event: MainActivityEvent? = null
     private lateinit var context: Context
+    var identifier : Int ?= null
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
@@ -33,6 +35,7 @@ class TicketPurchaseFragment : Fragment() {
         if (context is MainActivityEvent) {
             event = context
             Log.d(TAG, "onAttach: 호출")
+
         } else {
             throw RuntimeException(
                 context.toString()
@@ -45,6 +48,8 @@ class TicketPurchaseFragment : Fragment() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
+        identifier = arguments?.getInt("identifier")
+        Log.d(TAG, "Identifier: $identifier")
     }
 
     override fun onCreateView(
@@ -56,6 +61,7 @@ class TicketPurchaseFragment : Fragment() {
         return binding.root
     }
 
+    @RequiresApi(Build.VERSION_CODES.O)
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
@@ -73,6 +79,7 @@ class TicketPurchaseFragment : Fragment() {
 
     }
 
+    @RequiresApi(Build.VERSION_CODES.O)
     fun clickListener() {
 
         binding.foodTicketPurchaseButton.setOnClickListener {
@@ -89,6 +96,7 @@ class TicketPurchaseFragment : Fragment() {
 
     }
 
+    @RequiresApi(Build.VERSION_CODES.O)
     fun paymentTypeDialog() {
         val dialog = Dialog(context)
 
@@ -123,6 +131,7 @@ class TicketPurchaseFragment : Fragment() {
 
     }
 
+    @RequiresApi(Build.VERSION_CODES.O)
     fun paymentRegularDialog() {
 
         val dataBindingRegular: DialogPaymentRegularBinding = DataBindingUtil.inflate(
@@ -162,7 +171,8 @@ class TicketPurchaseFragment : Fragment() {
 
         dataBindingRegular.regularTicketPurchaseButton.setOnClickListener {
             //카카오페이 결제 요청
-            ticketPurchaseViewModel.createPaymentRequest()
+
+            ticketPurchaseViewModel.createPaymentRequest(identifier.toString())
 
         }
 

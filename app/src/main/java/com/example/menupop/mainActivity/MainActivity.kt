@@ -26,6 +26,8 @@ class MainActivity : AppCompatActivity(), MainActivityEvent{
 
     lateinit var ticketPurchaseFragment: TicketPurchaseFragment
 
+    var identifier : Int? = null
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
@@ -55,9 +57,9 @@ class MainActivity : AppCompatActivity(), MainActivityEvent{
         binding.appbarMenu.findViewById<TextView>(R.id.appbar_status).text = "음식 등록"
 
         var sharedPreferences = getSharedPreferences("userInfo", MODE_PRIVATE)
-        val identifier = mainActivityViewModel.getUserInfo(sharedPreferences)
+        identifier = mainActivityViewModel.getUserInfo(sharedPreferences)
 
-        mainActivityViewModel.requestUserInformation(identifier)
+        mainActivityViewModel.requestUserInformation(identifier!!)
 
         mainActivityViewModel.isLoading.observe(this, Observer {
             if(it){
@@ -108,8 +110,10 @@ class MainActivity : AppCompatActivity(), MainActivityEvent{
                     return true
                 }
                 R.id.tab_profile -> {
+
+
                     supportFragmentManager.beginTransaction()
-                        .replace(R.id.home_frame_layout, ProfileFragment())
+                        .replace(R.id.home_frame_layout, profileFragment)
                         .commit()
                     binding.appbarMenu.findViewById<TextView>(R.id.appbar_status).text = "프로필 확인"
                     return true
@@ -121,8 +125,14 @@ class MainActivity : AppCompatActivity(), MainActivityEvent{
 
     override fun moveToTicketPurchase() {
         Log.d(TAG, "moveToTicketPurchase: 호출")
+
+        val bundle = Bundle()
+        bundle.putInt("identifier", identifier!!)
+        ticketPurchaseFragment.arguments = bundle
+
+
         supportFragmentManager.beginTransaction().apply {
-            replace(R.id.home_frame_layout, TicketPurchaseFragment())
+            replace(R.id.home_frame_layout, ticketPurchaseFragment)
             commit()
             binding.appbarMenu.findViewById<TextView>(R.id.appbar_status).text = "티켓 구매"
             binding.appbarMenu.findViewById<ImageView>(R.id.appbar_back).visibility = View.VISIBLE

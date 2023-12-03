@@ -21,10 +21,8 @@ class ProfileFragment : Fragment() {
     var event: MainActivityEvent? = null
     private var context : Context? = null
 
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
 
     }
 
@@ -65,7 +63,7 @@ class ProfileFragment : Fragment() {
 
         profileViewModel.userInformation.observe(viewLifecycleOwner, Observer{
             if(it.id != null){
-                Log.d(TAG, "init: $id")
+                Log.d(TAG, "init: ${it.id}")
                 binding.profileId.text = it.id
             }else{
                 Log.d(TAG, "init: null")

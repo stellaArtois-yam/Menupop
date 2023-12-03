@@ -7,8 +7,11 @@ import com.example.menupop.mainActivity.UserInformationData
 import com.example.menupop.signup.ResultModel
 import retrofit2.Call
 import retrofit2.http.Field
+import retrofit2.http.FieldMap
 import retrofit2.http.FormUrlEncoded
 import retrofit2.http.GET
+import retrofit2.http.Header
+import retrofit2.http.Headers
 import retrofit2.http.POST
 import retrofit2.http.Path
 
@@ -66,8 +69,20 @@ interface RetrofitService {
 
 
     @POST("v1/payment/ready")
+    @Headers("Content-Type: application/json")
     @FormUrlEncoded
-    fun createPaymentRequest()
+    fun createPaymentRequest(@Header("Authorization") apiKey: String,
+                             @FieldMap kakaoPayRequestModel: KakaoPayRequestModel )  //실패 시 redirect url
+                            : Call<KakaoPayResponseModel>
+
+    @POST("v1/payment/approve")
+    @FormUrlEncoded
+    fun requestApprovePayment(@Header("Authorization") apiKey : String,
+                              @Field("cid") cid : String,
+                              @Field("tid") tid : String,
+                              @Field("partner_order_id") orderId : String,
+                              @Field("partner_user_id") userId : String,
+                              @Field("pg_token") pgToken : String)
 
 
 }
