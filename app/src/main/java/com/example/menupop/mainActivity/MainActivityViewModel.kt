@@ -42,11 +42,7 @@ class MainActivityViewModel: ViewModel() {
         callbackUserInfo = {response ->
             _userInformation.value = response
             Log.d(TAG, "requestUserInformation: ${response.id}, ${response.email}")
-            if(response.id != null && response.email!=null){
-                _isLoading.value = true
-            }else{
-                _isLoading.value = false
-            }
+            _isLoading.value = response.id != null && response.email!=null
         }
         mainActivityModel.requestUserInformation(identifier, callbackUserInfo!!)
     }
