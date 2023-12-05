@@ -20,7 +20,7 @@
     <string name="email_rule_warning">이메일 형식이 일치하지 않음</string>
 
     <string name="login_failed_warning">입력하신 아이디, 비밀번호와 일치하는 회원정보가 존재하지 않습니다.\n아이디, 비밀번호를 확인해주세요.</string>
-
+    <string name="dialog_delete_warning">삭제하시면 다시 복구되지 않습니다.\n신중하게 선택해주세요 :)</string>
 
     <string-array name="spinner_items">
         <item>선택</item>

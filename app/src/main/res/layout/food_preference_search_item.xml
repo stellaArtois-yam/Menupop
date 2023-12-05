@@ -6,20 +6,10 @@
     android:gravity="center"
     android:background="@drawable/stroke">
 
-    <TextView
-        android:id="@+id/food_preference_item_favorite"
-        android:layout_width="0dp"
-        android:layout_height="50dp"
-        android:layout_weight="0.2"
-        android:background="@drawable/radius_30_stroke_light_gray"
-        android:text="호"
-        android:textColor="@color/black"
-        android:textSize="18sp"
-        android:gravity="center"
-        android:layout_marginStart="10dp"/>
+
 
     <TextView
-        android:id="@+id/food_preference_item_name"
+        android:id="@+id/food_preference_search_name"
         android:layout_width="0dp"
         android:layout_height="50dp"
         android:layout_weight="1"
@@ -29,13 +19,29 @@
         android:gravity="center"/>
 
     <TextView
-        android:id="@+id/food_preference_item_delete_button"
+        android:id="@+id/food_preference_search_favorite"
         android:layout_width="0dp"
-        android:layout_weight="0.2"
         android:layout_height="50dp"
-        android:gravity="center"
+        android:layout_weight="0.2"
+        android:background="@drawable/radius_30_stroke_light_gray"
+        android:backgroundTint="@color/orange"
+        android:text="호"
         android:textColor="@color/black"
         android:textSize="18sp"
-        android:text="X"/>
+        android:gravity="center" />
+
+    <TextView
+        android:id="@+id/food_preference_search_unfavorite"
+        android:layout_width="0dp"
+        android:layout_height="50dp"
+        android:layout_weight="0.2"
+        android:background="@drawable/radius_30_stroke_light_gray"
+        android:backgroundTint="@color/yellow"
+        android:text="불호"
+        android:textColor="@color/black"
+        android:textSize="18sp"
+        android:gravity="center"
+        android:layout_marginEnd="10dp"
+        android:layout_marginStart="20dp"/>
 
 </LinearLayout>
