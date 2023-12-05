@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.util.Log
 import android.view.MenuItem
 import android.view.View
+import android.webkit.WebViewFragment
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
@@ -14,14 +15,19 @@ import com.example.menupop.R
 import com.example.menupop.databinding.ActivityMainBinding
 import com.google.android.material.bottomnavigation.BottomNavigationView
 
-class MainActivity : AppCompatActivity(){
+class MainActivity : AppCompatActivity(), MainActivityEvent{
     val TAG = "MainActivity"
 
     lateinit var mainActivityViewModel: MainActivityViewModel
     lateinit var binding : ActivityMainBinding
+
     lateinit var foodPreferenceFragment: FoodPreferenceFragment
     lateinit var exchangeFragment: ExchangeFragment
     lateinit var profileFragment: ProfileFragment
+
+    lateinit var ticketPurchaseFragment: TicketPurchaseFragment
+
+    var identifier : Int? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -40,6 +46,7 @@ class MainActivity : AppCompatActivity(){
         foodPreferenceFragment = FoodPreferenceFragment()
         exchangeFragment = ExchangeFragment()
         profileFragment = ProfileFragment()
+        ticketPurchaseFragment = TicketPurchaseFragment()
 
         binding = DataBindingUtil.setContentView(this, R.layout.activity_main)
         mainActivityViewModel = ViewModelProvider(this).get(MainActivityViewModel::class.java)
@@ -51,9 +58,9 @@ class MainActivity : AppCompatActivity(){
         binding.appbarMenu.findViewById<TextView>(R.id.appbar_status).text = "음식 등록"
 
         var sharedPreferences = getSharedPreferences("userInfo", MODE_PRIVATE)
-        val identifier = mainActivityViewModel.getUserInfo(sharedPreferences)
+        identifier = mainActivityViewModel.getUserInfo(sharedPreferences)
 
-        mainActivityViewModel.requestUserInformation(identifier)
+        mainActivityViewModel.requestUserInformation(identifier!!)
 
         mainActivityViewModel.isLoading.observe(this, Observer {
             if(it){
@@ -70,6 +77,8 @@ class MainActivity : AppCompatActivity(){
                 //
             }
         })
+
+
 
 
     }
@@ -104,8 +113,9 @@ class MainActivity : AppCompatActivity(){
                     return true
                 }
                 R.id.tab_profile -> {
+
                     supportFragmentManager.beginTransaction()
-                        .replace(R.id.home_frame_layout, ProfileFragment())
+                        .replace(R.id.home_frame_layout, profileFragment)
                         .commit()
                     binding.appbarMenu.findViewById<TextView>(R.id.appbar_status).text = "프로필 확인"
                     return true
@@ -114,4 +124,51 @@ class MainActivity : AppCompatActivity(){
             return false
         }
     }
+
+    override fun moveToTicketPurchase() {
+        Log.d(TAG, "moveToTicketPurchase: 호출")
+
+        val bundle = Bundle()
+        bundle.putInt("identifier", identifier!!)
+        ticketPurchaseFragment.arguments = bundle
+
+
+        supportFragmentManager.beginTransaction().apply {
+            replace(R.id.home_frame_layout, ticketPurchaseFragment)
+            commit()
+            binding.appbarMenu.findViewById<TextView>(R.id.appbar_status).text = "티켓 구매"
+            binding.appbarMenu.findViewById<ImageView>(R.id.appbar_back).visibility = View.VISIBLE
+
+            binding.appbarMenu.findViewById<ImageView>(R.id.appbar_back).setOnClickListener{
+                supportFragmentManager.beginTransaction().apply {
+                    replace(R.id.home_frame_layout, ProfileFragment())
+                    commit()
+                    binding.appbarMenu.findViewById<TextView>(R.id.appbar_status).text = "프로필 확인"
+                    binding.appbarMenu.findViewById<ImageView>(R.id.appbar_back).visibility = View.GONE
+
+                }
+            }
+
+            Log.d(TAG, "moveToTicketPurchase Main: ")
+        }
+    }
+
+    override fun moveToWebView() {
+        val webViewFragment = KakaoPayWebView()
+
+      supportFragmentManager.beginTransaction().apply {
+          replace(R.id.home_frame_layout, webViewFragment)
+          commit()
+      }
+    }
+
+    override fun moveToAdvertisement() {
+        //광고보러 가기
+    }
+
+    override fun accountWithdrawal() {
+      //회원 탈퇴
+    }
+
+
 }

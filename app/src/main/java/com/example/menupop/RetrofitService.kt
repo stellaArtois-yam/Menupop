@@ -7,8 +7,10 @@ import com.example.menupop.mainActivity.UserInformationData
 import com.example.menupop.signup.ResultModel
 import retrofit2.Call
 import retrofit2.http.Field
+import retrofit2.http.FieldMap
 import retrofit2.http.FormUrlEncoded
 import retrofit2.http.GET
+import retrofit2.http.Header
 import retrofit2.http.POST
 import retrofit2.http.Path
 
@@ -63,5 +65,24 @@ interface RetrofitService {
 
     @GET("v6/{authKey}/latest/{baseRate}")
     fun requestExchangeRates(@Path("authKey") authKey:String,@Path("baseRate")baseRate : String) : Call<ExchangeRateDataClass>
+
+
+    @POST("v1/payment/ready")
+    @FormUrlEncoded
+    fun createPaymentRequest(@Header("Authorization") apiKey : String,
+                             @FieldMap map : HashMap<String,String>)
+                            : Call<KakaoPayReadyResponse>
+//    @POST("SavePaymentHistory.php")
+//    @FormUrlEncoded
+//    fun savePaymentHistory(@Field("identifier") identifier : Int,
+//                           @Field)
+
+
+    @POST("v1/payment/approve")
+    @FormUrlEncoded
+    fun requestApprovePayment(@Header("Authorization") apiKey : String,
+                              @FieldMap map : HashMap<String, String>)
+                                :Call<KakaoPayApproveResponse>
+
 
 }

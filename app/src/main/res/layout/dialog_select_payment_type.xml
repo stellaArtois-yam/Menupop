@@ -1,56 +1,70 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="@dimen/login_width"
-    android:layout_height="wrap_content"
-    android:orientation="vertical"
-    android:background="@drawable/dialog_background">
 
-    <androidx.appcompat.widget.AppCompatButton
-        android:id="@+id/payment_type_cancel"
-        android:layout_width="30dp"
-        android:layout_height="30dp"
-        android:background="@drawable/cancel"
-        android:layout_gravity="end"
-        android:layout_margin="10dp"/>
+<layout>
 
-    <TextView
+
+    <data>
+
+        <variable
+            name="ticketPurchaseViewModel"
+            type="com.example.menupop.mainActivity.MainActivityViewModel" />
+    </data>
+
+
+    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="@string/payment_type"
-        android:gravity="center"
-        android:textSize="18sp"
-        android:padding="20dp"/>
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:gravity="center"
-        android:layout_marginBottom="50dp">
+        android:background="@drawable/dialog_background"
+        android:orientation="vertical">
 
         <androidx.appcompat.widget.AppCompatButton
-            android:id="@+id/payment_type_regular"
-            android:layout_width="120dp"
-            android:layout_height="@dimen/standard_height"
-            android:background="@drawable/profile_button"
-            android:text="일반 결제"
-            android:textStyle="bold"
-            android:textColor="@color/white"
-            android:textSize="16sp"/>
+            android:id="@+id/payment_type_cancel"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:layout_gravity="end"
+            android:layout_margin="10dp"
+            android:background="@drawable/cancel" />
 
-        <androidx.appcompat.widget.AppCompatButton
-            android:id="@+id/payment_type_reword"
-            android:layout_width="120dp"
-            android:layout_height="@dimen/standard_height"
-            android:background="@drawable/profile_button"
-            android:backgroundTint="@color/yellow"
-            android:text="리워드 사용"
-            android:textSize="16sp"
-            android:textColor="@color/white"
-            android:textStyle="bold"
-            android:layout_marginStart="30dp" />
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:padding="20dp"
+            android:text="@string/payment_type"
+            android:textSize="18sp" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="50dp"
+            android:gravity="center"
+            android:orientation="horizontal">
+
+            <androidx.appcompat.widget.AppCompatButton
+                android:id="@+id/payment_type_regular"
+                android:layout_width="120dp"
+                android:layout_height="@dimen/standard_height"
+                android:background="@drawable/profile_button"
+                android:text="일반 결제"
+                android:textColor="@color/white"
+                android:textSize="16sp"
+                android:textStyle="bold" />
+
+            <androidx.appcompat.widget.AppCompatButton
+                android:id="@+id/payment_type_reword"
+                android:layout_width="120dp"
+                android:layout_height="@dimen/standard_height"
+                android:layout_marginStart="30dp"
+                android:background="@drawable/profile_button"
+                android:backgroundTint="@color/yellow"
+                android:text="리워드 사용"
+                android:textColor="@color/white"
+                android:textSize="16sp"
+                android:textStyle="bold" />
+
+        </LinearLayout>
+
 
     </LinearLayout>
 
-
-</LinearLayout>
+</layout>

@@ -2,8 +2,14 @@
 <resources>
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
-    <color name="orange">#FF8D24</color>
+    <color name="orange">#FF7F09</color>
+    <color name="light_orange">#FFF1E0</color>
+
     <color name="yellow">#FFAD0D</color>
+    <color name="light_yellow">#FEF7E9</color>
+
+
+
     <color name="pale_gray">#E7E7E7</color>
     <color name="button_gray">#F5F4F4</color>
     <color name="light_gray">#8C8888</color>
