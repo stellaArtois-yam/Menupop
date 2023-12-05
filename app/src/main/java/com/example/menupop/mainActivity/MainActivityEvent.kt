@@ -4,6 +4,8 @@ interface MainActivityEvent {
 
     fun moveToTicketPurchase()
 
+    fun moveToWebView()
+
     fun moveToAdvertisement()
 
     fun accountWithdrawal()

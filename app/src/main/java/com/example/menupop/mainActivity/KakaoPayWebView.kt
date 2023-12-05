@@ -1,0 +1,130 @@
+package com.example.menupop.mainActivity
+
+import android.content.Context
+import android.content.Intent
+import android.os.Bundle
+import android.util.Log
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
+import android.webkit.WebChromeClient
+import android.webkit.WebResourceRequest
+import android.webkit.WebView
+import android.webkit.WebViewClient
+import androidx.fragment.app.Fragment
+import androidx.lifecycle.Observer
+import androidx.lifecycle.ViewModelProvider
+import com.example.menupop.R
+import java.net.URISyntaxException
+
+class KakaoPayWebView : Fragment() {
+    val TAG = "WebViewFragment"
+    private lateinit var webView: WebView
+    private lateinit var ticketPurchaseViewModel : MainActivityViewModel
+    var event : MainActivityEvent? = null
+    private lateinit var context : Context
+
+
+    override fun onAttach(context: Context) {
+        super.onAttach(context)
+
+        this.context = context
+        if (context is MainActivityEvent) {
+            event = context
+            Log.d(TAG, "onAttach: 호출")
+
+        } else {
+            throw RuntimeException(
+                context.toString()
+                        + "must implement MainActivityEvent"
+            )
+        }
+    }
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        Log.d(TAG, "onCreate:")
+
+
+    }
+
+    override fun onCreateView(
+        inflater: LayoutInflater, container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View? {
+        Log.d(TAG, "onCreateView: ")
+        val view = inflater.inflate(R.layout.webview, container, false)
+        webView = view.findViewById(R.id.webview)
+
+        return view
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+
+        Log.d(TAG, "onViewCreated: ")
+
+        ticketPurchaseViewModel = ViewModelProvider(requireActivity()).get(MainActivityViewModel::class.java)
+
+        val myWebViewClient = MyWebViewClient(ticketPurchaseViewModel)
+        webView.settings.javaScriptEnabled = true
+        webView.webViewClient = myWebViewClient
+
+        ticketPurchaseViewModel.paymentResponse.observe(viewLifecycleOwner, Observer {
+            if(it!=null){
+                val url = it.next_redirect_mobile_url
+                Log.d(TAG, "mobile url: $url")
+                webView.loadUrl(url)
+
+
+            }
+        })
+
+
+    }
+
+    inner class MyWebViewClient (val viewModel : MainActivityViewModel):WebViewClient(){
+
+        val TAG = "MyWebViewClient"
+
+        var pgToken : String ?= null
+
+        override fun shouldOverrideUrlLoading(view: WebView?, request: WebResourceRequest?): Boolean {
+
+
+            val url = request!!.url.toString()
+            Log.d(TAG, "urlLoading: $url")
+
+
+            if(url.startsWith("intent://")){
+                try{
+                    val intent = Intent.parseUri(url, Intent.URI_INTENT_SCHEME)
+                    intent?.let{
+                        view?.context?.startActivity(it)
+                        Log.d(TAG, "?")
+                        return true
+                    }
+                }catch (e : URISyntaxException){
+                    Log.d(TAG, "exception: ${e.message}")
+                }
+            }
+
+
+
+            pgToken = url.substringAfter("pg_token=")
+            Log.d(TAG, "pgToken: $pgToken")
+
+            if(pgToken != null){
+                viewModel.updatePgToken(pgToken!!)
+            }
+
+            view!!.loadUrl(url)
+
+
+            return super.shouldOverrideUrlLoading(view, request)
+        }
+
+    }
+
+
+}

@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.util.Log
 import android.view.MenuItem
 import android.view.View
+import android.webkit.WebViewFragment
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
@@ -78,6 +79,8 @@ class MainActivity : AppCompatActivity(), MainActivityEvent{
         })
 
 
+
+
     }
 
     private fun settingListener() {
@@ -110,7 +113,6 @@ class MainActivity : AppCompatActivity(), MainActivityEvent{
                     return true
                 }
                 R.id.tab_profile -> {
-
 
                     supportFragmentManager.beginTransaction()
                         .replace(R.id.home_frame_layout, profileFragment)
@@ -149,6 +151,15 @@ class MainActivity : AppCompatActivity(), MainActivityEvent{
 
             Log.d(TAG, "moveToTicketPurchase Main: ")
         }
+    }
+
+    override fun moveToWebView() {
+        val webViewFragment = KakaoPayWebView()
+
+      supportFragmentManager.beginTransaction().apply {
+          replace(R.id.home_frame_layout, webViewFragment)
+          commit()
+      }
     }
 
     override fun moveToAdvertisement() {

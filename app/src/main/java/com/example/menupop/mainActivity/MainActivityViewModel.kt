@@ -7,14 +7,19 @@ import androidx.annotation.RequiresApi
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import com.example.menupop.KakaoPayResponseModel
+import com.example.menupop.KakaoPayApproveResponse
+import com.example.menupop.KakaoPayReadyResponse
+import com.example.menupop.signup.ResultModel
 import java.text.DecimalFormat
+import java.util.Objects
 
 class MainActivityViewModel: ViewModel() {
     val TAG = "MainActivityViewModel"
     val mainActivityModel = MainActivityModel()
+    private var callback : ((ResultModel) -> Unit) ?= null
     private var callbackUserInfo :((UserInformationData) ->Unit) ?= null
-    private var callbackKakaoReady : ((KakaoPayResponseModel) -> Unit) ? = null
+    private var callbackKakaoReady : ((KakaoPayReadyResponse) -> Unit) ? = null
+    private var callbackApprove : ((KakaoPayApproveResponse) -> Unit) ? = null
 
     /**
      * 메인
@@ -130,34 +135,85 @@ class MainActivityViewModel: ViewModel() {
                  otherTicketAmount: MutableLiveData<String>) : String{
         if(ticketAmount.value!!.toInt() > 0 && otherTicketAmount.value!!.toInt() >0){
             val total = ticketAmount.value!!.toInt() + otherTicketAmount.value!!.toInt() - 1
-            Log.d(TAG, "itemName: 번역 티켓 외 $total")
             return "번역 티켓 외 $total"
 
         }else if(ticketAmount.value!!.toInt() > 0 && otherTicketAmount.value!!.toInt() == 0){
-            Log.d(TAG, "itemName: 번역 티켓")
             return "번역 티켓"
         }else{
-            Log.d(TAG, "itemName: 음식 티켓")
             return "음식 티켓"
         }
     }
 
+
+    private val _paymentResponse = MutableLiveData<KakaoPayReadyResponse>()
+    val paymentResponse : LiveData<KakaoPayReadyResponse>
+        get() = _paymentResponse
+
+    private val _pgToken = MutableLiveData<String>()
+    val pgToken : LiveData<String>
+        get() = _pgToken
+
+    private val _userId = MutableLiveData<String>()
+
+
+    @RequiresApi(Build.VERSION_CODES.O)
+    fun updatePgToken(token : String){
+
+        Log.d(TAG, "updatePgToken: $token")
+        _pgToken.value = token
+
+        if(_pgToken.value !=null){
+            Log.d(TAG, "updatePgToken: not null")
+            completePayment(_paymentResponse.value!!.tid, _userId.value!!, _pgToken.value!!)
+        }
+    }
+
+
     @RequiresApi(Build.VERSION_CODES.O)
     fun createPaymentRequest(userId : String){
-        Log.d(TAG, "createPaymentRequest: 호출")
         callbackKakaoReady = {response ->
 
-            Log.d(TAG, "createPaymentRequest: $response")
+            //여기서 웹뷰로 보내 줘야 함
+            if(response!=null){
+                _paymentResponse.value = response
+
+            }
+
 
         }
         val item = itemName(_regularTranslationAmount, _regularFoodAmount)
         val quantity = countTicket(_regularTranslationAmount, _regularFoodAmount)
+
+        _userId.value = userId
+
         mainActivityModel.createPaymentRequest(userId, item, quantity.toString(),
             _totalPriceForPay.value!!, callbackKakaoReady!!)
         
     }
 
-    fun completePayment(){
+    @RequiresApi(Build.VERSION_CODES.O)
+    fun completePayment(tid : String, userId: String, pgToken : String){
+        callbackApprove = {response ->
+            Log.d(TAG, "completePayment: $response")
+            //여기서 데이터 받아서 클라이언트 티켓 개수 수정
+
+
+        // db에 티켓 개수도 수정
+        // 구매 이력 저장
+            savePaymentHistory(response.partner_user_id.toInt(),
+                response.tid, response.payment_method_type,
+                response.item_name, response.amount.total.toInt(), response.approved_at)
+
+        }
+        mainActivityModel.requestApprovePayment(tid, userId, pgToken, callbackApprove!!)
+    }
+
+    fun savePaymentHistory(identifier: Int, tid : String, paymentType : String, item : String,
+                           price : Int, approve_at : String){
+        callback = {response ->
+
+        }
+
 
     }
 

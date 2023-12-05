@@ -11,7 +11,6 @@ import retrofit2.http.FieldMap
 import retrofit2.http.FormUrlEncoded
 import retrofit2.http.GET
 import retrofit2.http.Header
-import retrofit2.http.Headers
 import retrofit2.http.POST
 import retrofit2.http.Path
 
@@ -69,20 +68,21 @@ interface RetrofitService {
 
 
     @POST("v1/payment/ready")
-    @Headers("Content-Type: application/json")
     @FormUrlEncoded
-    fun createPaymentRequest(@Header("Authorization") apiKey: String,
-                             @FieldMap kakaoPayRequestModel: KakaoPayRequestModel )  //실패 시 redirect url
-                            : Call<KakaoPayResponseModel>
+    fun createPaymentRequest(@Header("Authorization") apiKey : String,
+                             @FieldMap map : HashMap<String,String>)
+                            : Call<KakaoPayReadyResponse>
+//    @POST("SavePaymentHistory.php")
+//    @FormUrlEncoded
+//    fun savePaymentHistory(@Field("identifier") identifier : Int,
+//                           @Field)
+
 
     @POST("v1/payment/approve")
     @FormUrlEncoded
     fun requestApprovePayment(@Header("Authorization") apiKey : String,
-                              @Field("cid") cid : String,
-                              @Field("tid") tid : String,
-                              @Field("partner_order_id") orderId : String,
-                              @Field("partner_user_id") userId : String,
-                              @Field("pg_token") pgToken : String)
+                              @FieldMap map : HashMap<String, String>)
+                                :Call<KakaoPayApproveResponse>
 
 
 }

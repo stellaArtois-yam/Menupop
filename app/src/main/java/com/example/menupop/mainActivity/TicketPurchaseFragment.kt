@@ -14,6 +14,7 @@ import android.view.WindowManager
 import androidx.annotation.RequiresApi
 
 import androidx.databinding.DataBindingUtil
+import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import com.example.menupop.R
 import com.example.menupop.databinding.DialogPaymentRegularBinding
@@ -75,6 +76,12 @@ class TicketPurchaseFragment : Fragment() {
             ViewModelProvider(requireActivity()).get(MainActivityViewModel::class.java)
         binding.ticketPurchaseViewModel = ticketPurchaseViewModel
         binding.lifecycleOwner = this
+
+        ticketPurchaseViewModel.paymentResponse.observe(viewLifecycleOwner, Observer {
+            if(it!=null){
+                event?.moveToWebView()
+            }
+        })
 
 
     }
@@ -171,7 +178,7 @@ class TicketPurchaseFragment : Fragment() {
 
         dataBindingRegular.regularTicketPurchaseButton.setOnClickListener {
             //카카오페이 결제 요청
-
+            dialogRegular.dismiss()
             ticketPurchaseViewModel.createPaymentRequest(identifier.toString())
 
         }
