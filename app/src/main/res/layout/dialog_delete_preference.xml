@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="300dp"
+    android:background="@drawable/dialog_background"
+    android:gravity="center">
+
+    <TextView
+        android:id="@+id/dialog_delete_preference_warning"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="[시금치]를 [불호]음식에서\n\n삭제 하시겠습니까?"
+        android:textSize="20sp"
+        android:textColor="@color/black"
+        android:gravity="center"/>
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/dialog_delete_warning"
+        android:textColor="@color/light_gray"
+        android:textSize="18sp"
+        android:gravity="center"
+        android:layout_marginTop="20dp"
+        android:layout_marginBottom="20dp"/>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center">
+
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/dialog_delete_preference_delete_button"
+            android:layout_width="100dp"
+            android:layout_height="wrap_content"
+            android:background="@drawable/radius_30_stroke_light_gray"
+            android:backgroundTint="@color/orange"
+            android:text="삭제"
+            android:textColor="@color/white"
+            android:textSize="18sp"
+            android:textStyle="bold"/>
+
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/dialog_delete_preference_cancel_button"
+            android:layout_width="100dp"
+            android:layout_height="wrap_content"
+            android:background="@drawable/radius_30_stroke_light_gray"
+            android:backgroundTint="@color/pale_gray"
+            android:textSize="18sp"
+            android:textColor="@color/black"
+            android:text="취소"
+            android:layout_marginStart="30dp"/>
+
+
+
+    </LinearLayout>
+
+</LinearLayout>
