@@ -56,7 +56,8 @@ class KakaoPayWebView : Fragment() {
     ): View? {
         Log.d(TAG, "onCreateView: ")
         val view = inflater.inflate(R.layout.webview, container, false)
-        webView = view.findViewById(R.id.webview)
+
+        webView  = view.findViewById(R.id.webview)
 
         return view
     }
@@ -78,7 +79,6 @@ class KakaoPayWebView : Fragment() {
                 Log.d(TAG, "mobile url: $url")
                 webView?.loadUrl(url)
 
-
             }
         })
 
@@ -99,16 +99,16 @@ class KakaoPayWebView : Fragment() {
             Log.d(TAG, "urlLoading: $url")
 
 
-            if(url.startsWith("intent://")){
+            if (url.startsWith("intent://")) {
 
-                try{
+                try {
                     val intent = Intent.parseUri(url, Intent.URI_INTENT_SCHEME)
-                    intent?.let{
+                    intent?.let {
                         view?.context?.startActivity(it)
                         Log.d(TAG, "?")
                         return true
                     }
-                }catch (e : URISyntaxException){
+                } catch (e: URISyntaxException) {
                     Log.d(TAG, "exception: ${e.message}")
                 }
 
@@ -119,19 +119,25 @@ class KakaoPayWebView : Fragment() {
             pgToken = url.substringAfter("pg_token=")
             Log.d(TAG, "pgToken: $pgToken")
 
-            if(pgToken != null){
+            if (pgToken != null) {
                 viewModel.updatePgToken(pgToken!!)
             }
 
-            if(url.contains("KakaoPayApprove")){
+            if (url.contains("KakaoPayApprove")) {
                 //여기서 결제 완료 observe해서 update 되면 이동
-                webView = null
-                event?.completePayment()
+                viewModel.changeTicket.observe(viewLifecycleOwner, Observer {
+                    if(it){
+                        event?.completePayment()
+                    }
+                })
+
+                Log.d(TAG, "webView Clear")
+
 
             }
 
-
             view!!.loadUrl(url)
+            Log.d(TAG, "what")
 
 
             return false

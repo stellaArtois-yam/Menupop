@@ -13,8 +13,6 @@ import com.example.menupop.TicketSaveModel
 import com.example.menupop.signup.ResultModel
 import com.google.gson.Gson
 import com.google.gson.GsonBuilder
-import kotlinx.serialization.encodeToString
-import kotlinx.serialization.json.Json
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
