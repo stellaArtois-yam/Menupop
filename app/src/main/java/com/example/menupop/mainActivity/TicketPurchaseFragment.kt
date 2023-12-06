@@ -182,6 +182,7 @@ class TicketPurchaseFragment : Fragment() {
             //카카오페이 결제 요청
             dialogRegular.dismiss()
             ticketPurchaseViewModel.createPaymentRequest(identifier.toString())
+            Log.d(TAG, "paymentRegularDialog: ?!?!??")
 
         }
 

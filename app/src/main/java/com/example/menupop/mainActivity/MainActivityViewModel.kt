@@ -194,6 +194,7 @@ class MainActivityViewModel: ViewModel() {
 
     @RequiresApi(Build.VERSION_CODES.O)
     fun createPaymentRequest(userId : String){
+        Log.d(TAG, "createPaymentRequest: !!!")
         callbackKakaoReady = {response ->
 
             //여기서 웹뷰로 보내 줘야 함
@@ -217,6 +218,8 @@ class MainActivityViewModel: ViewModel() {
         callbackApprove = {response ->
             Log.d(TAG, "completePayment: $response")
 
+            _paymentResponse.value = null
+
         // db에 티켓 개수도 수정
         // 구매 이력 저장
             savePaymentHistory(response.partner_user_id.toInt(),
@@ -226,6 +229,11 @@ class MainActivityViewModel: ViewModel() {
         }
         mainActivityModel.requestApprovePayment(tid, userId, pgToken, callbackApprove!!)
     }
+
+    val _changeTicket = MutableLiveData<Boolean>()
+
+    val changeTicket : LiveData<Boolean>
+        get() =_changeTicket
 
     fun savePaymentHistory(identifier: Int, tid : String, paymentType : String, item : String,
                            price : Int, approveAt : String){
@@ -237,9 +245,13 @@ class MainActivityViewModel: ViewModel() {
             if(response.result == "success"){
 
                 if(_paymentType.value == "regular"){
-
                     _userInformation.value!!.foodTicket = _userInformation.value!!.foodTicket + _regularFoodAmount.value!!.toInt()
+                    Log.d(TAG, "foodTicket: ${_userInformation.value!!.foodTicket}")
+
                     _userInformation.value!!.translationTicket = _userInformation.value!!.translationTicket + _regularTranslationAmount.value!!.toInt()
+                    Log.d(TAG, "translationTicket: ${_userInformation.value!!.translationTicket}")
+
+                    _changeTicket.value = true
 
                 }else if(_paymentType.value == "reword"){
                     /**
