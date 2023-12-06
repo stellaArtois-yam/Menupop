@@ -227,4 +227,10 @@ class MainActivityModel {
         })
     }
 
+    fun logout(sharedPreferences: SharedPreferences) {
+        val editor = sharedPreferences.edit()
+        editor.clear()
+        editor.commit()
+    }
+
 }

@@ -327,7 +327,7 @@ class MainActivityViewModel: ViewModel() {
     }
 
     fun logout(sharedPreferences: SharedPreferences){
-//        mainActivityModel.logout(sharedPreferences)
+        mainActivityModel.logout(sharedPreferences)
     }
 
 
