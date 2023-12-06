@@ -1,5 +1,6 @@
 package com.example.menupop.mainActivity
 
+import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.view.MenuItem
@@ -13,6 +14,7 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import com.example.menupop.R
 import com.example.menupop.databinding.ActivityMainBinding
+import com.example.menupop.login.LoginActivity
 import com.google.android.material.bottomnavigation.BottomNavigationView
 
 class MainActivity : AppCompatActivity(), MainActivityEvent{
@@ -176,6 +178,16 @@ class MainActivity : AppCompatActivity(), MainActivityEvent{
 
     override fun accountWithdrawal() {
       //회원 탈퇴
+        supportFragmentManager.beginTransaction().apply {
+            replace(R.id.home_frame_layout, WithdrawalFragment())
+            commit()
+            binding.appbarMenu.findViewById<TextView>(R.id.appbar_status).text = "회원탈퇴"
+        }
+    }
+
+    override fun logout() {
+        val intent = Intent(this, LoginActivity::class.java)
+        startActivity(intent)
     }
 
 

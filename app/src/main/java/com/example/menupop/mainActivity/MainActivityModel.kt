@@ -43,6 +43,12 @@ class MainActivityModel {
         return identifier
     }
 
+    fun logout(sharedPreferences: SharedPreferences){
+        val editor = sharedPreferences.edit()
+        editor.clear()
+        editor.commit()
+    }
+
     fun savePaymentHistory(ticketSaveModel: TicketSaveModel, callback: (ResultModel) -> Unit){
 
         val call : Call<ResultModel> = service.savePaymentHistory(ticketSaveModel.identifier,

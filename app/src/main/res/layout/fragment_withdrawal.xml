@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".mainActivity.WithdrawalFragment">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:gravity="center">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="회원 탈퇴 시 보유"
+            android:fontFamily="@font/GmarketSansTTFBold"
+            android:textSize="20sp"
+            android:textColor="@color/light_gray"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="티켓이 모두 사라집니다 :("
+            android:fontFamily="@font/GmarketSansTTFBold"
+            android:textSize="20sp"
+            android:textColor="@color/orange"
+            android:layout_marginTop="10dp"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="탈퇴하시면 지금까지 구매하신\n쿠폰들이 모두 사라져 복구가 불가합니다\n\n탈퇴 후에도 6개월간 회원님의 정보가 보관됩니다"
+            android:textAlignment="center"
+            android:textColor="@color/light_gray"
+            android:layout_marginTop="10dp"/>
+        <TextView
+            android:layout_width="300dp"
+            android:layout_height="wrap_content"
+            android:text="음식 티켓 : 4개"
+            android:textColor="@color/black"
+            android:textStyle="bold"
+            android:padding="10dp"
+            android:textSize="18sp"
+            android:textAlignment="center"
+            android:background="@drawable/stroke"
+            android:layout_marginTop="30dp"/>
+
+        <TextView
+            android:layout_width="300dp"
+            android:layout_height="wrap_content"
+            android:text="번역 티켓 : 4개"
+            android:textColor="@color/black"
+            android:textStyle="bold"
+            android:padding="10dp"
+            android:textSize="18sp"
+            android:textAlignment="center"
+            android:background="@drawable/stroke"
+            android:layout_marginTop="30dp"/>
+
+
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center"
+            ndroid:layout_marginTop="10dp">
+
+            <CheckBox
+                android:layout_width="48dp"
+                android:layout_height="48dp"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="위 주의사항을 모두 숙지했고, 탈퇴에 동의합니다"
+                android:textColor="@color/light_gray"/>
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center"
+            android:layout_marginTop="10dp">
+
+           <androidx.appcompat.widget.AppCompatButton
+               android:id="@+id/withdrawal_disagree"
+               android:layout_width="100dp"
+               android:layout_height="wrap_content"
+               android:text="더 써볼래요"
+               android:textStyle="bold"
+               android:textColor="@color/light_gray"
+               android:backgroundTint="@color/pale_gray"
+               android:background="@drawable/radius_30_stroke_light_gray" />
+
+            <androidx.appcompat.widget.AppCompatButton
+                android:id="@+id/withdrawal_agree"
+                android:layout_width="100dp"
+                android:layout_height="wrap_content"
+                android:text="진짜 안녕"
+                android:textColor="@color/white"
+                android:textStyle="bold"
+                android:background="@drawable/radius_30_stroke_light_gray"
+                android:backgroundTint="@color/orange"
+                android:layout_marginStart="50dp"/>
+        </LinearLayout>
+
+
+    </LinearLayout>
+
+
+
+
+
+
+
+
+</FrameLayout>
