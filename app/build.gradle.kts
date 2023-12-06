@@ -5,6 +5,7 @@ plugins {
     id("com.android.application")
     id("org.jetbrains.kotlin.android")
     id("com.google.gms.google-services")
+    kotlin("plugin.serialization") version "1.9.21"
 }
 
 //선언 및 키 값 가져오기
@@ -78,5 +79,6 @@ dependencies {
     implementation ("com.navercorp.nid:oauth-jdk8:5.1.0") // jdk 8
 
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.3.9")
+    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.2")
 
 }

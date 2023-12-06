@@ -2,6 +2,7 @@ package com.example.menupop.mainActivity
 
 import android.content.Context
 import android.content.Intent
+import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -11,6 +12,7 @@ import android.webkit.WebChromeClient
 import android.webkit.WebResourceRequest
 import android.webkit.WebView
 import android.webkit.WebViewClient
+import androidx.annotation.RequiresApi
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
@@ -19,7 +21,7 @@ import java.net.URISyntaxException
 
 class KakaoPayWebView : Fragment() {
     val TAG = "WebViewFragment"
-    private lateinit var webView: WebView
+    var webView: WebView ?= null
     private lateinit var ticketPurchaseViewModel : MainActivityViewModel
     var event : MainActivityEvent? = null
     private lateinit var context : Context
@@ -67,14 +69,14 @@ class KakaoPayWebView : Fragment() {
         ticketPurchaseViewModel = ViewModelProvider(requireActivity()).get(MainActivityViewModel::class.java)
 
         val myWebViewClient = MyWebViewClient(ticketPurchaseViewModel)
-        webView.settings.javaScriptEnabled = true
-        webView.webViewClient = myWebViewClient
+        webView?.settings?.javaScriptEnabled = true
+        webView?.webViewClient = myWebViewClient
 
         ticketPurchaseViewModel.paymentResponse.observe(viewLifecycleOwner, Observer {
             if(it!=null){
                 val url = it.next_redirect_mobile_url
                 Log.d(TAG, "mobile url: $url")
-                webView.loadUrl(url)
+                webView?.loadUrl(url)
 
 
             }
@@ -89,6 +91,7 @@ class KakaoPayWebView : Fragment() {
 
         var pgToken : String ?= null
 
+        @RequiresApi(Build.VERSION_CODES.O)
         override fun shouldOverrideUrlLoading(view: WebView?, request: WebResourceRequest?): Boolean {
 
 
@@ -97,6 +100,7 @@ class KakaoPayWebView : Fragment() {
 
 
             if(url.startsWith("intent://")){
+
                 try{
                     val intent = Intent.parseUri(url, Intent.URI_INTENT_SCHEME)
                     intent?.let{
@@ -107,6 +111,7 @@ class KakaoPayWebView : Fragment() {
                 }catch (e : URISyntaxException){
                     Log.d(TAG, "exception: ${e.message}")
                 }
+
             }
 
 
@@ -118,11 +123,20 @@ class KakaoPayWebView : Fragment() {
                 viewModel.updatePgToken(pgToken!!)
             }
 
+            if(url.contains("KakaoPayApprove")){
+                //여기서 결제 완료 observe해서 update 되면 이동
+                webView = null
+                event?.completePayment()
+
+            }
+
+
             view!!.loadUrl(url)
 
 
-            return super.shouldOverrideUrlLoading(view, request)
+            return false
         }
+
 
     }
 

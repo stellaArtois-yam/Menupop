@@ -163,6 +163,13 @@ class MainActivity : AppCompatActivity(), MainActivityEvent{
       }
     }
 
+    override fun completePayment() {
+        supportFragmentManager.beginTransaction().apply {
+            replace(R.id.home_frame_layout, profileFragment)
+            commit()
+        }
+    }
+
     override fun moveToAdvertisement() {
         //광고보러 가기
     }

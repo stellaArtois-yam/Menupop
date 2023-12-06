@@ -74,10 +74,16 @@ interface RetrofitService {
     fun createPaymentRequest(@Header("Authorization") apiKey : String,
                              @FieldMap map : HashMap<String,String>)
                             : Call<KakaoPayReadyResponse>
-//    @POST("SavePaymentHistory.php")
-//    @FormUrlEncoded
-//    fun savePaymentHistory(@Field("identifier") identifier : Int,
-//                           @Field)
+    @POST("SavePaymentHistory.php")
+    @FormUrlEncoded
+    fun savePaymentHistory(@Field("identifier") identifier : Int,
+                           @Field("tid") tid : String,
+                           @Field("paymentType") paymentType: String,
+                           @Field("item") item : String,
+                           @Field("price") price : Int,
+                           @Field("approvedAt") approvedAt : String,
+                           @Field("translationTicket") translationTicket : Int,
+                           @Field("foodTicket") foodTicket : Int) : Call<ResultModel>
 
 
     @POST("v1/payment/approve")
