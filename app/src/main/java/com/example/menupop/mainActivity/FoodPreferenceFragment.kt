@@ -1,7 +1,11 @@
 package com.example.menupop.mainActivity
 
 import android.content.Context
+import android.graphics.Typeface
 import android.os.Bundle
+import android.text.Spannable
+import android.text.SpannableString
+import android.text.style.StyleSpan
 import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
@@ -12,6 +16,7 @@ import android.widget.Button
 import android.widget.SearchView
 import android.widget.SearchView.OnQueryTextListener
 import android.widget.TextView
+import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -86,6 +91,49 @@ class FoodPreferenceFragment : Fragment() {
 
         bottomSheetDialog.show()
     }
+    fun setTextBold(text:String,foodName: String,classification: String) : SpannableString {
+        val spannableString = SpannableString(text)
+
+// 변수 부분을 볼드체로 설정
+        val startIndex = text.indexOf("[$foodName]")
+        val endIndex = startIndex + foodName.length + 2 // 변수를 감싸는 [] 기호를 제외한 길이
+        spannableString.setSpan(StyleSpan(Typeface.BOLD), startIndex, endIndex, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
+
+        val startIndex2 = text.indexOf("[$classification]")
+        val endIndex2 = startIndex2 + classification.length + 2
+        spannableString.setSpan(StyleSpan(android.graphics.Typeface.BOLD), startIndex2, endIndex2, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
+        return spannableString
+    }
+    fun existTicketShowDialog(foodName:String,classfication : String){
+        val bottomSheetView = layoutInflater.inflate(R.layout.dialog_ticket_bottom, null)
+        val bottomSheetDialog = BottomSheetDialog(context)
+        val foodTicket = mainViewModel.userInformation.value?.foodTicket.toString()
+        val translationTicket = mainViewModel.userInformation.value?.translationTicket.toString()
+        bottomSheetDialog.setContentView(bottomSheetView)
+        bottomSheetDialog.findViewById<TextView>(R.id.dialog_ticket_bottom_food_ticket)?.text = "음식 티켓 ${foodTicket} 개"
+        bottomSheetDialog.findViewById<TextView>(R.id.dialog_ticket_bottom_translation_ticket)?.text = "번역 티켓 ${translationTicket} 개"
+        bottomSheetDialog.findViewById<Button>(R.id.dialog_ticket_bottom_button)?.text = "등록하기"
+        bottomSheetDialog.findViewById<TextView>(R.id.dialog_ticket_bottom_text)?.text = setTextBold("[${foodName}]를 [${classfication}] 음식으로\n등록하시겠습니까?",foodName,classfication)
+        bottomSheetDialog.findViewById<Button>(R.id.dialog_ticket_bottom_button)?.setOnClickListener {
+            Log.d(TAG, "existTicketShowDialog: 클릭 됨")
+            var sharedPreferences = context.getSharedPreferences("userInfo",
+                AppCompatActivity.MODE_PRIVATE
+            )
+            mainViewModel.foodPreferenceRegister(sharedPreferences,foodName,classfication)
+            mainViewModel.registerResult.observe(viewLifecycleOwner){ result ->
+                Log.d(TAG, "existTicketShowDialog: ${result}")
+                if(result) {
+                    bottomSheetDialog.dismiss()
+                    mainViewModel.ticketMinus()
+                } else {
+                    Log.d(TAG, "existTicketShowDialog: 실패")
+                }
+            }
+
+        }
+
+        bottomSheetDialog.show()
+    }
 
     fun init(){
         mainViewModel = ViewModelProvider(requireActivity()).get(MainActivityViewModel::class.java)
@@ -97,6 +145,7 @@ class FoodPreferenceFragment : Fragment() {
                 if(checkTicketEmpty()){
                     emptyTicketShowDialog()
                 } else{
+                    existTicketShowDialog(foodName,"호")
 //                    호 음식 등록하기
 //
 //                    val bottomSheetView = layoutInflater.inflate(R.layout.dialog_, null)
@@ -115,6 +164,7 @@ class FoodPreferenceFragment : Fragment() {
                 if(checkTicketEmpty()){
                     emptyTicketShowDialog()
                 } else{
+                    existTicketShowDialog(foodName,"불호")
 //                  불호 음식 등록하기
                 }
             }

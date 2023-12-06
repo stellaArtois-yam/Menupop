@@ -138,23 +138,40 @@ class MainActivityModel {
             }
         })
     }
+    
+    fun foodPreferenceRegister(identifier: Int,foodName:String,classification:String,callback : (String) -> Unit){
+        Log.d(TAG, "foodPreferenceRegister: 호출됨")
+        service.foodPreferenceRegister(identifier,foodName,classification).enqueue(object : Callback<String>{
+            override fun onResponse(call: Call<String>, response: Response<String>) {
+                if(response.isSuccessful){
+                    Log.d(TAG, "onResponse: ${response}")
+                    callback(response.body()!!)
+                }
+            }
+
+            override fun onFailure(call: Call<String>, t: Throwable) {
+                Log.d(TAG, "onFailure: ${t}")
+            }
+
+        })
+    }
     fun searchFood(query : String, callback:(FoodPreferenceSearchDataClass) -> Unit){
-        callback(FoodPreferenceSearchDataClass("success", arrayListOf("낙지","오징어","ㅋㅋ","음식")))
-//        service.searchFood(query).enqueue(object : Callback<FoodPreferenceSearchDataClass>{
-//            override fun onResponse(
-//                call: Call<FoodPreferenceSearchDataClass>,
-//                response: Response<FoodPreferenceSearchDataClass>
-//            ) {
-//                if(response.isSuccessful){
-//                    callback(response.body()!!)
-//                }
-//            }
-//
-//            override fun onFailure(call: Call<FoodPreferenceSearchDataClass>, t: Throwable) {
-//                Log.d(TAG, "onFailure: ${t}")
-//            }
-//
-//        })
+//        callback(FoodPreferenceSearchDataClass("success", arrayListOf("낙지","오징어","ㅋㅋ","음식")))
+        service.searchFood(query).enqueue(object : Callback<FoodPreferenceSearchDataClass>{
+            override fun onResponse(
+                call: Call<FoodPreferenceSearchDataClass>,
+                response: Response<FoodPreferenceSearchDataClass>
+            ) {
+                if(response.isSuccessful){
+                    callback(response.body()!!)
+                }
+            }
+
+            override fun onFailure(call: Call<FoodPreferenceSearchDataClass>, t: Throwable) {
+                Log.d(TAG, "onFailure: ${t}")
+            }
+
+        })
     }
 
     @RequiresApi(Build.VERSION_CODES.O)

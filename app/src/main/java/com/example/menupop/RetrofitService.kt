@@ -94,4 +94,8 @@ interface RetrofitService {
     @GET("searchFood.php")
     fun searchFood(@Query("query") searchText :String) : Call<FoodPreferenceSearchDataClass>
 
+    @POST("FoodPreferenceRegister.php")
+    @FormUrlEncoded
+    fun foodPreferenceRegister(@Field("identifier") identifier: Int , @Field("foodName") foodName : String , @Field("classification") classification : String) : Call<String>
+
 }

@@ -22,10 +22,15 @@ class MainActivityViewModel: ViewModel() {
     private var callbackKakaoReady : ((KakaoPayReadyResponse) -> Unit) ? = null
     private var callbackApprove : ((KakaoPayApproveResponse) -> Unit) ? = null
     private var callbackSearchData : ((FoodPreferenceSearchDataClass) -> Unit) ?= null
+    private var callbackResult : ((String) -> Unit) ?= null
 
     private val _searchFood = MutableLiveData<ArrayList<String>>()
     val searchFood: LiveData<ArrayList<String>>
         get() = _searchFood
+
+    private val _registerResult = MutableLiveData<Boolean>()
+    val registerResult: LiveData<Boolean>
+        get() = _registerResult
 
     /**
      * 메인
@@ -38,11 +43,27 @@ class MainActivityViewModel: ViewModel() {
     val userInformation : LiveData<UserInformationData>
         get() = _userInformation
 
+    fun ticketMinus(){
+        _userInformation.value?.foodTicket = _userInformation.value?.foodTicket?.minus(1)!!
+    }
+
+    fun foodPreferenceRegister(sharedPreferences: SharedPreferences,foodName:String,classification:String){
+        Log.d(TAG, "foodPreferenceRegister: 호술됨")
+        val identifier = mainActivityModel.getUserInfo(sharedPreferences)
+        callbackResult = { result ->
+            Log.d(TAG, "foodPreferenceRegister: ${result}")
+            _registerResult.value = result == "success"
+        }
+        mainActivityModel.foodPreferenceRegister(identifier,foodName,classification,callbackResult!!)
+    }
+
     fun searchFood(query : String){
         callbackSearchData = {result ->
             Log.d(TAG, "searchFood: test")
             if(result.result == "success"){
                 _searchFood.value = result.foodList
+            } else if(result.result == "notFound"){
+
             }
             Log.d(TAG, "searchFood: $result")
         }
@@ -145,6 +166,8 @@ class MainActivityViewModel: ViewModel() {
 
         _regularTotalPrice.value = "총 결제 금액 : ${dec.format(totalPrice)}원"
     }
+
+
 
     fun countTicket(ticketAmount: MutableLiveData<String>,
                             otherTicketAmount: MutableLiveData<String>): Int{
