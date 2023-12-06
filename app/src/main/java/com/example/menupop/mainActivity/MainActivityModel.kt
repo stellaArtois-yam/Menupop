@@ -43,6 +43,7 @@ class MainActivityModel {
         return identifier
     }
 
+
     fun getFoodPreference(identifier: Int,callback : (FoodPreferenceDataClass)->Unit){
         Log.d(TAG, "getFoodPreference: 호출")
         service.getFoodPreference(identifier).enqueue(object : Callback<FoodPreferenceDataClass>{
@@ -61,6 +62,7 @@ class MainActivityModel {
             }
 
         })
+
     }
 
     fun savePaymentHistory(ticketSaveModel: TicketSaveModel, callback: (ResultModel) -> Unit){

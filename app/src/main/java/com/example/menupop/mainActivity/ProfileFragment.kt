@@ -1,25 +1,31 @@
 package com.example.menupop.mainActivity
 
+import android.app.Dialog
 import android.content.Context
+import android.content.SharedPreferences
 import android.os.Bundle
 import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.Window
+import android.view.WindowManager
+import android.widget.Button
+import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import com.example.menupop.R
 import com.example.menupop.databinding.FragmentProfileBinding
-import com.example.menupop.findId.FindIdFragmentEvent
 
 class ProfileFragment : Fragment() {
     val TAG = "ProfileFragment"
     lateinit var binding: FragmentProfileBinding
     private lateinit var profileViewModel: MainActivityViewModel
     var event: MainActivityEvent? = null
-    private var context : Context? = null
+    private lateinit var context : Context
+    private lateinit var sharedPreferences : SharedPreferences
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -69,6 +75,7 @@ class ProfileFragment : Fragment() {
                 Log.d(TAG, "init: null")
             }
         })
+
     }
 
     fun setClick(){
@@ -85,7 +92,7 @@ class ProfileFragment : Fragment() {
 
         // 로그아웃하면 다이얼로그 뜨고
         binding.profileLogoutButton.setOnClickListener{
-
+            showLogoutDialog()
         }
 
 
@@ -93,6 +100,33 @@ class ProfileFragment : Fragment() {
         binding.profileWithdrawalButton.setOnClickListener{
             event?.accountWithdrawal()
         }
+    }
+
+
+    fun showLogoutDialog(){
+        val dialog = Dialog(context)
+
+        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
+        dialog.setContentView(R.layout.dialog_two_button)
+        dialog.window!!.setLayout(WindowManager.LayoutParams.MATCH_PARENT, WindowManager.LayoutParams.WRAP_CONTENT)
+        dialog.show()
+
+        dialog.findViewById<Button>(R.id.dialog_two_button_agree).setOnClickListener{
+            dialog.dismiss()
+
+            var sharedPreferences = context?.getSharedPreferences("userInfo", AppCompatActivity.MODE_PRIVATE)
+            profileViewModel.logout(sharedPreferences!!)
+
+            event?.logout()
+        }
+
+        dialog.findViewById<Button>(R.id.dialog_two_button_disagree).setOnClickListener{
+            dialog.dismiss()
+        }
+
+
+
+
     }
 
 

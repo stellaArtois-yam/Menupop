@@ -10,6 +10,8 @@ interface MainActivityEvent {
 
     fun moveToAdvertisement()
 
+    fun logout()
+
     fun accountWithdrawal()
 
 }
