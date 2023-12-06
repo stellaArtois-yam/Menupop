@@ -39,6 +39,7 @@ class MainActivityViewModel: ViewModel() {
 
     fun searchFood(query : String){
         callbackSearchData = {result ->
+            Log.d(TAG, "searchFood: test")
             if(result.result == "success"){
                 _searchFood.value = result.foodList
             }
