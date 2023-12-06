@@ -43,6 +43,26 @@ class MainActivityModel {
         return identifier
     }
 
+    fun getFoodPreference(identifier: Int,callback : (FoodPreferenceDataClass)->Unit){
+        Log.d(TAG, "getFoodPreference: 호출")
+        service.getFoodPreference(identifier).enqueue(object : Callback<FoodPreferenceDataClass>{
+            override fun onResponse(
+                call: Call<FoodPreferenceDataClass>,
+                response: Response<FoodPreferenceDataClass>
+            ) {
+                Log.d(TAG, "onResponse: ${response}")
+                if(response.isSuccessful){
+                    callback(response.body()!!)
+                }
+            }
+
+            override fun onFailure(call: Call<FoodPreferenceDataClass>, t: Throwable) {
+                Log.d(TAG, "onFailure: ${t}")
+            }
+
+        })
+    }
+
     fun savePaymentHistory(ticketSaveModel: TicketSaveModel, callback: (ResultModel) -> Unit){
 
         val call : Call<ResultModel> = service.savePaymentHistory(ticketSaveModel.identifier,

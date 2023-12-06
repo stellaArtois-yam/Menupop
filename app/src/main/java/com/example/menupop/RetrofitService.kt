@@ -3,6 +3,7 @@ package com.example.menupop
 import com.example.menupop.findId.FindIdResponseModel
 import com.example.menupop.login.LoginResponseModel
 import com.example.menupop.mainActivity.ExchangeRateDataClass
+import com.example.menupop.mainActivity.FoodPreferenceDataClass
 import com.example.menupop.mainActivity.FoodPreferenceSearchDataClass
 import com.example.menupop.mainActivity.UserInformationData
 import com.example.menupop.signup.ResultModel
@@ -97,5 +98,7 @@ interface RetrofitService {
     @POST("FoodPreferenceRegister.php")
     @FormUrlEncoded
     fun foodPreferenceRegister(@Field("identifier") identifier: Int , @Field("foodName") foodName : String , @Field("classification") classification : String) : Call<String>
-
+    @POST("GetFoodPreference.php")
+    @FormUrlEncoded
+    fun getFoodPreference(@Field("identifier") identifier: Int) : Call<FoodPreferenceDataClass>
 }

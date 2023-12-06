@@ -12,11 +12,13 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.View.OnFocusChangeListener
 import android.view.ViewGroup
+import android.view.inputmethod.InputMethodManager
 import android.widget.Button
 import android.widget.SearchView
 import android.widget.SearchView.OnQueryTextListener
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.ContextCompat.getSystemService
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -32,6 +34,7 @@ class FoodPreferenceFragment : Fragment() {
     private lateinit var mainViewModel : MainActivityViewModel
     private lateinit var context : Context
     private lateinit var searchAdapter: FoodPreferenceSearchAdapter
+    private lateinit var foodPreferenceAdapter: FoodPreferenceAdapter
     var event: MainActivityEvent? = null
 
     override fun onAttach(context: Context) {
@@ -70,7 +73,7 @@ class FoodPreferenceFragment : Fragment() {
         return binding.root
     }
     fun checkTicketEmpty() : Boolean{
-        if(mainViewModel.userInformation.value?.foodTicket ==0){
+        if(mainViewModel.userInformation.value?.foodTicket!! <= 0){
             return true
         }
         return false
@@ -125,6 +128,10 @@ class FoodPreferenceFragment : Fragment() {
                 if(result) {
                     bottomSheetDialog.dismiss()
                     mainViewModel.ticketMinus()
+                    val imm = context.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+                    imm.hideSoftInputFromWindow(requireActivity().currentFocus?.windowToken, 0)
+                    binding.foodPreferenceRecyclerview.visibility = View.VISIBLE
+                    binding.foodPreferenceSearchRecyclerview.visibility = View.GONE
                 } else {
                     Log.d(TAG, "existTicketShowDialog: 실패")
                 }
@@ -146,15 +153,6 @@ class FoodPreferenceFragment : Fragment() {
                     emptyTicketShowDialog()
                 } else{
                     existTicketShowDialog(foodName,"호")
-//                    호 음식 등록하기
-//
-//                    val bottomSheetView = layoutInflater.inflate(R.layout.dialog_, null)
-//                    val bottomSheetDialog = BottomSheetDialog(context)
-//                    val foodTicket = mainViewModel.userInformation.value?.foodTicket.toString()
-//                    val translationTicket = mainViewModel.userInformation.value?.translationTicket.toString()
-//                    bottomSheetDialog.setContentView(bottomSheetView)
-//                    bottomSheetDialog.findViewById<TextView>(R.id.dialog_ticket_bottom_food_ticket)?.text = "음식 티켓 ${foodTicket} 개"
-//                    bottomSheetDialog.findViewById<TextView>(R.id.dialog_ticket_bottom_translation_ticket)?.text = "번역 티켓 ${translationTicket} 개"
                 }
 
             }
@@ -165,13 +163,26 @@ class FoodPreferenceFragment : Fragment() {
                     emptyTicketShowDialog()
                 } else{
                     existTicketShowDialog(foodName,"불호")
-//                  불호 음식 등록하기
                 }
             }
 
         })
-        binding.foodPreferenceRecyclerview.adapter = searchAdapter
+        binding.foodPreferenceSearchRecyclerview.adapter = searchAdapter
+        binding.foodPreferenceSearchRecyclerview.layoutManager = LinearLayoutManager(context)
+
+
+        foodPreferenceAdapter = FoodPreferenceAdapter()
+        binding.foodPreferenceRecyclerview.adapter = foodPreferenceAdapter
         binding.foodPreferenceRecyclerview.layoutManager = LinearLayoutManager(context)
+
+        var sharedPreferences = context.getSharedPreferences("userInfo",
+            AppCompatActivity.MODE_PRIVATE
+        )
+        mainViewModel.getFoodPreference(sharedPreferences)
+
+        mainViewModel.foodPreferenceList.observe(viewLifecycleOwner){ it->
+            foodPreferenceAdapter.setFoodList(it)
+        }
 
         mainViewModel.searchFood.observe(viewLifecycleOwner){ it ->
 
@@ -187,13 +198,21 @@ class FoodPreferenceFragment : Fragment() {
             override fun onQueryTextSubmit(query: String?): Boolean {
                 Log.d(TAG, "onQueryTextSubmit: ${query}")
                 if(query!=null){
+                    binding.foodPreferenceSearchRecyclerview.visibility = View.VISIBLE
+                    binding.foodPreferenceRecyclerview.visibility = View.GONE
                     mainViewModel.searchFood(query)
+                    val imm = context.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+                    imm.hideSoftInputFromWindow(requireActivity().currentFocus?.windowToken, 0)
                 }
                 return true
             }
 
             override fun onQueryTextChange(newText: String?): Boolean {
                 Log.d(TAG, "onQueryTextChange: ${newText}")
+                if(newText?.isEmpty() == true){
+                    binding.foodPreferenceSearchRecyclerview.visibility = View.GONE
+                    binding.foodPreferenceRecyclerview.visibility = View.VISIBLE
+                }
                 return true
             }
 

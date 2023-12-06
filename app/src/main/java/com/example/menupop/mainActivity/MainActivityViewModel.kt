@@ -23,10 +23,15 @@ class MainActivityViewModel: ViewModel() {
     private var callbackApprove : ((KakaoPayApproveResponse) -> Unit) ? = null
     private var callbackSearchData : ((FoodPreferenceSearchDataClass) -> Unit) ?= null
     private var callbackResult : ((String) -> Unit) ?= null
+    private var callbackFoodPreference : ((FoodPreferenceDataClass) -> Unit) ?= null
 
     private val _searchFood = MutableLiveData<ArrayList<String>>()
     val searchFood: LiveData<ArrayList<String>>
         get() = _searchFood
+
+    private val _foodPreferenceList = MutableLiveData<ArrayList<FoodPreference>>()
+    val foodPreferenceList: LiveData<ArrayList<FoodPreference>>
+        get() = _foodPreferenceList
 
     private val _registerResult = MutableLiveData<Boolean>()
     val registerResult: LiveData<Boolean>
@@ -87,6 +92,17 @@ class MainActivityViewModel: ViewModel() {
             _isLoading.value = response.id != null && response.email!=null
         }
         mainActivityModel.requestUserInformation(identifier, callbackUserInfo!!)
+    }
+
+    fun getFoodPreference(sharedPreferences: SharedPreferences){
+        val identifier = getUserInfo(sharedPreferences)
+        callbackFoodPreference = { foodPreferenceDataClass ->
+            Log.d(TAG, "getFoodPreference: ${foodPreferenceDataClass}")
+            if(foodPreferenceDataClass.result == "success"){
+                _foodPreferenceList.value = foodPreferenceDataClass.foodList
+            }
+        }
+        mainActivityModel.getFoodPreference(identifier,callbackFoodPreference!!)
     }
 
 

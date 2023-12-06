@@ -32,10 +32,16 @@
                 android:backgroundTint="@color/pale_gray" />
 
             <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/food_preference_search_recyclerview"
+                android:layout_width="350dp"
+                android:visibility="gone"
+                android:layout_height="match_parent"
+                tools:listitem="@layout/food_preference_search_item"/>
+            <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/food_preference_recyclerview"
                 android:layout_width="350dp"
                 android:layout_height="match_parent"
-                tools:listitem="@layout/food_preference_search_item"/>
+                tools:listitem="@layout/food_preference_item"/>
 
 
         </LinearLayout>
