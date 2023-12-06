@@ -1,47 +1,54 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="horizontal"
-    android:layout_width="match_parent"
-    android:layout_height="70dp"
-    android:gravity="center"
-    android:background="@drawable/stroke">
-
-
-
-    <TextView
-        android:id="@+id/food_preference_search_name"
-        android:layout_width="0dp"
-        android:layout_height="50dp"
-        android:layout_weight="1"
-        android:text="고수"
-        android:textColor="@color/black"
-        android:textSize="18sp"
-        android:gravity="center"/>
-
-    <TextView
-        android:id="@+id/food_preference_search_favorite"
-        android:layout_width="0dp"
-        android:layout_height="50dp"
-        android:layout_weight="0.2"
-        android:background="@drawable/radius_30_stroke_light_gray"
-        android:backgroundTint="@color/orange"
-        android:text="호"
-        android:textColor="@color/black"
-        android:textSize="18sp"
-        android:gravity="center" />
-
-    <TextView
-        android:id="@+id/food_preference_search_unfavorite"
-        android:layout_width="0dp"
-        android:layout_height="50dp"
-        android:layout_weight="0.2"
-        android:background="@drawable/radius_30_stroke_light_gray"
-        android:backgroundTint="@color/yellow"
-        android:text="불호"
-        android:textColor="@color/black"
-        android:textSize="18sp"
+<layout>
+    <data>
+        <variable
+            name="item"
+            type="String" />
+    </data>
+    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="70dp"
         android:gravity="center"
-        android:layout_marginEnd="10dp"
-        android:layout_marginStart="20dp"/>
+        android:background="@drawable/stroke">
 
-</LinearLayout>
+
+
+        <TextView
+            android:id="@+id/food_preference_search_name"
+            android:layout_width="0dp"
+            android:layout_height="50dp"
+            android:layout_weight="1"
+            android:text="@{item}"
+            android:textColor="@color/black"
+            android:textSize="18sp"
+            android:gravity="center"/>
+
+        <TextView
+            android:id="@+id/food_preference_search_favorite"
+            android:layout_width="0dp"
+            android:layout_height="50dp"
+            android:layout_weight="0.2"
+            android:background="@drawable/radius_30_stroke_light_gray"
+            android:backgroundTint="@color/orange"
+            android:text="호"
+            android:textColor="@color/black"
+            android:textSize="18sp"
+            android:gravity="center" />
+
+        <TextView
+            android:id="@+id/food_preference_search_unfavorite"
+            android:layout_width="0dp"
+            android:layout_height="50dp"
+            android:layout_weight="0.2"
+            android:background="@drawable/radius_30_stroke_light_gray"
+            android:backgroundTint="@color/yellow"
+            android:text="불호"
+            android:textColor="@color/black"
+            android:textSize="18sp"
+            android:gravity="center"
+            android:layout_marginEnd="10dp"
+            android:layout_marginStart="20dp"/>
+
+    </LinearLayout>
+</layout>

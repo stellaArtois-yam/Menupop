@@ -3,6 +3,7 @@ package com.example.menupop
 import com.example.menupop.findId.FindIdResponseModel
 import com.example.menupop.login.LoginResponseModel
 import com.example.menupop.mainActivity.ExchangeRateDataClass
+import com.example.menupop.mainActivity.FoodPreferenceSearchDataClass
 import com.example.menupop.mainActivity.UserInformationData
 import com.example.menupop.signup.ResultModel
 import retrofit2.Call
@@ -13,6 +14,7 @@ import retrofit2.http.GET
 import retrofit2.http.Header
 import retrofit2.http.POST
 import retrofit2.http.Path
+import retrofit2.http.Query
 
 interface RetrofitService {
 
@@ -83,6 +85,7 @@ interface RetrofitService {
     fun requestApprovePayment(@Header("Authorization") apiKey : String,
                               @FieldMap map : HashMap<String, String>)
                                 :Call<KakaoPayApproveResponse>
-
+    @GET("searchFood.php")
+    fun searchFood(@Query("query") searchText :String) : Call<FoodPreferenceSearchDataClass>
 
 }

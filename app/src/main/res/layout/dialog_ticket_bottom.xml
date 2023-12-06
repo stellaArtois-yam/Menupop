@@ -20,6 +20,7 @@
         android:layout_height="0dp"
         android:layout_weight="0.2"
         android:text="사용할 수 있는 티켓이 없습니다."
+        android:layout_marginTop="15dp"
         android:textColor="@color/black"
         android:textSize="20sp"
         android:gravity="center_horizontal"/>

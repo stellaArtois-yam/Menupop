@@ -20,6 +20,11 @@ class MainActivityViewModel: ViewModel() {
     private var callbackUserInfo :((UserInformationData) ->Unit) ?= null
     private var callbackKakaoReady : ((KakaoPayReadyResponse) -> Unit) ? = null
     private var callbackApprove : ((KakaoPayApproveResponse) -> Unit) ? = null
+    private var callbackSearchData : ((FoodPreferenceSearchDataClass) -> Unit) ?= null
+
+    private val _searchFood = MutableLiveData<ArrayList<String>>()
+    val searchFood: LiveData<ArrayList<String>>
+        get() = _searchFood
 
     /**
      * 메인
@@ -31,6 +36,20 @@ class MainActivityViewModel: ViewModel() {
     private val _userInformation = MutableLiveData<UserInformationData>()
     val userInformation : LiveData<UserInformationData>
         get() = _userInformation
+
+    fun searchFood(query : String){
+        callbackSearchData = {result ->
+            if(result.result == "success"){
+                _searchFood.value = result.foodList
+            }
+            Log.d(TAG, "searchFood: $result")
+        }
+        mainActivityModel.searchFood(query,callbackSearchData!!)
+
+    }
+    fun getUserTaste(sharedPreferences: SharedPreferences){
+        val identifier = mainActivityModel.getUserInfo(sharedPreferences)
+    }
 
 
     fun getUserInfo(sharedPreferences: SharedPreferences) : Int{
