@@ -119,6 +119,24 @@ class MainActivityModel {
             }
         })
     }
+    fun searchFood(query : String, callback:(FoodPreferenceSearchDataClass) -> Unit){
+        callback(FoodPreferenceSearchDataClass("success", arrayListOf("낙지","오징어","ㅋㅋ","음식")))
+//        service.searchFood(query).enqueue(object : Callback<FoodPreferenceSearchDataClass>{
+//            override fun onResponse(
+//                call: Call<FoodPreferenceSearchDataClass>,
+//                response: Response<FoodPreferenceSearchDataClass>
+//            ) {
+//                if(response.isSuccessful){
+//                    callback(response.body()!!)
+//                }
+//            }
+//
+//            override fun onFailure(call: Call<FoodPreferenceSearchDataClass>, t: Throwable) {
+//                Log.d(TAG, "onFailure: ${t}")
+//            }
+//
+//        })
+    }
 
     @RequiresApi(Build.VERSION_CODES.O)
     fun requestApprovePayment(tid : String, userId: String, pgToken : String, callback : (KakaoPayApproveResponse) -> Unit){

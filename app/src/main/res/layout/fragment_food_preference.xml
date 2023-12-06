@@ -34,7 +34,8 @@
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/food_preference_recyclerview"
                 android:layout_width="350dp"
-                android:layout_height="match_parent" />
+                android:layout_height="match_parent"
+                tools:listitem="@layout/food_preference_search_item"/>
 
 
         </LinearLayout>

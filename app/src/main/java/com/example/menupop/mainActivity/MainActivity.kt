@@ -131,6 +131,7 @@ class MainActivity : AppCompatActivity(), MainActivityEvent{
         val bundle = Bundle()
         bundle.putInt("identifier", identifier!!)
         ticketPurchaseFragment.arguments = bundle
+        binding.bottomNavigation.selectedItemId = R.id.tab_profile
 
 
         supportFragmentManager.beginTransaction().apply {
