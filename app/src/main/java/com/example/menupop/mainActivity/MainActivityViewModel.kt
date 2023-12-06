@@ -9,6 +9,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.example.menupop.KakaoPayApproveResponse
 import com.example.menupop.KakaoPayReadyResponse
+import com.example.menupop.TicketSaveModel
 import com.example.menupop.signup.ResultModel
 import java.text.DecimalFormat
 import java.util.Objects
@@ -71,6 +72,9 @@ class MainActivityViewModel: ViewModel() {
     /**
      * 티켓 구매 + 다이얼로그
      */
+
+    private val _paymentType = MutableLiveData<String>()
+
     private val _regularTranslationAmount = MutableLiveData<String>()
     val regularTranslationAmount : LiveData<String>
         get() = _regularTranslationAmount
@@ -94,6 +98,10 @@ class MainActivityViewModel: ViewModel() {
 
     private val _totalPriceForPay = MutableLiveData<String>()
 
+    fun updatePaymentType (type : String){
+        Log.d(TAG, "updatePaymentType: $type")
+        _paymentType.value = type
+    }
 
     fun addTranslationTicket() {
         changeTicketAmount(_regularTranslationAmount, _regularTranslationPrice, _regularFoodAmount)
@@ -165,8 +173,6 @@ class MainActivityViewModel: ViewModel() {
         get() = _paymentResponse
 
     private val _pgToken = MutableLiveData<String>()
-    val pgToken : LiveData<String>
-        get() = _pgToken
 
     private val _userId = MutableLiveData<String>()
 
@@ -184,6 +190,8 @@ class MainActivityViewModel: ViewModel() {
     }
 
 
+
+
     @RequiresApi(Build.VERSION_CODES.O)
     fun createPaymentRequest(userId : String){
         callbackKakaoReady = {response ->
@@ -191,9 +199,7 @@ class MainActivityViewModel: ViewModel() {
             //여기서 웹뷰로 보내 줘야 함
             if(response!=null){
                 _paymentResponse.value = response
-
             }
-
 
         }
         val item = itemName(_regularTranslationAmount, _regularFoodAmount)
@@ -210,8 +216,6 @@ class MainActivityViewModel: ViewModel() {
     fun completePayment(tid : String, userId: String, pgToken : String){
         callbackApprove = {response ->
             Log.d(TAG, "completePayment: $response")
-            //여기서 데이터 받아서 클라이언트 티켓 개수 수정
-
 
         // db에 티켓 개수도 수정
         // 구매 이력 저장
@@ -224,10 +228,48 @@ class MainActivityViewModel: ViewModel() {
     }
 
     fun savePaymentHistory(identifier: Int, tid : String, paymentType : String, item : String,
-                           price : Int, approve_at : String){
+                           price : Int, approveAt : String){
+        var ticketSaveModel : TicketSaveModel ?= null
         callback = {response ->
+            Log.d(TAG, "savePaymentHistory: ${response.result}")
+            //여기서 클라이언트 티켓 개수 수정
+
+            if(response.result == "success"){
+
+                if(_paymentType.value == "regular"){
+
+                    _userInformation.value!!.foodTicket = _userInformation.value!!.foodTicket + _regularFoodAmount.value!!.toInt()
+                    _userInformation.value!!.translationTicket = _userInformation.value!!.translationTicket + _regularTranslationAmount.value!!.toInt()
+
+                }else if(_paymentType.value == "reword"){
+                    /**
+                     * 여기 바꿔야함
+                     */
+                    _userInformation.value!!.foodTicket = _userInformation.value!!.foodTicket + _regularFoodAmount.value!!.toInt()
+                    _userInformation.value!!.translationTicket = _userInformation.value!!.translationTicket + _regularTranslationAmount.value!!.toInt()
+
+                }
+
+
+            }else{
+                Log.d(TAG, "savePaymentHistory: failed")
+            }
 
         }
+
+        if(_paymentType.value == "regular"){
+            ticketSaveModel = TicketSaveModel(identifier,
+                tid, paymentType, item, price,approveAt,
+                _regularTranslationAmount.value!!.toInt(), _regularFoodAmount.value!!.toInt())
+            Log.d(TAG, "ticketSaveModel: $ticketSaveModel")
+
+
+        }else{
+
+        }
+
+
+        mainActivityModel.savePaymentHistory(ticketSaveModel!!, callback!!)
 
 
     }

@@ -6,6 +6,8 @@ interface MainActivityEvent {
 
     fun moveToWebView()
 
+    fun completePayment()
+
     fun moveToAdvertisement()
 
     fun accountWithdrawal()

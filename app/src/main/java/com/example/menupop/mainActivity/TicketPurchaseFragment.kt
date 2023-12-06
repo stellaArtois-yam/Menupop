@@ -127,11 +127,13 @@ class TicketPurchaseFragment : Fragment() {
         dialogBinding.paymentTypeRegular.setOnClickListener {
             Log.d(TAG, "regular click")
             dialog.dismiss()
+            ticketPurchaseViewModel.updatePaymentType("regular")
             paymentRegularDialog()
         }
 
         dialogBinding.paymentTypeReword.setOnClickListener {
             Log.d(TAG, "reword click")
+            ticketPurchaseViewModel.updatePaymentType("reword")
             dialog.dismiss()
             paymentRewordDialog()
         }

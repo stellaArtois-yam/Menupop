@@ -9,9 +9,12 @@ import com.example.menupop.KakaoPayApproveResponse
 import com.example.menupop.KakaoPayRequestModel
 import com.example.menupop.KakaoPayReadyResponse
 import com.example.menupop.RetrofitService
+import com.example.menupop.TicketSaveModel
 import com.example.menupop.signup.ResultModel
 import com.google.gson.Gson
 import com.google.gson.GsonBuilder
+import kotlinx.serialization.encodeToString
+import kotlinx.serialization.json.Json
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -42,9 +45,27 @@ class MainActivityModel {
         return identifier
     }
 
-    fun savePaymentHistory(identifier: Int, tid : String, paymentType: String,
-                           item : String, price : Int, approved_at : String){
-//        val call : Call<ResultModel> = service.savePaymentHistory(identifier, tid, paymentType, item, price, approved_at)
+    fun savePaymentHistory(ticketSaveModel: TicketSaveModel, callback: (ResultModel) -> Unit){
+
+        val call : Call<ResultModel> = service.savePaymentHistory(ticketSaveModel.identifier,
+            ticketSaveModel.tid, ticketSaveModel.paymentType, ticketSaveModel.item, ticketSaveModel.price,
+            ticketSaveModel.approvedAt, ticketSaveModel.translationTicket, ticketSaveModel.foodTicket)
+
+        
+        call.enqueue(object : Callback<ResultModel>{
+            override fun onResponse(call: Call<ResultModel>, response: Response<ResultModel>) {
+                if(response.isSuccessful){
+                    Log.d(TAG, "onResponse: ${response.body()}")
+                    callback(response.body()!!)
+                }else{
+                    Log.d(TAG, "is not successful: $response")
+                }
+                
+            }
+            override fun onFailure(call: Call<ResultModel>, t: Throwable) {
+                Log.d(TAG, "onFailure: ${t.message}")
+            }
+        })
     }
 
     fun requestUserInformation(identifier : Int, callback: (UserInformationData) -> Unit){
@@ -76,9 +97,9 @@ class MainActivityModel {
     private val kakaoPayService = kakaopay.create(RetrofitService::class.java)
     val cid  = "TC0ONETIME"
     val API_KEY = "KakaoAK " + BuildConfig.KAKAOPAY_ADMIN_KEY
-    val approvalUrl = "http://3.135.51.201/approve"
-    val cancelUrl = "http://3.135.51.201/cancel"
-    val failUrl = "http://3.135.51.201/fail"
+    val approvalUrl = "http://3.135.51.201/KakaoPayApprove"
+    val cancelUrl = "http://3.135.51.201/KakaoPayCancel"
+    val failUrl = "http://3.135.51.201/KakaoPayFail"
 
 
     @RequiresApi(Build.VERSION_CODES.O)
