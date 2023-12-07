@@ -253,7 +253,7 @@
 
                     android:background="@drawable/radius_30_stroke_light_gray"
                     android:text="로그아웃"
-                    android:textColor="@color/light_gray"
+                    android:textColor="@color/white"
                     android:textSize="16sp"
                     android:textStyle="bold" />
 

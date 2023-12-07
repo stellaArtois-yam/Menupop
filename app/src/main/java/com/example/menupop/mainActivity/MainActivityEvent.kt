@@ -14,4 +14,6 @@ interface MainActivityEvent {
 
     fun accountWithdrawal()
 
+    fun moveToProfile()
+
 }
