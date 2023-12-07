@@ -196,6 +196,22 @@ class MainActivityModel {
         })
     }
 
+    fun deleteFoodPreference(identifier: Int,foodName: String,callback: (String) -> Unit){
+        service.deleteFoodPreference(identifier,foodName).enqueue(object : Callback<String>{
+            override fun onResponse(call: Call<String>, response: Response<String>) {
+                if(response.isSuccessful){
+                    callback(response.body()!!)
+                    Log.d(TAG, "onResponse: $response")
+                }
+            }
+
+            override fun onFailure(call: Call<String>, t: Throwable) {
+                callback("failed")
+            }
+
+        })
+
+    }
     @RequiresApi(Build.VERSION_CODES.O)
     fun requestApprovePayment(tid : String, userId: String, pgToken : String, callback : (KakaoPayApproveResponse) -> Unit){
 

@@ -101,4 +101,8 @@ interface RetrofitService {
     @POST("GetFoodPreference.php")
     @FormUrlEncoded
     fun getFoodPreference(@Field("identifier") identifier: Int) : Call<FoodPreferenceDataClass>
+
+    @POST("DeleteFoodPreference.php")
+    @FormUrlEncoded
+    fun deleteFoodPreference(@Field("identifier") identifier: Int,@Field("foodName") foodName: String) : Call<String>
 }

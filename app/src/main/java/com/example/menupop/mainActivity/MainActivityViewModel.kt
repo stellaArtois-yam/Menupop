@@ -3,6 +3,7 @@ package com.example.menupop.mainActivity
 import android.content.SharedPreferences
 import android.os.Build
 import android.util.Log
+import android.widget.Toast
 import androidx.annotation.RequiresApi
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -29,8 +30,8 @@ class MainActivityViewModel: ViewModel() {
     val searchFood: LiveData<ArrayList<String>>
         get() = _searchFood
 
-    private val _foodPreferenceList = MutableLiveData<ArrayList<FoodPreference>>()
-    val foodPreferenceList: LiveData<ArrayList<FoodPreference>>
+    private val _foodPreferenceList = MutableLiveData<FoodPreferenceDataClass>()
+    val foodPreferenceList: LiveData<FoodPreferenceDataClass>
         get() = _foodPreferenceList
 
     private val _registerResult = MutableLiveData<Boolean>()
@@ -43,6 +44,10 @@ class MainActivityViewModel: ViewModel() {
     private val _isLoading = MutableLiveData<Boolean>().apply { value = false }
     val isLoading : LiveData<Boolean>
         get() = _isLoading
+
+    private val _deletedResult = MutableLiveData<Boolean>()
+    val deletedResult : LiveData<Boolean>
+        get() = _deletedResult
 
     private val _userInformation = MutableLiveData<UserInformationData>()
     val userInformation : LiveData<UserInformationData>
@@ -62,21 +67,33 @@ class MainActivityViewModel: ViewModel() {
         mainActivityModel.foodPreferenceRegister(identifier,foodName,classification,callbackResult!!)
     }
 
+    fun deleteFoodPreference(sharedPreferences: SharedPreferences,foodName: String){
+        callbackResult = {result ->
+            Log.d(TAG, "deleteFoodPreference:$result d ${result == "success"}")
+            if(result.trim() == "success"){
+                Log.d(TAG, "deleteFoodPreference: 성공")
+                _deletedResult.value = true
+            }else{
+                _deletedResult.value= false
+            }
+        }
+        val identifier = mainActivityModel.getUserInfo(sharedPreferences)
+        mainActivityModel.deleteFoodPreference(identifier,foodName,callbackResult!!)
+
+    }
+
     fun searchFood(query : String){
         callbackSearchData = {result ->
             Log.d(TAG, "searchFood: test")
             if(result.result == "success"){
                 _searchFood.value = result.foodList
             } else if(result.result == "notFound"){
-
+                Log.d(TAG, "searchFood: 찾을 수 없음")
             }
             Log.d(TAG, "searchFood: $result")
         }
         mainActivityModel.searchFood(query,callbackSearchData!!)
 
-    }
-    fun getUserTaste(sharedPreferences: SharedPreferences){
-        val identifier = mainActivityModel.getUserInfo(sharedPreferences)
     }
 
 
@@ -98,9 +115,7 @@ class MainActivityViewModel: ViewModel() {
         val identifier = getUserInfo(sharedPreferences)
         callbackFoodPreference = { foodPreferenceDataClass ->
             Log.d(TAG, "getFoodPreference: ${foodPreferenceDataClass}")
-            if(foodPreferenceDataClass.result == "success"){
-                _foodPreferenceList.value = foodPreferenceDataClass.foodList
-            }
+            _foodPreferenceList.value = foodPreferenceDataClass
         }
         mainActivityModel.getFoodPreference(identifier,callbackFoodPreference!!)
     }

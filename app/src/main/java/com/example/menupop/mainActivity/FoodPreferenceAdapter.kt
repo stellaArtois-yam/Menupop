@@ -10,7 +10,7 @@ import com.example.menupop.R
 import com.example.menupop.databinding.FoodPreferenceItemBinding
 import com.example.menupop.databinding.FoodPreferenceSearchItemBinding
 
-class FoodPreferenceAdapter : RecyclerView.Adapter<FoodPreferenceAdapter.FoodPreferenceViewHolder>() {
+class FoodPreferenceAdapter(private val listener: FoodPreferenceClickListener) : RecyclerView.Adapter<FoodPreferenceAdapter.FoodPreferenceViewHolder>() {
     private var foodList = emptyList<FoodPreference>()
     class FoodPreferenceViewHolder(val binding: FoodPreferenceItemBinding) : RecyclerView.ViewHolder(binding.root)
 
@@ -37,6 +37,7 @@ class FoodPreferenceAdapter : RecyclerView.Adapter<FoodPreferenceAdapter.FoodPre
 
         holder.binding.foodPreferenceItemFavorite.background = backgroundDrawable
         holder.binding.foodPreferenceItemDeleteButton.setOnClickListener {
+            listener.deleteBtnClick(foodList[position])
 //            listener.favoriteItemClick(foodList[position])
         }
     }
