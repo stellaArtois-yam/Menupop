@@ -54,11 +54,13 @@ class MainActivityViewModel: ViewModel() {
         get() = _userInformation
 
     fun ticketMinus(){
+        Log.d(TAG, "ticketMinus: ${_userInformation.value!!.foodTicket}")
         _userInformation.value?.foodTicket = _userInformation.value?.foodTicket?.minus(1)!!
+        Log.d(TAG, "ticketMinus 반역: ${_userInformation.value!!.foodTicket}")
     }
 
     fun foodPreferenceRegister(sharedPreferences: SharedPreferences,foodName:String,classification:String){
-        Log.d(TAG, "foodPreferenceRegister: 호술됨")
+        Log.d(TAG, "foodPreferenceRegister: 호출됨")
         val identifier = mainActivityModel.getUserInfo(sharedPreferences)
         callbackResult = { result ->
             Log.d(TAG, "foodPreferenceRegister: ${result}")

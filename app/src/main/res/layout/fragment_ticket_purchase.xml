@@ -51,7 +51,7 @@
                     android:layout_marginTop="10dp"
                     android:layout_marginBottom="10dp"
                     android:textColor="@color/black"
-                    android:text="보유티켓 : 00개 "
+                    android:text='@{"보유티켓: " + Integer.toString(ticketPurchaseViewModel.userInformation.translationTicket) + "개"}'
                     android:textSize="20sp"/>
 
                 <androidx.appcompat.widget.AppCompatButton
@@ -100,7 +100,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="10dp"
                     android:layout_marginBottom="10dp"
-                    android:text="보유 티켓 : 00개"
+                    android:text='@{"보유티켓: " + Integer.toString(ticketPurchaseViewModel.userInformation.translationTicket) + "개"}'
                     android:textColor="@color/black"
                     android:textSize="20sp"/>
 

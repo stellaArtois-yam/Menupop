@@ -120,6 +120,7 @@ class FoodPreferenceFragment : Fragment() {
         bottomSheetDialog.findViewById<TextView>(R.id.dialog_ticket_bottom_translation_ticket)?.text = "번역 티켓 ${translationTicket} 개"
         bottomSheetDialog.findViewById<Button>(R.id.dialog_ticket_bottom_button)?.text = "등록하기"
         bottomSheetDialog.findViewById<TextView>(R.id.dialog_ticket_bottom_text)?.text = setTextBold("[${foodName}]를 [${classfication}] 음식으로\n등록하시겠습니까?",foodName,classfication)
+
         bottomSheetDialog.findViewById<Button>(R.id.dialog_ticket_bottom_button)?.setOnClickListener {
             Log.d(TAG, "existTicketShowDialog: 클릭 됨")
             var sharedPreferences = context.getSharedPreferences("userInfo",
@@ -128,9 +129,12 @@ class FoodPreferenceFragment : Fragment() {
             mainViewModel.foodPreferenceRegister(sharedPreferences,foodName,classfication)
             mainViewModel.registerResult.observe(viewLifecycleOwner){ result ->
                 Log.d(TAG, "existTicketShowDialog: ${result}")
+
                 if(result) {
                     bottomSheetDialog.dismiss()
                     mainViewModel.ticketMinus()
+                    Log.d(TAG, "ticket Minus: ${mainViewModel.userInformation.value!!.foodTicket}")
+
                     val imm = context.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
                     imm.hideSoftInputFromWindow(requireActivity().currentFocus?.windowToken, 0)
                     binding.foodPreferenceRecyclerview.visibility = View.VISIBLE
