@@ -1,5 +1,6 @@
 package com.example.menupop.mainActivity
 
+import android.app.Dialog
 import android.content.Context
 import android.graphics.Typeface
 import android.os.Bundle
@@ -12,11 +13,13 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.View.OnFocusChangeListener
 import android.view.ViewGroup
+import android.view.Window
 import android.view.inputmethod.InputMethodManager
 import android.widget.Button
 import android.widget.SearchView
 import android.widget.SearchView.OnQueryTextListener
 import android.widget.TextView
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat.getSystemService
 import androidx.databinding.DataBindingUtil
@@ -132,6 +135,10 @@ class FoodPreferenceFragment : Fragment() {
                     imm.hideSoftInputFromWindow(requireActivity().currentFocus?.windowToken, 0)
                     binding.foodPreferenceRecyclerview.visibility = View.VISIBLE
                     binding.foodPreferenceSearchRecyclerview.visibility = View.GONE
+                    var sharedPreferences = context.getSharedPreferences("userInfo",
+                        AppCompatActivity.MODE_PRIVATE
+                    )
+                    mainViewModel.getFoodPreference(sharedPreferences)
                 } else {
                     Log.d(TAG, "existTicketShowDialog: 실패")
                 }
@@ -140,6 +147,34 @@ class FoodPreferenceFragment : Fragment() {
         }
 
         bottomSheetDialog.show()
+    }
+    fun deleteFoodPreferenceItem(foodName: String,classification: String){
+        val dialog = Dialog(context)
+        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
+        dialog.setContentView(R.layout.dialog_delete_preference)
+        dialog.findViewById<TextView>(R.id.dialog_delete_preference_warning).text = setTextBold("[${foodName}]를 [${classification}] 음식에서 \n삭제 하시겠습니까?",foodName,classification)
+        dialog.findViewById<Button>(R.id.dialog_delete_preference_delete_button).setOnClickListener {
+            Log.d(TAG, "deleteFoodPreferenceItem: 호출")
+            mainViewModel.deletedResult.observe(viewLifecycleOwner){ result ->
+                if(result){
+                    dialog.dismiss()
+                    var sharedPreferences = context.getSharedPreferences("userInfo",
+                        AppCompatActivity.MODE_PRIVATE
+                    )
+                    mainViewModel.getFoodPreference(sharedPreferences)
+                }else{
+                    Toast.makeText(context,"잠시 후 다시 시도해주세요.",Toast.LENGTH_SHORT).show()
+                }
+            }
+            var sharedPreferences = context.getSharedPreferences("userInfo",
+                AppCompatActivity.MODE_PRIVATE
+            )
+            mainViewModel.deleteFoodPreference(sharedPreferences,foodName)
+        }
+        dialog.findViewById<Button>(R.id.dialog_delete_preference_cancel_button).setOnClickListener {
+            dialog.dismiss()
+        }
+        dialog.show()
     }
 
     fun init(){
@@ -171,7 +206,12 @@ class FoodPreferenceFragment : Fragment() {
         binding.foodPreferenceSearchRecyclerview.layoutManager = LinearLayoutManager(context)
 
 
-        foodPreferenceAdapter = FoodPreferenceAdapter()
+        foodPreferenceAdapter = FoodPreferenceAdapter(object : FoodPreferenceClickListener{
+            override fun deleteBtnClick(foodPreference: FoodPreference) {
+                deleteFoodPreferenceItem(foodPreference.foodName,foodPreference.classification)
+            }
+
+        })
         binding.foodPreferenceRecyclerview.adapter = foodPreferenceAdapter
         binding.foodPreferenceRecyclerview.layoutManager = LinearLayoutManager(context)
 
@@ -181,7 +221,9 @@ class FoodPreferenceFragment : Fragment() {
         mainViewModel.getFoodPreference(sharedPreferences)
 
         mainViewModel.foodPreferenceList.observe(viewLifecycleOwner){ it->
-            foodPreferenceAdapter.setFoodList(it)
+            if (it.result.trim() == "success") {
+                foodPreferenceAdapter.setFoodList(it.foodList)
+            }
         }
 
         mainViewModel.searchFood.observe(viewLifecycleOwner){ it ->
