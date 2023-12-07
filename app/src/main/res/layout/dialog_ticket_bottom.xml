@@ -2,23 +2,21 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="vertical"
     android:layout_width="match_parent"
-    android:layout_height="300dp"
+    android:layout_height="wrap_content"
     android:background="@drawable/dialog_background"
     android:gravity="center">
 
     <ImageView
         android:id="@+id/dialog_ticket_bottom_down"
         android:layout_width="wrap_content"
-        android:layout_height="0dp"
-        android:layout_weight="0.15"
+        android:layout_height="wrap_content"
         android:background="@drawable/arrow_down"
         android:backgroundTint="@color/black"/>
 
     <TextView
         android:id="@+id/dialog_ticket_bottom_text"
         android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="0.2"
+        android:layout_height="wrap_content"
         android:text="사용할 수 있는 티켓이 없습니다."
         android:layout_marginTop="15dp"
         android:textColor="@color/black"
@@ -27,10 +25,10 @@
 
     <LinearLayout
         android:layout_width="300dp"
-        android:layout_height="0dp"
-        android:layout_weight="0.5"
+        android:layout_height="wrap_content"
         android:layout_marginTop="10dp"
         android:layout_marginBottom="20dp"
+        android:padding="10dp"
         android:orientation="vertical"
         android:background="@drawable/stroke"
         android:backgroundTint="@color/pale_gray"
