@@ -3,6 +3,7 @@ package com.example.menupop.mainActivity
 import android.app.Dialog
 import android.content.Context
 import android.os.Bundle
+import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
@@ -11,16 +12,33 @@ import android.view.Window
 import android.view.WindowManager
 import android.widget.Button
 import android.widget.TextView
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.databinding.DataBindingUtil
+import androidx.lifecycle.ViewModelProvider
 import com.example.menupop.R
+import com.example.menupop.databinding.FragmentWithdrawalBinding
 
 class WithdrawalFragment : Fragment() {
+    val TAG = "WithdrawalFragment"
+    lateinit var binding : FragmentWithdrawalBinding
     private lateinit var withdrawalViewModel: MainActivityViewModel
     var event: MainActivityEvent? = null
     private lateinit var context: Context
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
+        this.context = context
+        if (context is MainActivityEvent) {
+            event = context
+            Log.d(TAG, "onAttach: 호출")
+
+        } else {
+            throw RuntimeException(
+                context.toString()
+                        + "must implement MainActivityEvent"
+            )
+        }
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -32,12 +50,39 @@ class WithdrawalFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
+        binding = DataBindingUtil.inflate(inflater, R.layout.fragment_withdrawal, container, false)
 
-        return inflater.inflate(R.layout.fragment_withdrawal, container, false)
+        return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        init()
+        clickListener()
+    }
+
+    fun init(){
+        withdrawalViewModel = ViewModelProvider(requireActivity()).get(MainActivityViewModel::class.java)
+        binding.withdrawalViewModel = withdrawalViewModel
+        binding.lifecycleOwner = this
+
+    }
+
+    fun clickListener(){
+        binding.withdrawalAgree.setOnClickListener {
+            if(binding.withdrawalCheckBox.isChecked){
+                showDialog()
+            }else{
+                Toast.makeText(context,"주의 사항에 동의해주세요", Toast.LENGTH_LONG).show()
+            }
+        }
+
+        binding.withdrawalDisagree.setOnClickListener {
+            event?.moveToProfile()
+        }
+
+
     }
 
     fun showDialog(){
@@ -61,9 +106,7 @@ class WithdrawalFragment : Fragment() {
 
         }
         val disagreeButton = dialog.findViewById<Button>(R.id.dialog_two_button_disagree)
-        disagreeButton.setBackgroundColor(resources.getColor(R.color.pale_gray))
-        disagreeButton.setTextColor(resources.getColor(R.color.pale_gray))
-
+        disagreeButton.text = "더 써볼래요"
 
         disagreeButton.setOnClickListener{
             dialog.dismiss()

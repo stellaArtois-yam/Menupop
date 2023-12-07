@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+
+<!--    unchecked-->
+    <item android:state_checked="false">
+        <shape>
+            <stroke android:color="@color/light_gray" android:width="1dp"/>
+            <solid android:color="#fff"/>
+        </shape>
+    </item>
+
+<!--    checked-->
+    <item android:state_checked="true">
+        <layer-list>
+            <item>
+                <shape>
+                    <stroke android:color="@color/light_gray" android:width="1dp"/>
+                </shape>
+            </item>
+            <item  android:drawable="@drawable/check_24"
+                android:top="4dp"
+                android:right="4dp"
+                android:bottom="4dp"
+                android:left="4dp" />
+        </layer-list>
+    </item>
+
+</selector>

@@ -190,5 +190,12 @@ class MainActivity : AppCompatActivity(), MainActivityEvent{
         startActivity(intent)
     }
 
+    override fun moveToProfile() {
+        supportFragmentManager.beginTransaction().apply {
+            replace(R.id.home_frame_layout, profileFragment)
+                .commit()
+        }
+    }
+
 
 }
