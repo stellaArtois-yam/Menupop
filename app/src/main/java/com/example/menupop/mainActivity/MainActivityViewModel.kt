@@ -53,9 +53,16 @@ class MainActivityViewModel: ViewModel() {
     val userInformation : LiveData<UserInformationData>
         get() = _userInformation
 
-    fun ticketMinus(){
+    fun ticketMinus(sharedPreferences: SharedPreferences){
         Log.d(TAG, "ticketMinus: ${_userInformation.value!!.foodTicket}")
-        _userInformation.value?.foodTicket = _userInformation.value?.foodTicket?.minus(1)!!
+        val identifier = mainActivityModel.getUserInfo(sharedPreferences)
+        callbackResult = {result ->
+            Log.d(TAG, "ticketMinus: $result")
+            if(result.trim() == "success"){
+                _userInformation.value?.foodTicket = _userInformation.value?.foodTicket?.minus(1)!!
+            }
+        }
+        mainActivityModel.minusFoodTicket(identifier,callbackResult!!)
         Log.d(TAG, "ticketMinus 반역: ${_userInformation.value!!.foodTicket}")
     }
 
@@ -120,6 +127,9 @@ class MainActivityViewModel: ViewModel() {
             _foodPreferenceList.value = foodPreferenceDataClass
         }
         mainActivityModel.getFoodPreference(identifier,callbackFoodPreference!!)
+    }
+
+    fun listReset(){
     }
 
 
@@ -346,7 +356,9 @@ class MainActivityViewModel: ViewModel() {
     fun logout(sharedPreferences: SharedPreferences){
         mainActivityModel.logout(sharedPreferences)
     }
-
+    fun registerVariableReset(){
+        _registerResult.value = false
+    }
 
 
 

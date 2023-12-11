@@ -43,6 +43,23 @@ class MainActivityModel {
         return identifier
     }
 
+    fun minusFoodTicket(identifier: Int,callback: (String) -> Unit){
+        service.minusFoodTicket(identifier).enqueue(object : Callback<String>{
+            override fun onResponse(call: Call<String>, response: Response<String>) {
+                Log.d(TAG, "onResponse:  minusTicket $response")
+                if(response.isSuccessful){
+                    
+                    callback(response.body()!!)
+                }
+            }
+
+            override fun onFailure(call: Call<String>, t: Throwable) {
+                Log.d(TAG, "onFailure: ${t}")
+                callback("failed")
+            }
+
+        })
+    }
 
     fun getFoodPreference(identifier: Int,callback : (FoodPreferenceDataClass)->Unit){
         Log.d(TAG, "getFoodPreference: 호출")

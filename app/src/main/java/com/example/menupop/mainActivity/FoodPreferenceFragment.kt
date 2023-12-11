@@ -212,6 +212,10 @@ class FoodPreferenceFragment : Fragment() {
         mainViewModel.foodPreferenceList.observe(viewLifecycleOwner){ it->
             if (it.result.trim() == "success") {
                 foodPreferenceAdapter.setFoodList(it.foodList)
+                binding.foodPreferenceEmptyListWarring.visibility = View.GONE
+            }else if(it.result.trim()=="notRegister"){
+                binding.foodPreferenceEmptyListWarring.visibility = View.VISIBLE
+                binding.foodPreferenceRecyclerview.visibility = View.INVISIBLE
             }
         }
 
@@ -224,16 +228,18 @@ class FoodPreferenceFragment : Fragment() {
         mainViewModel.registerResult.observe(viewLifecycleOwner){ result ->
             Log.d(TAG, "existTicketShowDialog: ${result}")
             if(result) {
+                var sharedPreferences = context.getSharedPreferences("userInfo",
+                    AppCompatActivity.MODE_PRIVATE
+                )
                 existBottomSheetDialog.dismiss()
-                mainViewModel.ticketMinus()
+                mainViewModel.ticketMinus(sharedPreferences)
                 val imm = context.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
                 imm.hideSoftInputFromWindow(requireActivity().currentFocus?.windowToken, 0)
                 binding.foodPreferenceRecyclerview.visibility = View.VISIBLE
                 binding.foodPreferenceSearchRecyclerview.visibility = View.GONE
-                var sharedPreferences = context.getSharedPreferences("userInfo",
-                    AppCompatActivity.MODE_PRIVATE
-                )
                 mainViewModel.getFoodPreference(sharedPreferences)
+                mainViewModel.registerVariableReset()
+
             } else {
                 Log.d(TAG, "existTicketShowDialog: 실패")
             }
