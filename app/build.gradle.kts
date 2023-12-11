@@ -26,6 +26,11 @@ android {
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         buildConfigField("String", "KAKAOPAY_ADMIN_KEY", localProperties.getProperty("KAKAOPAY_ADMIN_KEY"))
+        buildConfigField("String", "KAKAO_NATIVE_APP_KEY", localProperties.getProperty("KAKAO_NATIVE_APP_KEY"))
+        buildConfigField("String", "GOOGLE_API_KEY", localProperties.getProperty("GOOGLE_API_KEY"))
+        buildConfigField("String", "SOCIAL_LOGIN_INFO_NAVER_CLIENT_ID", localProperties.getProperty("SOCIAL_LOGIN_INFO_NAVER_CLIENT_ID"))
+        buildConfigField("String", "SOCIAL_LOGIN_INFO_NAVER_CLIENT_SECRET", localProperties.getProperty("SOCIAL_LOGIN_INFO_NAVER_CLIENT_SECRET"))
+        buildConfigField("String", "BANK_API_KEY", localProperties.getProperty("BANK_API_KEY"))
     }
 
     buildFeatures{

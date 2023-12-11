@@ -184,4 +184,5 @@ data class ExchangeRateDataClass(
         var ZMW: Double,
         var ZWL: Double
     )
+
 }
