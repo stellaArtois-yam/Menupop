@@ -1,68 +1,76 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical"
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:background="@drawable/dialog_background"
-    android:gravity="center">
+<layout>
+    <data>
+        <variable
+            name="viewModel"
+            type="com.example.menupop.mainActivity.MainActivityViewModel" />
+    </data>
 
-    <ImageView
-        android:id="@+id/dialog_ticket_bottom_down"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:background="@drawable/arrow_down"
-        android:backgroundTint="@color/black"/>
-
-    <TextView
-        android:id="@+id/dialog_ticket_bottom_text"
+    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        android:orientation="vertical"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="사용할 수 있는 티켓이 없습니다."
-        android:layout_marginTop="15dp"
-        android:textColor="@color/black"
-        android:textSize="20sp"
-        android:gravity="center_horizontal"/>
-
-    <LinearLayout
-        android:layout_width="300dp"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="10dp"
-        android:layout_marginBottom="20dp"
-        android:padding="10dp"
-        android:orientation="vertical"
-        android:background="@drawable/stroke"
-        android:backgroundTint="@color/pale_gray"
+        android:background="@drawable/dialog_background"
         android:gravity="center">
 
-        <TextView
-            android:id="@+id/dialog_ticket_bottom_food_ticket"
+        <ImageView
+            android:id="@+id/dialog_ticket_bottom_down"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="음식 티켓 : 00개"
-            android:textColor="@color/black"
-            android:textSize="18sp"/>
+            android:background="@drawable/arrow_down"
+            android:backgroundTint="@color/black"/>
 
         <TextView
-            android:id="@+id/dialog_ticket_bottom_translation_ticket"
-            android:layout_width="wrap_content"
+            android:id="@+id/dialog_ticket_bottom_text"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="번역 티켓 : 01개"
+            android:text="사용할 수 있는 티켓이 없습니다."
+            android:layout_marginTop="15dp"
             android:textColor="@color/black"
+            android:textSize="20sp"
+            android:gravity="center_horizontal"/>
+
+        <LinearLayout
+            android:layout_width="300dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:layout_marginBottom="20dp"
+            android:padding="10dp"
+            android:orientation="vertical"
+            android:background="@drawable/stroke"
+            android:backgroundTint="@color/pale_gray"
+            android:gravity="center">
+
+            <TextView
+                android:id="@+id/dialog_ticket_bottom_food_ticket"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="음식 티켓 : 00개"
+                android:textColor="@color/black"
+                android:textSize="18sp"/>
+
+            <TextView
+                android:id="@+id/dialog_ticket_bottom_translation_ticket"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="번역 티켓 : 01개"
+                android:textColor="@color/black"
+                android:textSize="18sp"
+                android:layout_marginTop="10dp"/>
+
+        </LinearLayout>
+
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/dialog_ticket_bottom_button"
+            android:layout_width="300dp"
+            android:layout_height="wrap_content"
+            android:background="@drawable/radius_30_stroke_light_gray"
+            android:backgroundTint="@color/orange"
+            android:text="티켓 구매하러 가기"
+            android:textColor="@color/white"
             android:textSize="18sp"
-            android:layout_marginTop="10dp"/>
+            android:textStyle="bold"
+            android:layout_marginBottom="30dp"/>
 
     </LinearLayout>
-
-    <androidx.appcompat.widget.AppCompatButton
-        android:id="@+id/dialog_ticket_bottom_button"
-        android:layout_width="300dp"
-        android:layout_height="wrap_content"
-        android:background="@drawable/radius_30_stroke_light_gray"
-        android:backgroundTint="@color/orange"
-        android:text="티켓 구매하러 가기"
-        android:textColor="@color/white"
-        android:textSize="18sp"
-        android:textStyle="bold"
-        android:layout_marginBottom="30dp"/>
-
-</LinearLayout>
+</layout>

@@ -23,9 +23,13 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat.getSystemService
 import androidx.databinding.DataBindingUtil
+import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.menupop.R
+import com.example.menupop.databinding.DialogDeletePreferenceBinding
+import com.example.menupop.databinding.DialogSelectPaymentTypeBinding
+import com.example.menupop.databinding.DialogTicketBottomBinding
 import com.example.menupop.databinding.FragmentExchangeBinding
 import com.example.menupop.databinding.FragmentFoodPreferenceBinding
 import com.google.android.material.bottomsheet.BottomSheetDialog
@@ -39,6 +43,7 @@ class FoodPreferenceFragment : Fragment() {
     private lateinit var searchAdapter: FoodPreferenceSearchAdapter
     private lateinit var foodPreferenceAdapter: FoodPreferenceAdapter
     var event: MainActivityEvent? = null
+    lateinit var existBottomSheetDialog : BottomSheetDialog
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
@@ -82,14 +87,14 @@ class FoodPreferenceFragment : Fragment() {
         return false
     }
     fun emptyTicketShowDialog(){
-        val bottomSheetView = layoutInflater.inflate(R.layout.dialog_ticket_bottom, null)
+        val bindingDialog : DialogTicketBottomBinding = DataBindingUtil.inflate(LayoutInflater.from(context), R.layout.dialog_ticket_bottom, null, false);
         val bottomSheetDialog = BottomSheetDialog(context)
         val foodTicket = mainViewModel.userInformation.value?.foodTicket.toString()
         val translationTicket = mainViewModel.userInformation.value?.translationTicket.toString()
-        bottomSheetDialog.setContentView(bottomSheetView)
-        bottomSheetDialog.findViewById<TextView>(R.id.dialog_ticket_bottom_food_ticket)?.text = "음식 티켓 ${foodTicket} 개"
-        bottomSheetDialog.findViewById<TextView>(R.id.dialog_ticket_bottom_translation_ticket)?.text = "번역 티켓 ${translationTicket} 개"
-        bottomSheetDialog.findViewById<Button>(R.id.dialog_ticket_bottom_button)?.setOnClickListener {
+        bottomSheetDialog.setContentView(bindingDialog.root)
+        bindingDialog.dialogTicketBottomFoodTicket.text = "음식 티켓 $foodTicket 개"
+        bindingDialog.dialogTicketBottomTranslationTicket.text = "번역 티켓 $translationTicket 개"
+        bindingDialog.dialogTicketBottomButton.setOnClickListener {
             Log.d(TAG, "favoriteItemClick: 결제 화면 띄우기")
             event?.moveToTicketPurchase()
             bottomSheetDialog.dismiss()
@@ -111,53 +116,33 @@ class FoodPreferenceFragment : Fragment() {
         return spannableString
     }
     fun existTicketShowDialog(foodName:String,classfication : String){
-        val bottomSheetView = layoutInflater.inflate(R.layout.dialog_ticket_bottom, null)
-        val bottomSheetDialog = BottomSheetDialog(context)
+        val bindingDialog : DialogTicketBottomBinding = DataBindingUtil.inflate(LayoutInflater.from(context), R.layout.dialog_ticket_bottom, null, false);
+        existBottomSheetDialog = BottomSheetDialog(context)
         val foodTicket = mainViewModel.userInformation.value?.foodTicket.toString()
         val translationTicket = mainViewModel.userInformation.value?.translationTicket.toString()
-        bottomSheetDialog.setContentView(bottomSheetView)
-        bottomSheetDialog.findViewById<TextView>(R.id.dialog_ticket_bottom_food_ticket)?.text = "음식 티켓 ${foodTicket} 개"
-        bottomSheetDialog.findViewById<TextView>(R.id.dialog_ticket_bottom_translation_ticket)?.text = "번역 티켓 ${translationTicket} 개"
-        bottomSheetDialog.findViewById<Button>(R.id.dialog_ticket_bottom_button)?.text = "등록하기"
-        bottomSheetDialog.findViewById<TextView>(R.id.dialog_ticket_bottom_text)?.text = setTextBold("[${foodName}]를 [${classfication}] 음식으로\n등록하시겠습니까?",foodName,classfication)
-
-        bottomSheetDialog.findViewById<Button>(R.id.dialog_ticket_bottom_button)?.setOnClickListener {
+        existBottomSheetDialog.setContentView(bindingDialog.root)
+        bindingDialog.dialogTicketBottomFoodTicket.text = "음식 티켓 ${foodTicket} 개"
+        bindingDialog.dialogTicketBottomTranslationTicket.text = "번역 티켓 ${translationTicket} 개"
+        bindingDialog.dialogTicketBottomButton.text = "등록하기"
+        bindingDialog.dialogTicketBottomText.text = setTextBold("[${foodName}]를 [${classfication}] 음식으로\n등록하시겠습니까?",foodName,classfication)
+        bindingDialog.dialogTicketBottomButton.setOnClickListener {
             Log.d(TAG, "existTicketShowDialog: 클릭 됨")
             var sharedPreferences = context.getSharedPreferences("userInfo",
                 AppCompatActivity.MODE_PRIVATE
             )
             mainViewModel.foodPreferenceRegister(sharedPreferences,foodName,classfication)
-            mainViewModel.registerResult.observe(viewLifecycleOwner){ result ->
-                Log.d(TAG, "existTicketShowDialog: ${result}")
-
-                if(result) {
-                    bottomSheetDialog.dismiss()
-                    mainViewModel.ticketMinus()
-                    Log.d(TAG, "ticket Minus: ${mainViewModel.userInformation.value!!.foodTicket}")
-
-                    val imm = context.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
-                    imm.hideSoftInputFromWindow(requireActivity().currentFocus?.windowToken, 0)
-                    binding.foodPreferenceRecyclerview.visibility = View.VISIBLE
-                    binding.foodPreferenceSearchRecyclerview.visibility = View.GONE
-                    var sharedPreferences = context.getSharedPreferences("userInfo",
-                        AppCompatActivity.MODE_PRIVATE
-                    )
-                    mainViewModel.getFoodPreference(sharedPreferences)
-                } else {
-                    Log.d(TAG, "existTicketShowDialog: 실패")
-                }
-            }
 
         }
 
-        bottomSheetDialog.show()
+        existBottomSheetDialog.show()
     }
     fun deleteFoodPreferenceItem(foodName: String,classification: String){
         val dialog = Dialog(context)
+        val binding : DialogDeletePreferenceBinding = DataBindingUtil.inflate(LayoutInflater.from(context), R.layout.dialog_delete_preference, null, false);
         dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
-        dialog.setContentView(R.layout.dialog_delete_preference)
-        dialog.findViewById<TextView>(R.id.dialog_delete_preference_warning).text = setTextBold("[${foodName}]를 [${classification}] 음식에서 \n삭제 하시겠습니까?",foodName,classification)
-        dialog.findViewById<Button>(R.id.dialog_delete_preference_delete_button).setOnClickListener {
+        dialog.setContentView(binding.root)
+        binding.dialogDeletePreferenceWarning.text = setTextBold("[${foodName}]를 [${classification}] 음식에서 \n삭제 하시겠습니까?",foodName,classification)
+        binding.dialogDeletePreferenceDeleteButton.setOnClickListener {
             Log.d(TAG, "deleteFoodPreferenceItem: 호출")
             mainViewModel.deletedResult.observe(viewLifecycleOwner){ result ->
                 if(result){
@@ -175,7 +160,7 @@ class FoodPreferenceFragment : Fragment() {
             )
             mainViewModel.deleteFoodPreference(sharedPreferences,foodName)
         }
-        dialog.findViewById<Button>(R.id.dialog_delete_preference_cancel_button).setOnClickListener {
+        binding.dialogDeletePreferenceCancelButton.setOnClickListener {
             dialog.dismiss()
         }
         dialog.show()
@@ -235,6 +220,23 @@ class FoodPreferenceFragment : Fragment() {
             Log.d(TAG, "init: ${it}")
             searchAdapter.setFoodList(it)
 
+        }
+        mainViewModel.registerResult.observe(viewLifecycleOwner){ result ->
+            Log.d(TAG, "existTicketShowDialog: ${result}")
+            if(result) {
+                existBottomSheetDialog.dismiss()
+                mainViewModel.ticketMinus()
+                val imm = context.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+                imm.hideSoftInputFromWindow(requireActivity().currentFocus?.windowToken, 0)
+                binding.foodPreferenceRecyclerview.visibility = View.VISIBLE
+                binding.foodPreferenceSearchRecyclerview.visibility = View.GONE
+                var sharedPreferences = context.getSharedPreferences("userInfo",
+                    AppCompatActivity.MODE_PRIVATE
+                )
+                mainViewModel.getFoodPreference(sharedPreferences)
+            } else {
+                Log.d(TAG, "existTicketShowDialog: 실패")
+            }
         }
 
     }
