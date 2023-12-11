@@ -117,7 +117,6 @@ class FoodPreferenceFragment : Fragment() {
     }
     fun existTicketShowDialog(foodName:String,classfication : String){
         val bindingDialog : DialogTicketBottomBinding = DataBindingUtil.inflate(LayoutInflater.from(context), R.layout.dialog_ticket_bottom, null, false);
-        existBottomSheetDialog = BottomSheetDialog(context)
         val foodTicket = mainViewModel.userInformation.value?.foodTicket.toString()
         val translationTicket = mainViewModel.userInformation.value?.translationTicket.toString()
         existBottomSheetDialog.setContentView(bindingDialog.root)
@@ -191,6 +190,7 @@ class FoodPreferenceFragment : Fragment() {
             }
 
         })
+        existBottomSheetDialog = BottomSheetDialog(context)
         binding.foodPreferenceSearchRecyclerview.adapter = searchAdapter
         binding.foodPreferenceSearchRecyclerview.layoutManager = LinearLayoutManager(context)
 
