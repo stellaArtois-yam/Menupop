@@ -19,13 +19,15 @@ class ExchangeModel {
     val gson: Gson = GsonBuilder()
         .setLenient()
         .create()
-    private val retrofit = Retrofit.Builder()
-        .baseUrl("https://v6.exchangerate-api.com/") // 실제 서버의 기본 URL로 대체해야 합니다.
+
+    private val exchangeBuilder = Retrofit.Builder()
+        .baseUrl("https://v6.exchangerate-api.com/")
         .addConverterFactory(GsonConverterFactory.create(gson))
         .addConverterFactory(ScalarsConverterFactory.create())
         .build()
 
-    private val service = retrofit.create(RetrofitService::class.java)
+
+    private val service = exchangeBuilder.create(RetrofitService::class.java)
     fun requestExchangeRate(
         authkey: String,
         baseRate: String,
@@ -45,30 +47,16 @@ class ExchangeModel {
             }
 
         })
-//        service.requestExchangeRate(authkey,"20231123","AP01")
-////        service.requestExchangeRate(authkey,"AP01")
-//        .enqueue(object : Callback<ArrayList<ExchangeDataClass.ExchangeDataClassItem>>{
-//            override fun onResponse(
-//                call: Call<ArrayList<ExchangeDataClass.ExchangeDataClassItem>>,
-//                response: Response<ArrayList<ExchangeDataClass.ExchangeDataClassItem>>
-//            ) {
-//                if(response.isSuccessful){
-//                    callback(response.body()!!)
-//                }
-//            }
-//
-//            override fun onFailure(
-//                call: Call<ArrayList<ExchangeDataClass.ExchangeDataClassItem>>,
-//                t: Throwable
-//            ) {
-//                Log.d(TAG, "onFailure: ${t}")
-//            }
-//
-//        })
     }
     fun exchangeRateApplicationStatus(sharedPreferences: SharedPreferences, status : Boolean){
         var editor = sharedPreferences.edit()
         editor.putBoolean("exchangeRateApplicationStatus",status)
         editor.apply()
     }
+
+
+
+
+
+
 }

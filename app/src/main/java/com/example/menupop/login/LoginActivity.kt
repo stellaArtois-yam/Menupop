@@ -2,6 +2,7 @@ package com.example.menupop.login
 
 import android.app.Dialog
 import android.content.Intent
+import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import android.view.Window
@@ -13,6 +14,7 @@ import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
+import com.airbnb.lottie.BuildConfig
 import com.example.menupop.mainActivity.MainActivity
 import com.example.menupop.R
 import com.example.menupop.signup.SignupActivity
@@ -48,6 +50,9 @@ class LoginActivity : AppCompatActivity() {
     private val googleSignInClient: GoogleSignInClient by lazy { getGoogleClient() }
     private var mGoogleSignInClient: GoogleSignInClient? = null
     private var mAuth: FirebaseAuth? = null
+
+    val googleApiKey = com.example.menupop.BuildConfig.GOOGLE_API_KEY
+
     private val googleAuthLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
         val task: Task<GoogleSignInAccount> = GoogleSignIn.getSignedInAccountFromIntent(result.data)
         try {
@@ -169,7 +174,8 @@ class LoginActivity : AppCompatActivity() {
         Log.d(TAG, "getHash: ${keyHash}")
     }
     private fun kakaoLoginRequest(){
-        KakaoSdk.init(this,getString(R.string.KAKAO_NATIVE_APP_KEY))
+        val apiKey = com.example.menupop.BuildConfig.KAKAO_NATIVE_APP_KEY
+        KakaoSdk.init(this,apiKey)
         setKakaoCallback()
         btnKakaoLogin()
     }
@@ -232,15 +238,16 @@ class LoginActivity : AppCompatActivity() {
     private fun getGoogleClient(): GoogleSignInClient {
         val googleSignInOption = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
             .requestScopes(Scope("https://www.googleapis.com/auth/pubsub"))
-            .requestServerAuthCode(getString(R.string.GOOGLE_API_KEY)) // string 파일에 저장해둔 client id 를 이용해 server authcode를 요청한다.
+            .requestServerAuthCode(googleApiKey)
             .requestEmail() // 이메일도 요청할 수 있다.
             .build()
 
         return GoogleSignIn.getClient(applicationContext, googleSignInOption)
     }
     private fun signIn() {
+
         val gso = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-            .requestIdToken(getString(R.string.GOOGLE_API_KEY))
+            .requestIdToken(googleApiKey)
             .requestProfile()
             .requestEmail()
             .build()
@@ -269,8 +276,8 @@ class LoginActivity : AppCompatActivity() {
         }
             }
     private fun requestNaverLogin(){
-        val naverClientId = getString(R.string.social_login_info_naver_client_id)
-        val naverClientSecret = getString(R.string.social_login_info_naver_client_secret)
+        val naverClientId = com.example.menupop.BuildConfig.SOCIAL_LOGIN_INFO_NAVER_CLIENT_ID
+        val naverClientSecret = com.example.menupop.BuildConfig.SOCIAL_LOGIN_INFO_NAVER_CLIENT_SECRET
         val naverClientName = getString(R.string.social_login_info_naver_client_name)
         NaverIdLoginSDK.initialize(this, naverClientId, naverClientSecret , naverClientName)
         var naverToken :String? = ""
