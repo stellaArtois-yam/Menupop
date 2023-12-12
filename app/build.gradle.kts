@@ -31,6 +31,7 @@ android {
         buildConfigField("String", "SOCIAL_LOGIN_INFO_NAVER_CLIENT_ID", localProperties.getProperty("SOCIAL_LOGIN_INFO_NAVER_CLIENT_ID"))
         buildConfigField("String", "SOCIAL_LOGIN_INFO_NAVER_CLIENT_SECRET", localProperties.getProperty("SOCIAL_LOGIN_INFO_NAVER_CLIENT_SECRET"))
         buildConfigField("String", "BANK_API_KEY", localProperties.getProperty("BANK_API_KEY"))
+        buildConfigField("String", "GOOGLE_AD_ID", localProperties.getProperty("GOOGLE_AD_ID"))
     }
 
     buildFeatures{
@@ -87,5 +88,7 @@ dependencies {
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.2")
 
     implementation("androidx.work:work-runtime-ktx:2.9.0")
+
+    implementation("com.google.android.gms:play-services-ads-base:22.6.0")
 
 }
