@@ -1,15 +1,21 @@
 package com.example.menupop.mainActivity
 
+import android.app.Application
 import android.content.SharedPreferences
 import android.os.Build
 import android.util.Log
 import androidx.annotation.RequiresApi
+import androidx.core.content.ContentProviderCompat.requireContext
+import androidx.work.OneTimeWorkRequestBuilder
+import androidx.work.WorkInfo
+import androidx.work.WorkManager
 import com.example.menupop.BuildConfig
 import com.example.menupop.KakaoPayApproveResponse
-import com.example.menupop.KakaoPayRequestModel
+import com.example.menupop.KakaoPayRequestDTO
 import com.example.menupop.KakaoPayReadyResponse
+import com.example.menupop.MidnightResetWorker
 import com.example.menupop.RetrofitService
-import com.example.menupop.TicketSaveModel
+import com.example.menupop.TicketSaveDTO
 import com.example.menupop.signup.ResultModel
 import com.google.gson.Gson
 import com.google.gson.GsonBuilder
@@ -20,6 +26,8 @@ import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import retrofit2.converter.scalars.ScalarsConverterFactory
 import java.time.LocalDate
+import java.util.Calendar
+import java.util.concurrent.TimeUnit
 
 
 class MainActivityModel {
@@ -37,10 +45,17 @@ class MainActivityModel {
 
     private val service = retrofit.create(RetrofitService::class.java)
 
-    fun getUserInfo(sharedPreferences: SharedPreferences) : Int {
+    fun getUserInfo(sharedPreferences: SharedPreferences) : HashMap<String, Int> {
+        val hashmap = HashMap<String, Int>()
         val identifier = sharedPreferences.getInt("identifier", 0)
+        val dailyTranslation = sharedPreferences.getInt("dailyTranslation", 0)
+        val dailyReword = sharedPreferences.getInt("dailyReword", 0)
 
-        return identifier
+        hashmap.put("identifier", identifier)
+        hashmap.put("dailyTranslation", dailyTranslation)
+        hashmap.put("dailyReword", dailyReword)
+
+        return hashmap
     }
 
     fun minusFoodTicket(identifier: Int,callback: (String) -> Unit){
@@ -48,7 +63,7 @@ class MainActivityModel {
             override fun onResponse(call: Call<String>, response: Response<String>) {
                 Log.d(TAG, "onResponse:  minusTicket $response")
                 if(response.isSuccessful){
-                    
+
                     callback(response.body()!!)
                 }
             }
@@ -82,13 +97,13 @@ class MainActivityModel {
 
     }
 
-    fun savePaymentHistory(ticketSaveModel: TicketSaveModel, callback: (ResultModel) -> Unit){
+    fun savePaymentHistory(ticketSaveModel: TicketSaveDTO, callback: (ResultModel) -> Unit){
 
         val call : Call<ResultModel> = service.savePaymentHistory(ticketSaveModel.identifier,
             ticketSaveModel.tid, ticketSaveModel.paymentType, ticketSaveModel.item, ticketSaveModel.price,
             ticketSaveModel.approvedAt, ticketSaveModel.translationTicket, ticketSaveModel.foodTicket)
 
-        
+
         call.enqueue(object : Callback<ResultModel>{
             override fun onResponse(call: Call<ResultModel>, response: Response<ResultModel>) {
                 if(response.isSuccessful){
@@ -97,7 +112,7 @@ class MainActivityModel {
                 }else{
                     Log.d(TAG, "is not successful: $response")
                 }
-                
+
             }
             override fun onFailure(call: Call<ResultModel>, t: Throwable) {
                 Log.d(TAG, "onFailure: ${t.message}")
@@ -145,11 +160,11 @@ class MainActivityModel {
 
     @RequiresApi(Build.VERSION_CODES.O)
     fun createPaymentRequest(userId: String, item: String, quantity: String,
-        totalAmount: String, callback: (KakaoPayReadyResponse) -> Unit){
+                             totalAmount: String, callback: (KakaoPayReadyResponse) -> Unit){
 
         val requestModel = HashMap<String, String>()
 
-        val kakaoPayRequestModel = KakaoPayRequestModel(cid, orderId, userId, item, quantity, totalAmount, "0", approvalUrl, cancelUrl, failUrl)
+        val kakaoPayRequestModel = KakaoPayRequestDTO(cid, orderId, userId, item, quantity, totalAmount, "0", approvalUrl, cancelUrl, failUrl)
 
         val fields = kakaoPayRequestModel.javaClass.declaredFields
         for (field in fields) {
@@ -159,17 +174,17 @@ class MainActivityModel {
         }
 
         val call : Call<KakaoPayReadyResponse>
-        = kakaoPayService.createPaymentRequest(API_KEY, requestModel)
+                = kakaoPayService.createPaymentRequest(API_KEY, requestModel)
 
         call.enqueue(object  : Callback<KakaoPayReadyResponse>{
             override fun onResponse(call: Call<KakaoPayReadyResponse>, response: Response<KakaoPayReadyResponse>
             ) {
-               if(response.isSuccessful){
-                   Log.d(TAG, "onResponse: ${response.body()}")
-                   callback(response.body()!!)
-               }else{
-                   Log.d(TAG, "is not successful: ${response}")
-               }
+                if(response.isSuccessful){
+                    Log.d(TAG, "onResponse: ${response.body()}")
+                    callback(response.body()!!)
+                }else{
+                    Log.d(TAG, "is not successful: ${response}")
+                }
             }
 
             override fun onFailure(call: Call<KakaoPayReadyResponse>, t: Throwable) {
@@ -177,7 +192,7 @@ class MainActivityModel {
             }
         })
     }
-    
+
     fun foodPreferenceRegister(identifier: Int,foodName:String,classification:String,callback : (String) -> Unit){
         Log.d(TAG, "foodPreferenceRegister: 호출됨")
         service.foodPreferenceRegister(identifier,foodName,classification).enqueue(object : Callback<String>{
@@ -259,6 +274,39 @@ class MainActivityModel {
             }
         })
     }
+
+
+    fun scheduleMidnightWork(application: Application, callback: (Boolean) -> Unit) {
+        val midnight = Calendar.getInstance().apply {
+            set(Calendar.HOUR_OF_DAY, 24) // 자정
+            set(Calendar.MINUTE, 0)
+            set(Calendar.SECOND, 0)
+        }
+
+        val currentTime = Calendar.getInstance()
+        val delay = midnight.timeInMillis - currentTime.timeInMillis
+
+        val midnightWorkRequest = OneTimeWorkRequestBuilder<MidnightResetWorker>()
+            .setInitialDelay(delay, TimeUnit.MILLISECONDS)
+            .addTag("midnightWork")
+            .build()
+
+        WorkManager.getInstance(application.applicationContext).enqueue(midnightWorkRequest)
+
+        WorkManager.getInstance(application.applicationContext)
+            .getWorkInfoByIdLiveData(midnightWorkRequest.id)
+            .observeForever{
+                if(it != null && it.state == WorkInfo.State.SUCCEEDED){
+                    Log.d(TAG, "scheduleMidnightWork: success")
+                    callback(true)
+                }
+            }
+        //Application Context를 사용하되, 액티비티나 프래그먼트 Context 사용 x
+        //직접 참조 시 ViewModel 생명주기가 View보다 long 독립적인 각각의 생명주기가 꼬일 수 있고,
+        // View가 모두 종료돼도 ViewModel이 계속해서 참조 시 메모리 누수 발생 가능
+    }
+
+
 
     fun logout(sharedPreferences: SharedPreferences) {
         val editor = sharedPreferences.edit()

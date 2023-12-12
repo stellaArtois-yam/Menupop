@@ -1,6 +1,6 @@
 package com.example.menupop
 
-data class KakaoPayRequestModel(
+data class KakaoPayRequestDTO(
     val cid : String,
     val partner_order_id : String,
     val partner_user_id : String,

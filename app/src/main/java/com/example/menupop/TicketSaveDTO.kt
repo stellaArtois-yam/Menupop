@@ -3,7 +3,7 @@ package com.example.menupop
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class TicketSaveModel(
+data class TicketSaveDTO(
     val identifier : Int,
     val tid : String,
     val paymentType: String,

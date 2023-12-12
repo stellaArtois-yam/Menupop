@@ -1,19 +1,23 @@
 package com.example.menupop.mainActivity
 
+import android.app.Application
 import android.content.SharedPreferences
 import android.os.Build
 import android.util.Log
-import android.widget.Toast
 import androidx.annotation.RequiresApi
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.work.OneTimeWorkRequestBuilder
+import androidx.work.WorkManager
 import com.example.menupop.KakaoPayApproveResponse
 import com.example.menupop.KakaoPayReadyResponse
-import com.example.menupop.TicketSaveModel
+import com.example.menupop.MidnightResetWorker
+import com.example.menupop.TicketSaveDTO
 import com.example.menupop.signup.ResultModel
 import java.text.DecimalFormat
-import java.util.Objects
+import java.util.Calendar
+import java.util.concurrent.TimeUnit
 
 class MainActivityViewModel: ViewModel() {
     val TAG = "MainActivityViewModel"
@@ -55,25 +59,27 @@ class MainActivityViewModel: ViewModel() {
 
     fun ticketMinus(sharedPreferences: SharedPreferences){
         Log.d(TAG, "ticketMinus: ${_userInformation.value!!.foodTicket}")
-        val identifier = mainActivityModel.getUserInfo(sharedPreferences)
+        val userInfo = mainActivityModel.getUserInfo(sharedPreferences)
+        val identifier = userInfo.get("identifier")
         callbackResult = {result ->
             Log.d(TAG, "ticketMinus: $result")
             if(result.trim() == "success"){
                 _userInformation.value?.foodTicket = _userInformation.value?.foodTicket?.minus(1)!!
             }
         }
-        mainActivityModel.minusFoodTicket(identifier,callbackResult!!)
+        mainActivityModel.minusFoodTicket(identifier!!,callbackResult!!)
         Log.d(TAG, "ticketMinus 반역: ${_userInformation.value!!.foodTicket}")
     }
 
     fun foodPreferenceRegister(sharedPreferences: SharedPreferences,foodName:String,classification:String){
         Log.d(TAG, "foodPreferenceRegister: 호출됨")
-        val identifier = mainActivityModel.getUserInfo(sharedPreferences)
+        val userInfo = mainActivityModel.getUserInfo(sharedPreferences)
+        val identifier = userInfo.get("identifier")
         callbackResult = { result ->
             Log.d(TAG, "foodPreferenceRegister: ${result}")
             _registerResult.value = result == "success"
         }
-        mainActivityModel.foodPreferenceRegister(identifier,foodName,classification,callbackResult!!)
+        mainActivityModel.foodPreferenceRegister(identifier!!,foodName,classification,callbackResult!!)
     }
 
     fun deleteFoodPreference(sharedPreferences: SharedPreferences,foodName: String){
@@ -86,8 +92,10 @@ class MainActivityViewModel: ViewModel() {
                 _deletedResult.value= false
             }
         }
-        val identifier = mainActivityModel.getUserInfo(sharedPreferences)
-        mainActivityModel.deleteFoodPreference(identifier,foodName,callbackResult!!)
+        val userInfo = mainActivityModel.getUserInfo(sharedPreferences)
+        val identifier = userInfo.get("identifier")
+
+        mainActivityModel.deleteFoodPreference(identifier!!,foodName,callbackResult!!)
 
     }
 
@@ -107,10 +115,14 @@ class MainActivityViewModel: ViewModel() {
 
 
     fun getUserInfo(sharedPreferences: SharedPreferences) : Int{
-        val identifier = mainActivityModel.getUserInfo(sharedPreferences)
-        return identifier
+        val userInfo = mainActivityModel.getUserInfo(sharedPreferences)
+        val identifier = userInfo.get("identifier")
+        _dailyTranslation.value = userInfo.get("dailyTranslation")
+        _dailyReword.value = userInfo.get("dailyReword")
+        Log.d(TAG, "getUserInfo: $identifier")
+        return identifier!!
     }
-    
+
     fun requestUserInformation(identifier : Int){
         callbackUserInfo = {response ->
             _userInformation.value = response
@@ -213,7 +225,7 @@ class MainActivityViewModel: ViewModel() {
 
 
     fun countTicket(ticketAmount: MutableLiveData<String>,
-                            otherTicketAmount: MutableLiveData<String>): Int{
+                    otherTicketAmount: MutableLiveData<String>): Int{
         if(ticketAmount.value!!.toInt() > 0 && otherTicketAmount.value!!.toInt() >0){
             return 2
         }else{
@@ -277,7 +289,7 @@ class MainActivityViewModel: ViewModel() {
 
         mainActivityModel.createPaymentRequest(userId, item, quantity.toString(),
             _totalPriceForPay.value!!, callbackKakaoReady!!)
-        
+
     }
 
     @RequiresApi(Build.VERSION_CODES.O)
@@ -287,8 +299,8 @@ class MainActivityViewModel: ViewModel() {
 
             _paymentResponse.value = null
 
-        // db에 티켓 개수도 수정
-        // 구매 이력 저장
+            // db에 티켓 개수도 수정
+            // 구매 이력 저장
             savePaymentHistory(response.partner_user_id.toInt(),
                 response.tid, response.payment_method_type,
                 response.item_name, response.amount.total.toInt(), response.approved_at)
@@ -304,7 +316,7 @@ class MainActivityViewModel: ViewModel() {
 
     fun savePaymentHistory(identifier: Int, tid : String, paymentType : String, item : String,
                            price : Int, approveAt : String){
-        var ticketSaveModel : TicketSaveModel ?= null
+        var ticketSaveModel : TicketSaveDTO ?= null
         callback = {response ->
             Log.d(TAG, "savePaymentHistory: ${response.result}")
             //여기서 클라이언트 티켓 개수 수정
@@ -337,7 +349,7 @@ class MainActivityViewModel: ViewModel() {
         }
 
         if(_paymentType.value == "regular"){
-            ticketSaveModel = TicketSaveModel(identifier,
+            ticketSaveModel = TicketSaveDTO(identifier,
                 tid, paymentType, item, price,approveAt,
                 _regularTranslationAmount.value!!.toInt(), _regularFoodAmount.value!!.toInt())
             Log.d(TAG, "ticketSaveModel: $ticketSaveModel")
@@ -358,6 +370,27 @@ class MainActivityViewModel: ViewModel() {
     }
     fun registerVariableReset(){
         _registerResult.value = false
+    }
+
+    private val _dailyTranslation = MutableLiveData<Int>()
+    val dailyTranslation : LiveData<Int>
+        get() = _dailyTranslation
+
+    private val _dailyReword = MutableLiveData<Int>()
+    val dailyReword : LiveData<Int>
+        get() = _dailyReword
+
+    fun scheduleMidnightWork(application: Application){
+        val callback : ((Boolean) -> Unit) ={
+            if(it){
+                _dailyTranslation.value = 3
+                _dailyReword.value = 3
+            }
+
+        }
+        mainActivityModel.scheduleMidnightWork(application, callback)
+
+
     }
 
 

@@ -12,6 +12,8 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
+import androidx.work.WorkInfo
+import androidx.work.WorkManager
 import com.example.menupop.R
 import com.example.menupop.databinding.ActivityMainBinding
 import com.example.menupop.login.LoginActivity
@@ -59,10 +61,20 @@ class MainActivity : AppCompatActivity(), MainActivityEvent{
 
         binding.appbarMenu.findViewById<TextView>(R.id.appbar_status).text = "음식 등록"
 
+        /**
+         * 여기서 dailyTranslation, dailyReword 를 받아....!
+         */
         var sharedPreferences = getSharedPreferences("userInfo", MODE_PRIVATE)
         identifier = mainActivityViewModel.getUserInfo(sharedPreferences)
 
         mainActivityViewModel.requestUserInformation(identifier!!)
+
+        mainActivityViewModel.scheduleMidnightWork(application)
+
+
+
+
+
 
         mainActivityViewModel.isLoading.observe(this, Observer {
             if(it){
@@ -159,10 +171,10 @@ class MainActivity : AppCompatActivity(), MainActivityEvent{
     override fun moveToWebView() {
         val webViewFragment = KakaoPayWebView()
 
-      supportFragmentManager.beginTransaction().apply {
-          replace(R.id.home_frame_layout, webViewFragment)
-          commit()
-      }
+        supportFragmentManager.beginTransaction().apply {
+            replace(R.id.home_frame_layout, webViewFragment)
+            commit()
+        }
     }
 
     override fun completePayment() {
@@ -177,7 +189,7 @@ class MainActivity : AppCompatActivity(), MainActivityEvent{
     }
 
     override fun accountWithdrawal() {
-      //회원 탈퇴
+        //회원 탈퇴
         supportFragmentManager.beginTransaction().apply {
             replace(R.id.home_frame_layout, WithdrawalFragment())
             commit()
