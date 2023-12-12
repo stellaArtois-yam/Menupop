@@ -15,6 +15,9 @@
         android:theme="@style/Theme.Menupop"
         android:usesCleartextTraffic="true"
         tools:targetApi="31">
+        <meta-data
+            android:name="com.google.android.gms.ads.APPLICATION_ID"
+            android:value="ca-app-pub-1245093859457840~5142119221"/>
         <activity
             android:name=".resetPassword.ResetPasswordActivity"
             android:exported="false" />
