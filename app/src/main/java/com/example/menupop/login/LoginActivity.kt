@@ -176,8 +176,7 @@ class LoginActivity : AppCompatActivity() {
     private fun kakaoLoginRequest(){
         val apiKey = com.example.menupop.BuildConfig.KAKAO_NATIVE_APP_KEY
         KakaoSdk.init(this,apiKey)
-        setKakaoCallback()
-        btnKakaoLogin()
+        loginViewModel.requestKakaoSocialLogin()
     }
     private fun showSocialWarningDialog(identifier:Int) {
         val dialog = Dialog(this)
@@ -201,34 +200,15 @@ class LoginActivity : AppCompatActivity() {
     private fun socialLoginRequest(email : String){
         loginViewModel.socialLoginRequest(email)
     }
-    fun btnKakaoLogin() {
+    fun btnKakaoLogin(callback : (OAuthToken?, Throwable?) -> Unit) {
         // 카카오톡이 설치되어 있으면 카카오톡으로 로그인, 아니면 카카오계정으로 로그인
         if(UserApiClient.instance.isKakaoTalkLoginAvailable(this)){
-            UserApiClient.instance.loginWithKakaoTalk(this, callback = kakaoCallback)
+            UserApiClient.instance.loginWithKakaoTalk(this, callback = callback)
         }else{
-            UserApiClient.instance.loginWithKakaoAccount(this, callback = kakaoCallback)
+            UserApiClient.instance.loginWithKakaoAccount(this, callback = callback)
         }
     }
 
-    fun setKakaoCallback() {
-        kakaoCallback = { token, error ->
-            if (error != null) {
-                Log.d(TAG, "setKakaoCallback: ${error.toString()}")
-            }
-            else if (token != null) {
-                Log.d("[카카오로그인]","로그인에 성공하였습니다.\n${token.accessToken}")
-                UserApiClient.instance.accessTokenInfo { tokenInfo, error ->
-                    UserApiClient.instance.me { user, error ->
-                        Log.d(TAG, "setKakaoCallback: 닉네임: ${user?.kakaoAccount?.profile?.nickname} 이메일 : ${user?.kakaoAccount?.email}")
-                        socialLoginRequest(user?.kakaoAccount?.email.toString())
-                    }
-                }
-            }
-            else {
-                Log.d(TAG, "setKakaoCallback: 토큰==null")
-            }
-        }
-    }
     private fun requestGoogleLogin() {
         googleSignInClient.signOut()
         val signInIntent = googleSignInClient.signInIntent
@@ -280,44 +260,8 @@ class LoginActivity : AppCompatActivity() {
         val naverClientSecret = com.example.menupop.BuildConfig.SOCIAL_LOGIN_INFO_NAVER_CLIENT_SECRET
         val naverClientName = getString(R.string.social_login_info_naver_client_name)
         NaverIdLoginSDK.initialize(this, naverClientId, naverClientSecret , naverClientName)
-        var naverToken :String? = ""
 
-        val profileCallback = object : NidProfileCallback<NidProfileResponse> {
-            override fun onSuccess(response: NidProfileResponse) {
-                val email = response.profile?.email
-                loginViewModel.socialLoginRequest(email!!)
-                Log.d(TAG, "onSuccess: ${email}")
-            }
-            override fun onFailure(httpStatus: Int, message: String) {
-                val errorCode = NaverIdLoginSDK.getLastErrorCode().code
-                val errorDescription = NaverIdLoginSDK.getLastErrorDescription()
-                Log.d(TAG, "onFailure: ${errorCode} ${errorDescription}")
-            }
-            override fun onError(errorCode: Int, message: String) {
-                onFailure(errorCode, message)
-            }
-        }
-
-        /** OAuthLoginCallback을 authenticate() 메서드 호출 시 파라미터로 전달하거나 NidOAuthLoginButton 객체에 등록하면 인증이 종료되는 것을 확인할 수 있습니다. */
-        val oauthLoginCallback = object : OAuthLoginCallback {
-            override fun onSuccess() {
-                // 네이버 로그인 인증이 성공했을 때 수행할 코드 추가
-                naverToken = NaverIdLoginSDK.getAccessToken()
-
-                //로그인 유저 정보 가져오기
-                NidOAuthLogin().callProfileApi(profileCallback)
-            }
-            override fun onFailure(httpStatus: Int, message: String) {
-                val errorCode = NaverIdLoginSDK.getLastErrorCode().code
-                val errorDescription = NaverIdLoginSDK.getLastErrorDescription()
-                Log.d(TAG, "onFailure: ${errorCode} ${errorDescription}")
-            }
-            override fun onError(errorCode: Int, message: String) {
-                onFailure(errorCode, message)
-            }
-        }
-
-        NaverIdLoginSDK.authenticate(this, oauthLoginCallback)
+        loginViewModel.requestNaverSocialLogin()
     }
     }
 
