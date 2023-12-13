@@ -97,7 +97,7 @@ fun requestLogin(id: String, password: String, callback: (LoginResponseModel) ->
         })
     }
     fun requestNaverSocialLogin(oauthLoginCallback : OAuthLoginCallback){
-        NaverIdLoginSDK.authenticate(application, oauthLoginCallback)
+        NaverIdLoginSDK.authenticate(application.applicationContext, oauthLoginCallback)
     }
     fun requestKakaoSocialLogin(kakaoCallback : (OAuthToken?, Throwable?) -> Unit){
         if(UserApiClient.instance.isKakaoTalkLoginAvailable(application.applicationContext)){

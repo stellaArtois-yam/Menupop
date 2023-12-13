@@ -306,6 +306,22 @@ class MainActivityModel {
         // View가 모두 종료돼도 ViewModel이 계속해서 참조 시 메모리 누수 발생 가능
     }
 
+    fun withDrawal(identifier: Int,email:String,id:String,date:String,callback: (String) -> Unit){
+        service.withDrawal(identifier, email, id, date).enqueue(object : Callback<String>{
+            override fun onResponse(call: Call<String>, response: Response<String>) {
+                if(response.isSuccessful && response.body() != null){
+                    callback(response.body()!!)
+                }
+            }
+
+            override fun onFailure(call: Call<String>, t: Throwable) {
+                Log.d(TAG, "onFailure: ${t}")
+                callback("failed")
+            }
+
+        })
+    }
+
 
 
     fun logout(sharedPreferences: SharedPreferences) {

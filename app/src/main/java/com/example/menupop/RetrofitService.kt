@@ -108,5 +108,8 @@ interface RetrofitService {
     @POST("MinusFoodTicket.php")
     @FormUrlEncoded
     fun minusFoodTicket(@Field("identifier") identifier: Int) : Call<String>
+    @POST("WithDrawal.php")
+    @FormUrlEncoded
+    fun withDrawal(@Field("identifier") identifier: Int,@Field("email") email: String,@Field("id") id : String,@Field("date") date:String) : Call<String>
 
 }
