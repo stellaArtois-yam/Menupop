@@ -1,23 +1,28 @@
 package com.example.menupop.mainActivity
 
 import android.content.Intent
+import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import android.view.MenuItem
 import android.view.View
-import android.webkit.WebViewFragment
 import android.widget.ImageView
 import android.widget.TextView
+import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
-import androidx.work.WorkInfo
-import androidx.work.WorkManager
+import com.example.menupop.BuildConfig
 import com.example.menupop.R
 import com.example.menupop.databinding.ActivityMainBinding
 import com.example.menupop.login.LoginActivity
+import com.google.android.gms.ads.AdRequest
+import com.google.android.gms.ads.LoadAdError
+import com.google.android.gms.ads.rewarded.RewardedAd
+import com.google.android.gms.ads.rewarded.RewardedAdLoadCallback
 import com.google.android.material.bottomnavigation.BottomNavigationView
+
 
 class MainActivity : AppCompatActivity(), MainActivityEvent{
     val TAG = "MainActivity"
@@ -30,6 +35,8 @@ class MainActivity : AppCompatActivity(), MainActivityEvent{
     lateinit var profileFragment: ProfileFragment
 
     lateinit var ticketPurchaseFragment: TicketPurchaseFragment
+
+    private var rewardedAd: RewardedAd? = null
 
     var identifier : Int? = null
 
@@ -185,9 +192,24 @@ class MainActivity : AppCompatActivity(), MainActivityEvent{
     }
 
     override fun moveToAdvertisement() {
-        //광고보러 가기
+        val adRequest: AdRequest = AdRequest.Builder().build()
+        val key = BuildConfig.GOOGLE_AD_ID
+        RewardedAd.load(this, key,
+            adRequest, object : RewardedAdLoadCallback() {
+                override fun onAdFailedToLoad(loadAdError: LoadAdError) {
+                    // Handle the error.
+                    Log.d(TAG, loadAdError.toString())
+                    rewardedAd = null
+                }
+
+                override fun onAdLoaded(ad: RewardedAd) {
+                    rewardedAd = ad
+                    Log.d(TAG, "Ad was loaded.")
+                }
+            })
     }
 
+    @RequiresApi(Build.VERSION_CODES.O)
     override fun accountWithdrawal() {
         //회원 탈퇴
         supportFragmentManager.beginTransaction().apply {

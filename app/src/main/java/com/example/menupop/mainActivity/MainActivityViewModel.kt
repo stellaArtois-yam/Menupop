@@ -16,7 +16,9 @@ import com.example.menupop.MidnightResetWorker
 import com.example.menupop.TicketSaveDTO
 import com.example.menupop.signup.ResultModel
 import java.text.DecimalFormat
+import java.time.LocalDate
 import java.util.Calendar
+import java.util.Date
 import java.util.concurrent.TimeUnit
 
 class MainActivityViewModel: ViewModel() {
@@ -41,6 +43,11 @@ class MainActivityViewModel: ViewModel() {
     private val _registerResult = MutableLiveData<Boolean>()
     val registerResult: LiveData<Boolean>
         get() = _registerResult
+
+    private val _accountWithdrawal = MutableLiveData<String>()
+
+    val accountWithdrawal : LiveData<String>
+        get() = _accountWithdrawal
 
     /**
      * 메인
@@ -130,6 +137,21 @@ class MainActivityViewModel: ViewModel() {
             _isLoading.value = response.id != null && response.email!=null
         }
         mainActivityModel.requestUserInformation(identifier, callbackUserInfo!!)
+    }
+    @RequiresApi(Build.VERSION_CODES.O)
+    fun withDrawal(sharedPreferences: SharedPreferences){
+        callbackResult = {
+            Log.d(TAG, "withDrawal: $it")
+            _accountWithdrawal.value = it
+            if(it == "success"){
+                logout(sharedPreferences)
+            }
+        }
+        val identifier = getUserInfo(sharedPreferences)
+        val email = userInformation.value?.email
+        val id = userInformation.value?.id
+        val localDate: LocalDate = LocalDate.now()
+        mainActivityModel.withDrawal(identifier,email!!,id!!,localDate.toString(),callbackResult!!)
     }
 
     fun getFoodPreference(sharedPreferences: SharedPreferences){

@@ -2,6 +2,7 @@ package com.example.menupop.mainActivity
 
 import android.app.Dialog
 import android.content.Context
+import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import androidx.fragment.app.Fragment
@@ -13,11 +14,13 @@ import android.view.WindowManager
 import android.widget.Button
 import android.widget.TextView
 import android.widget.Toast
+import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.ViewModelProvider
 import com.example.menupop.R
 import com.example.menupop.databinding.FragmentWithdrawalBinding
+@RequiresApi(Build.VERSION_CODES.O)
 
 class WithdrawalFragment : Fragment() {
     val TAG = "WithdrawalFragment"
@@ -67,6 +70,10 @@ class WithdrawalFragment : Fragment() {
         binding.withdrawalViewModel = withdrawalViewModel
         binding.lifecycleOwner = this
 
+        withdrawalViewModel.accountWithdrawal.observe(viewLifecycleOwner){
+            event?.logout()
+        }
+
     }
 
     fun clickListener(){
@@ -103,6 +110,9 @@ class WithdrawalFragment : Fragment() {
         agreeButton.setOnClickListener{
             dialog.dismiss()
             //회원 탈퇴
+            var sharedPreferences = context.getSharedPreferences("userInfo",
+                AppCompatActivity.MODE_PRIVATE)
+            withdrawalViewModel.withDrawal(sharedPreferences)
 
         }
         val disagreeButton = dialog.findViewById<Button>(R.id.dialog_two_button_disagree)
