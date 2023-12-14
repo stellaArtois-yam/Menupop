@@ -1,5 +1,6 @@
 package com.example.menupop.mainActivity
 
+import android.app.Activity
 import android.content.Intent
 import android.os.Build
 import android.os.Bundle
@@ -8,6 +9,7 @@ import android.view.MenuItem
 import android.view.View
 import android.widget.ImageView
 import android.widget.TextView
+import android.widget.Toast
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
@@ -19,6 +21,7 @@ import com.example.menupop.databinding.ActivityMainBinding
 import com.example.menupop.login.LoginActivity
 import com.google.android.gms.ads.AdRequest
 import com.google.android.gms.ads.LoadAdError
+import com.google.android.gms.ads.OnUserEarnedRewardListener
 import com.google.android.gms.ads.rewarded.RewardedAd
 import com.google.android.gms.ads.rewarded.RewardedAdLoadCallback
 import com.google.android.material.bottomnavigation.BottomNavigationView
@@ -36,7 +39,6 @@ class MainActivity : AppCompatActivity(), MainActivityEvent{
 
     lateinit var ticketPurchaseFragment: TicketPurchaseFragment
 
-    private var rewardedAd: RewardedAd? = null
 
     var identifier : Int? = null
 
@@ -77,6 +79,19 @@ class MainActivity : AppCompatActivity(), MainActivityEvent{
         mainActivityViewModel.requestUserInformation(identifier!!)
 
         mainActivityViewModel.scheduleMidnightWork(application)
+
+        mainActivityViewModel.rewardedAd.observe(this){
+            it.show(this, OnUserEarnedRewardListener { rewardItem ->
+                // Handle the reward.
+                val rewardAmount = rewardItem.amount
+                val rewardType = rewardItem.type
+                Log.d(TAG, "User earned the reward. ${rewardAmount} ${rewardType}")
+                val sharedPreferences = getSharedPreferences("userInfo", MODE_PRIVATE)
+                mainActivityViewModel.rewardedSuccess(sharedPreferences)
+            })
+        }
+
+        mainActivityViewModel.setRewarded(getSharedPreferences("userInfo", MODE_PRIVATE))
 
 
 
@@ -192,21 +207,14 @@ class MainActivity : AppCompatActivity(), MainActivityEvent{
     }
 
     override fun moveToAdvertisement() {
-        val adRequest: AdRequest = AdRequest.Builder().build()
-        val key = BuildConfig.GOOGLE_AD_ID
-        RewardedAd.load(this, key,
-            adRequest, object : RewardedAdLoadCallback() {
-                override fun onAdFailedToLoad(loadAdError: LoadAdError) {
-                    // Handle the error.
-                    Log.d(TAG, loadAdError.toString())
-                    rewardedAd = null
-                }
-
-                override fun onAdLoaded(ad: RewardedAd) {
-                    rewardedAd = ad
-                    Log.d(TAG, "Ad was loaded.")
-                }
-            })
+        val rewarded = getSharedPreferences("userInfo", MODE_PRIVATE).getInt("rewarded",0)
+        Log.d(TAG, "showDialog: ${rewarded}")
+        if(rewarded >= 3){
+            Toast.makeText(this,"하루에 받을 수 있는 리워드를 초과했습니다.", Toast.LENGTH_SHORT).show()
+        }else{
+            val key = BuildConfig.GOOGLE_AD_ID
+            mainActivityViewModel.loadAd(key)
+        }
     }
 
     @RequiresApi(Build.VERSION_CODES.O)

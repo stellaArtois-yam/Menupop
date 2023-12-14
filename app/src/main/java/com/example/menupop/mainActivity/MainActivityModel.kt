@@ -1,5 +1,7 @@
 package com.example.menupop.mainActivity
 
+import android.annotation.SuppressLint
+import android.app.Activity
 import android.app.Application
 import android.content.SharedPreferences
 import android.os.Build
@@ -17,6 +19,11 @@ import com.example.menupop.MidnightResetWorker
 import com.example.menupop.RetrofitService
 import com.example.menupop.TicketSaveDTO
 import com.example.menupop.signup.ResultModel
+import com.google.android.gms.ads.AdRequest
+import com.google.android.gms.ads.LoadAdError
+import com.google.android.gms.ads.OnUserEarnedRewardListener
+import com.google.android.gms.ads.rewarded.RewardedAd
+import com.google.android.gms.ads.rewarded.RewardedAdLoadCallback
 import com.google.gson.Gson
 import com.google.gson.GsonBuilder
 import retrofit2.Call
@@ -30,7 +37,7 @@ import java.util.Calendar
 import java.util.concurrent.TimeUnit
 
 
-class MainActivityModel {
+class MainActivityModel(val application :Application) {
     val TAG = "MainActivityModel"
 
     val gson: Gson = GsonBuilder()
@@ -44,6 +51,7 @@ class MainActivityModel {
         .build()
 
     private val service = retrofit.create(RetrofitService::class.java)
+
 
     fun getUserInfo(sharedPreferences: SharedPreferences) : HashMap<String, Int> {
         val hashmap = HashMap<String, Int>()
@@ -320,6 +328,35 @@ class MainActivityModel {
             }
 
         })
+    }
+    fun rewardedPlus(sharedPreferences: SharedPreferences) : Int{
+        var rewarded = sharedPreferences.getInt("rewarded",0)
+        rewarded += 1
+        sharedPreferences.edit().putInt("rewarded",rewarded).commit()
+        return rewarded
+    }
+    fun setRewarded(sharedPreferences: SharedPreferences) : String{
+
+        val rewarded = sharedPreferences.getInt("rewarded",0)
+
+        return "${rewarded}/3"
+
+    }
+
+    fun requestAd(key:String,callback: ((RewardedAd) -> Unit)){
+        val adRequest: AdRequest = AdRequest.Builder().build()
+        RewardedAd.load(application, key,
+            adRequest, object : RewardedAdLoadCallback() {
+                override fun onAdFailedToLoad(loadAdError: LoadAdError) {
+                    // Handle the error.
+                    Log.d(TAG, loadAdError.toString())
+                }
+
+                override fun onAdLoaded(ad: RewardedAd) {
+                    callback(ad)
+                    Log.d(TAG, "Ad was loaded.")
+                }
+            })
     }
 
 
