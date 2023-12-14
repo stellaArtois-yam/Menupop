@@ -112,7 +112,7 @@ class WithdrawalFragment : Fragment() {
             //회원 탈퇴
             var sharedPreferences = context.getSharedPreferences("userInfo",
                 AppCompatActivity.MODE_PRIVATE)
-            withdrawalViewModel.withDrawal(sharedPreferences)
+                withdrawalViewModel.withDrawal(sharedPreferences)
 
         }
         val disagreeButton = dialog.findViewById<Button>(R.id.dialog_two_button_disagree)

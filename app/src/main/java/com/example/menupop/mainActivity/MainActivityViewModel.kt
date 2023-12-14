@@ -5,6 +5,7 @@ import android.content.SharedPreferences
 import android.os.Build
 import android.util.Log
 import androidx.annotation.RequiresApi
+import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -15,15 +16,18 @@ import com.example.menupop.KakaoPayReadyResponse
 import com.example.menupop.MidnightResetWorker
 import com.example.menupop.TicketSaveDTO
 import com.example.menupop.signup.ResultModel
+import com.google.android.gms.ads.LoadAdError
+import com.google.android.gms.ads.rewarded.RewardedAd
+import com.google.android.gms.ads.rewarded.RewardedAdLoadCallback
 import java.text.DecimalFormat
 import java.time.LocalDate
 import java.util.Calendar
 import java.util.Date
 import java.util.concurrent.TimeUnit
 
-class MainActivityViewModel: ViewModel() {
+class MainActivityViewModel(private val application: Application) :  AndroidViewModel(application){
     val TAG = "MainActivityViewModel"
-    val mainActivityModel = MainActivityModel()
+    val mainActivityModel = MainActivityModel(application)
     private var callback : ((ResultModel) -> Unit) ?= null
     private var callbackUserInfo :((UserInformationData) ->Unit) ?= null
     private var callbackKakaoReady : ((KakaoPayReadyResponse) -> Unit) ? = null
@@ -31,6 +35,13 @@ class MainActivityViewModel: ViewModel() {
     private var callbackSearchData : ((FoodPreferenceSearchDataClass) -> Unit) ?= null
     private var callbackResult : ((String) -> Unit) ?= null
     private var callbackFoodPreference : ((FoodPreferenceDataClass) -> Unit) ?= null
+    private var callbackAd: ((RewardedAd?) -> Unit)? = null
+
+
+    private val _rewardedAd = MutableLiveData<RewardedAd>()
+
+    val rewardedAd : LiveData<RewardedAd>
+        get() = _rewardedAd
 
     private val _searchFood = MutableLiveData<ArrayList<String>>()
     val searchFood: LiveData<ArrayList<String>>
@@ -48,6 +59,7 @@ class MainActivityViewModel: ViewModel() {
 
     val accountWithdrawal : LiveData<String>
         get() = _accountWithdrawal
+    val haveRewarded = MutableLiveData<String>()
 
     /**
      * 메인
@@ -138,6 +150,23 @@ class MainActivityViewModel: ViewModel() {
         }
         mainActivityModel.requestUserInformation(identifier, callbackUserInfo!!)
     }
+
+    fun loadAd(key: String) {
+        callbackAd = { ad ->
+            Log.d(TAG, "loadAd: ${ad}")
+            _rewardedAd.value = ad
+        }
+        mainActivityModel.requestAd(key, callbackAd!!)
+    }
+    fun setRewarded(sharedPreferences: SharedPreferences){
+        haveRewarded.value = mainActivityModel.setRewarded(sharedPreferences)
+    }
+    fun rewardedSuccess(sharedPreferences: SharedPreferences){
+        val rewarded = mainActivityModel.rewardedPlus(sharedPreferences)
+        haveRewarded.value = "${rewarded.toString()} / 3"
+    }
+
+
     @RequiresApi(Build.VERSION_CODES.O)
     fun withDrawal(sharedPreferences: SharedPreferences){
         callbackResult = {
