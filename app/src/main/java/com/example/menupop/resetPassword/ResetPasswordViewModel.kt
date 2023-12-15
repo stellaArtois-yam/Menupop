@@ -6,7 +6,7 @@ import android.util.Patterns
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import com.example.menupop.signup.ResultModel
+import com.example.menupop.SimpleResultDTO
 import java.util.concurrent.TimeUnit
 import java.util.regex.Pattern
 
@@ -15,7 +15,7 @@ class ResetPasswordViewModel : ViewModel() {
     private val id = MutableLiveData<String>()
     private val resetPasswordModel = ResetPasswordModel() //뷰모델
     private var callback: ((String) -> Unit) ?= null // 콜백
-    private var callbackList : ((ResultModel) -> Unit) ?= null
+    private var callbackList : ((SimpleResultDTO) -> Unit) ?= null
 
     var verifiedEmail = MutableLiveData<Boolean>()
 

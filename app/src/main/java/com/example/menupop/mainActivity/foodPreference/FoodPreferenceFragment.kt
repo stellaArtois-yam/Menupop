@@ -1,4 +1,4 @@
-package com.example.menupop.mainActivity
+package com.example.menupop.mainActivity.foodPreference
 
 import android.app.Dialog
 import android.content.Context
@@ -11,27 +11,20 @@ import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
-import android.view.View.OnFocusChangeListener
 import android.view.ViewGroup
 import android.view.Window
 import android.view.inputmethod.InputMethodManager
-import android.widget.Button
-import android.widget.SearchView
-import android.widget.SearchView.OnQueryTextListener
-import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.content.ContextCompat.getSystemService
 import androidx.databinding.DataBindingUtil
-import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.menupop.R
 import com.example.menupop.databinding.DialogDeletePreferenceBinding
-import com.example.menupop.databinding.DialogSelectPaymentTypeBinding
 import com.example.menupop.databinding.DialogTicketBottomBinding
-import com.example.menupop.databinding.FragmentExchangeBinding
 import com.example.menupop.databinding.FragmentFoodPreferenceBinding
+import com.example.menupop.mainActivity.MainActivityEvent
+import com.example.menupop.mainActivity.MainActivityViewModel
 import com.google.android.material.bottomsheet.BottomSheetDialog
 
 
@@ -169,7 +162,7 @@ class FoodPreferenceFragment : Fragment() {
         mainViewModel = ViewModelProvider(requireActivity()).get(MainActivityViewModel::class.java)
         binding.mainActivityViewModel = mainViewModel
         binding.lifecycleOwner = this
-        searchAdapter = FoodPreferenceSearchAdapter(object : FoodPreferenceItemClickListener{
+        searchAdapter = FoodPreferenceSearchAdapter(object : FoodPreferenceItemClickListener {
             override fun favoriteItemClick(foodName: String) {
                 Log.d(TAG, "favoriteItemClick: 좋아하는 음식 ${foodName} 클릭됨 ")
                 if(checkTicketEmpty()){
@@ -195,7 +188,7 @@ class FoodPreferenceFragment : Fragment() {
         binding.foodPreferenceSearchRecyclerview.layoutManager = LinearLayoutManager(context)
 
 
-        foodPreferenceAdapter = FoodPreferenceAdapter(object : FoodPreferenceClickListener{
+        foodPreferenceAdapter = FoodPreferenceAdapter(object : FoodPreferenceClickListener {
             override fun deleteBtnClick(foodPreference: FoodPreference) {
                 deleteFoodPreferenceItem(foodPreference.foodName,foodPreference.classification)
             }
@@ -225,6 +218,8 @@ class FoodPreferenceFragment : Fragment() {
             searchAdapter.setFoodList(it)
 
         }
+
+
         mainViewModel.registerResult.observe(viewLifecycleOwner){ result ->
             Log.d(TAG, "existTicketShowDialog: ${result}")
             if(result) {
@@ -233,10 +228,13 @@ class FoodPreferenceFragment : Fragment() {
                 )
                 existBottomSheetDialog.dismiss()
                 mainViewModel.ticketMinus(sharedPreferences)
+
                 val imm = context.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
                 imm.hideSoftInputFromWindow(requireActivity().currentFocus?.windowToken, 0)
+
                 binding.foodPreferenceRecyclerview.visibility = View.VISIBLE
                 binding.foodPreferenceSearchRecyclerview.visibility = View.GONE
+
                 mainViewModel.getFoodPreference(sharedPreferences)
                 mainViewModel.registerVariableReset()
 

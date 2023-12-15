@@ -1,6 +1,6 @@
-package com.example.menupop
+package com.example.menupop.mainActivity.profile
 
-data class KakaoPayReadyResponse(
+data class KakaoPayReadyResponseDTO(
     var tid : String,
     var next_redirect_app_url: String,
     var next_redirect_mobile_url : String,

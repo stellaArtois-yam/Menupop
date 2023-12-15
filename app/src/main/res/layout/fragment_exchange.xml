@@ -7,7 +7,7 @@
 
         <variable
             name="exchangeRateViewModel"
-            type="com.example.menupop.mainActivity.ExchangeViewModel" />
+            type="com.example.menupop.mainActivity.exchange.ExchangeViewModel" />
     </data>
 
     <ScrollView
@@ -17,7 +17,7 @@
         <FrameLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            tools:context=".mainActivity.ExchangeFragment">
+            tools:context=".mainActivity.exchange.ExchangeFragment">
 
             <LinearLayout
                 android:layout_width="match_parent"

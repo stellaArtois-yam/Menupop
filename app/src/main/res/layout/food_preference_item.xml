@@ -3,7 +3,7 @@
     <data>
         <variable
             name="items"
-            type="com.example.menupop.mainActivity.FoodPreference" />
+            type="com.example.menupop.mainActivity.foodPreference.FoodPreference" />
     </data>
     <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
         android:orientation="horizontal"

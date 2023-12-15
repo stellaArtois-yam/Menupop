@@ -26,22 +26,22 @@ class FindIdModel {
 
     private val service = retrofit.create(RetrofitService::class.java)
 
-    fun checkUserId(email : String, callback : (FindIdResponseModel) -> Unit){
-        val call : Call<FindIdResponseModel> = service.requestFindID(email)
+    fun checkUserId(email : String, callback : (FindIdResponseDTO) -> Unit){
+        val call : Call<FindIdResponseDTO> = service.requestFindID(email)
 
-        call.enqueue(object : Callback<FindIdResponseModel> {
-            override fun onResponse(call: Call<FindIdResponseModel>, response: Response<FindIdResponseModel>) {
+        call.enqueue(object : Callback<FindIdResponseDTO> {
+            override fun onResponse(call: Call<FindIdResponseDTO>, response: Response<FindIdResponseDTO>) {
                 if(response.isSuccessful){
                     Log.d(TAG, "onResponse: ${response.body()}")
                     callback(response.body()!!)
                 }else{
                     Log.d(TAG, "onResponse: ${response.body()}")
-                    callback(FindIdResponseModel("failed", "none"))
+                    callback(FindIdResponseDTO("failed", "none"))
                 }
             }
-            override fun onFailure(call: Call<FindIdResponseModel>, t: Throwable) {
+            override fun onFailure(call: Call<FindIdResponseDTO>, t: Throwable) {
                 Log.d(TAG, "onFailure: ${t.message}")
-                callback(FindIdResponseModel("failed", "none"))
+                callback(FindIdResponseDTO("failed", "none"))
             }
         })
     }

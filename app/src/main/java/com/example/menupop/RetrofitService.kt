@@ -1,12 +1,13 @@
 package com.example.menupop
 
-import com.example.menupop.findId.FindIdResponseModel
+import com.example.menupop.findId.FindIdResponseDTO
 import com.example.menupop.login.LoginResponseModel
-import com.example.menupop.mainActivity.ExchangeRateDataClass
-import com.example.menupop.mainActivity.FoodPreferenceDataClass
-import com.example.menupop.mainActivity.FoodPreferenceSearchDataClass
-import com.example.menupop.mainActivity.UserInformationData
-import com.example.menupop.signup.ResultModel
+import com.example.menupop.mainActivity.exchange.ExchangeRateResponseDTO
+import com.example.menupop.mainActivity.foodPreference.FoodPreferenceDataClass
+import com.example.menupop.mainActivity.foodPreference.FoodPreferenceSearchDTO
+import com.example.menupop.mainActivity.profile.KakaoPayApproveResponseDTO
+import com.example.menupop.mainActivity.profile.KakaoPayReadyResponseDTO
+import com.example.menupop.mainActivity.UserInformationDTO
 import retrofit2.Call
 import retrofit2.http.Field
 import retrofit2.http.FieldMap
@@ -21,7 +22,9 @@ interface RetrofitService {
 
     @POST("checkUserIdDuplication.php")
     @FormUrlEncoded
-    fun checkDuplicateId(@Field("userId") id: String): Call<ResultModel>
+    fun checkDuplicateId(@Field("userId") id: String)
+                        : Call<SimpleResultDTO>
+
 
     @POST("Signup.php")
     @FormUrlEncoded
@@ -30,23 +33,27 @@ interface RetrofitService {
                  @Field("password") password: String,
                  @Field("email") email :String,
                  @Field("identifier") identifier : Int)
-    : Call<ResultModel>
+                : Call<SimpleResultDTO>
 
     @POST("GetUserInformation.php")
     @FormUrlEncoded
-    fun requestUserInformation(@Field("identifier") identifier: Int) : Call<UserInformationData>
+    fun requestUserInformation(@Field("identifier") identifier: Int)
+                                : Call<UserInformationDTO>
 
     @POST("FindId.php")
     @FormUrlEncoded
-    fun requestFindID(@Field("email") email: String): Call<FindIdResponseModel>
+    fun requestFindID(@Field("email") email: String): Call<FindIdResponseDTO>
+
 
     @POST("SignupCheckEmail.php")
     @FormUrlEncoded
-    fun checkEmailExistence(@Field("email") email: String): Call<ResultModel>
+    fun checkEmailExistence(@Field("email") email: String): Call<SimpleResultDTO>
 
     @POST("login.php")
     @FormUrlEncoded
-    fun requestLogin(@Field("id") id: String,@Field("password") password : String): Call<LoginResponseModel>
+    fun requestLogin(@Field("id") id: String,
+                     @Field("password") password : String)
+                    : Call<LoginResponseModel>
 
     @POST("SendEmailVerifyCode.php")
     @FormUrlEncoded
@@ -54,27 +61,40 @@ interface RetrofitService {
 
     @POST("checkEmail.php")
     @FormUrlEncoded
-    fun checkEmail(@Field("email") email : String,@Field("id") id : String) : Call<String>
+    fun checkEmail(@Field("email") email : String,
+                   @Field("id") id : String)
+                    : Call<String>
 
     @POST("ResetPassword.php")
     @FormUrlEncoded
-    fun resetPassword(@Field("id") id : String,@Field("password") password : String) : Call<String>
+    fun resetPassword(@Field("id") id : String,
+                      @Field("password") password : String)
+                        : Call<String>
+
+
     @POST("socialLogin.php")
     @FormUrlEncoded
-    fun socialLoginRequest(@Field("email") email : String,@Field("identifier") identifier: Int) : Call<LoginResponseModel>
+    fun socialLoginRequest(@Field("email") email : String,
+                           @Field("identifier") identifier: Int)
+                            : Call<LoginResponseModel>
+
+
     @POST("socialAccountMergeLocalAccount.php")
     @FormUrlEncoded
-    fun socialAccountMergeLocalAccount(@Field("identifier") identifier : Int) : Call<LoginResponseModel>
+    fun socialAccountMergeLocalAccount(@Field("identifier") identifier : Int)
+                                        : Call<LoginResponseModel>
 
     @GET("v6/{authKey}/latest/{baseRate}")
-    fun requestExchangeRates(@Path("authKey") authKey:String,@Path("baseRate")baseRate : String) : Call<ExchangeRateDataClass>
+    fun requestExchangeRates(@Path("authKey") authKey:String,
+                             @Path("baseRate")baseRate : String)
+                            : Call<ExchangeRateResponseDTO>
 
 
     @POST("v1/payment/ready")
     @FormUrlEncoded
     fun createPaymentRequest(@Header("Authorization") apiKey : String,
                              @FieldMap map : HashMap<String,String>)
-                            : Call<KakaoPayReadyResponse>
+                            : Call<KakaoPayReadyResponseDTO>
     @POST("SavePaymentHistory.php")
     @FormUrlEncoded
     fun savePaymentHistory(@Field("identifier") identifier : Int,
@@ -84,16 +104,16 @@ interface RetrofitService {
                            @Field("price") price : Int,
                            @Field("approvedAt") approvedAt : String,
                            @Field("translationTicket") translationTicket : Int,
-                           @Field("foodTicket") foodTicket : Int) : Call<ResultModel>
+                           @Field("foodTicket") foodTicket : Int) : Call<SimpleResultDTO>
 
 
     @POST("v1/payment/approve")
     @FormUrlEncoded
     fun requestApprovePayment(@Header("Authorization") apiKey : String,
                               @FieldMap map : HashMap<String, String>)
-                                :Call<KakaoPayApproveResponse>
+                                :Call<KakaoPayApproveResponseDTO>
     @GET("searchFood.php")
-    fun searchFood(@Query("query") searchText :String) : Call<FoodPreferenceSearchDataClass>
+    fun searchFood(@Query("query") searchText :String) : Call<FoodPreferenceSearchDTO>
 
     @POST("FoodPreferenceRegister.php")
     @FormUrlEncoded
@@ -108,8 +128,8 @@ interface RetrofitService {
     @POST("MinusFoodTicket.php")
     @FormUrlEncoded
     fun minusFoodTicket(@Field("identifier") identifier: Int) : Call<String>
-    @POST("WithDrawal.php")
+    @POST("Withdrawal.php")
     @FormUrlEncoded
-    fun withDrawal(@Field("identifier") identifier: Int,@Field("email") email: String,@Field("id") id : String,@Field("date") date:String) : Call<String>
+    fun withdrawal(@Field("identifier") identifier: Int,@Field("email") email: String,@Field("id") id : String,@Field("date") date:String) : Call<String>
 
 }

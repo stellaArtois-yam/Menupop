@@ -8,31 +8,25 @@ import androidx.annotation.RequiresApi
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModel
-import androidx.work.OneTimeWorkRequestBuilder
-import androidx.work.WorkManager
-import com.example.menupop.KakaoPayApproveResponse
-import com.example.menupop.KakaoPayReadyResponse
-import com.example.menupop.MidnightResetWorker
-import com.example.menupop.TicketSaveDTO
-import com.example.menupop.signup.ResultModel
-import com.google.android.gms.ads.LoadAdError
+import com.example.menupop.mainActivity.profile.KakaoPayApproveResponseDTO
+import com.example.menupop.mainActivity.profile.KakaoPayReadyResponseDTO
+import com.example.menupop.mainActivity.profile.TicketSaveDTO
+import com.example.menupop.mainActivity.foodPreference.FoodPreferenceDataClass
+import com.example.menupop.mainActivity.foodPreference.FoodPreferenceSearchDTO
+import com.example.menupop.SimpleResultDTO
 import com.google.android.gms.ads.rewarded.RewardedAd
-import com.google.android.gms.ads.rewarded.RewardedAdLoadCallback
 import java.text.DecimalFormat
 import java.time.LocalDate
-import java.util.Calendar
-import java.util.Date
-import java.util.concurrent.TimeUnit
 
 class MainActivityViewModel(private val application: Application) :  AndroidViewModel(application){
     val TAG = "MainActivityViewModel"
     val mainActivityModel = MainActivityModel(application)
-    private var callback : ((ResultModel) -> Unit) ?= null
-    private var callbackUserInfo :((UserInformationData) ->Unit) ?= null
-    private var callbackKakaoReady : ((KakaoPayReadyResponse) -> Unit) ? = null
-    private var callbackApprove : ((KakaoPayApproveResponse) -> Unit) ? = null
-    private var callbackSearchData : ((FoodPreferenceSearchDataClass) -> Unit) ?= null
+
+    private var callback : ((SimpleResultDTO) -> Unit) ?= null
+    private var callbackUserInfo :((UserInformationDTO) ->Unit) ?= null
+    private var callbackKakaoReady : ((KakaoPayReadyResponseDTO) -> Unit) ? = null
+    private var callbackApprove : ((KakaoPayApproveResponseDTO) -> Unit) ? = null
+    private var callbackSearchData : ((FoodPreferenceSearchDTO) -> Unit) ?= null
     private var callbackResult : ((String) -> Unit) ?= null
     private var callbackFoodPreference : ((FoodPreferenceDataClass) -> Unit) ?= null
     private var callbackAd: ((RewardedAd?) -> Unit)? = null
@@ -72,8 +66,8 @@ class MainActivityViewModel(private val application: Application) :  AndroidView
     val deletedResult : LiveData<Boolean>
         get() = _deletedResult
 
-    private val _userInformation = MutableLiveData<UserInformationData>()
-    val userInformation : LiveData<UserInformationData>
+    private val _userInformation = MutableLiveData<UserInformationDTO>()
+    val userInformation : LiveData<UserInformationDTO>
         get() = _userInformation
 
     fun ticketMinus(sharedPreferences: SharedPreferences){
@@ -168,9 +162,9 @@ class MainActivityViewModel(private val application: Application) :  AndroidView
 
 
     @RequiresApi(Build.VERSION_CODES.O)
-    fun withDrawal(sharedPreferences: SharedPreferences){
+    fun withdrawal(sharedPreferences: SharedPreferences){
         callbackResult = {
-            Log.d(TAG, "withDrawal: $it")
+            Log.d(TAG, "withdrawal: $it")
             _accountWithdrawal.value = it
             if(it == "success"){
                 logout(sharedPreferences)
@@ -180,7 +174,7 @@ class MainActivityViewModel(private val application: Application) :  AndroidView
         val email = userInformation.value?.email
         val id = userInformation.value?.id
         val localDate: LocalDate = LocalDate.now()
-        mainActivityModel.withDrawal(identifier,email!!,id!!,localDate.toString(),callbackResult!!)
+        mainActivityModel.withdrawal(identifier,email!!,id!!,localDate.toString(),callbackResult!!)
     }
 
     fun getFoodPreference(sharedPreferences: SharedPreferences){
@@ -191,9 +185,7 @@ class MainActivityViewModel(private val application: Application) :  AndroidView
         }
         mainActivityModel.getFoodPreference(identifier,callbackFoodPreference!!)
     }
-
-    fun listReset(){
-    }
+    
 
 
 
@@ -298,8 +290,8 @@ class MainActivityViewModel(private val application: Application) :  AndroidView
     }
 
 
-    private val _paymentResponse = MutableLiveData<KakaoPayReadyResponse>()
-    val paymentResponse : LiveData<KakaoPayReadyResponse>
+    private val _paymentResponse = MutableLiveData<KakaoPayReadyResponseDTO>()
+    val paymentResponse : LiveData<KakaoPayReadyResponseDTO>
         get() = _paymentResponse
 
     private val _pgToken = MutableLiveData<String>()
@@ -367,7 +359,7 @@ class MainActivityViewModel(private val application: Application) :  AndroidView
 
     fun savePaymentHistory(identifier: Int, tid : String, paymentType : String, item : String,
                            price : Int, approveAt : String){
-        var ticketSaveModel : TicketSaveDTO ?= null
+        var ticketSaveModel : TicketSaveDTO?= null
         callback = {response ->
             Log.d(TAG, "savePaymentHistory: ${response.result}")
             //여기서 클라이언트 티켓 개수 수정
@@ -440,6 +432,7 @@ class MainActivityViewModel(private val application: Application) :  AndroidView
 
         }
         mainActivityModel.scheduleMidnightWork(application, callback)
+        Log.d(TAG, "scheduleMidnightWork: ?")
 
 
     }

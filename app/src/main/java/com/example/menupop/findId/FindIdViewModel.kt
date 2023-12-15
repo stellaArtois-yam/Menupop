@@ -13,14 +13,14 @@ class   FindIdViewModel :ViewModel() {
 
     val findIdModel = FindIdModel()
 
-    var callback : ((FindIdResponseModel) -> Unit)? = null
+    var callback : ((FindIdResponseDTO) -> Unit)? = null
 
     private val _checkEmailForm = MutableLiveData<Boolean>()
     val checkEmailForm : LiveData<Boolean>
         get() = _checkEmailForm
 
-    private val _userIdExistence = MutableLiveData<FindIdResponseModel>()
-    val userIdExistence : LiveData<FindIdResponseModel>
+    private val _userIdExistence = MutableLiveData<FindIdResponseDTO>()
+    val userIdExistence : LiveData<FindIdResponseDTO>
         get() = _userIdExistence
 
     private val _emailWarning = MutableLiveData<String>()

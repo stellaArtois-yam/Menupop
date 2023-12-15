@@ -1,9 +1,8 @@
-package com.example.menupop.mainActivity
+package com.example.menupop.mainActivity.exchange
 
 import android.content.SharedPreferences
 import android.util.Log
 import com.example.menupop.RetrofitService
-import com.example.menupop.login.LoginResponseModel
 import com.google.gson.Gson
 import com.google.gson.GsonBuilder
 import retrofit2.Call
@@ -29,20 +28,20 @@ class ExchangeModel {
 
     private val service = exchangeBuilder.create(RetrofitService::class.java)
     fun requestExchangeRate(
-        authkey: String,
+        authKey: String,
         baseRate: String,
-        callback: (ExchangeRateDataClass) -> Unit){
-        service.requestExchangeRates(authkey,baseRate).enqueue(object : Callback<ExchangeRateDataClass>{
+        callback: (ExchangeRateResponseDTO) -> Unit){
+        service.requestExchangeRates(authKey,baseRate).enqueue(object : Callback<ExchangeRateResponseDTO>{
             override fun onResponse(
-                call: Call<ExchangeRateDataClass>,
-                response: Response<ExchangeRateDataClass>
+                call: Call<ExchangeRateResponseDTO>,
+                response: Response<ExchangeRateResponseDTO>
             ) {
                 if(response.isSuccessful && response.body() != null){
                     callback(response.body()!!)
                 }
             }
 
-            override fun onFailure(call: Call<ExchangeRateDataClass>, t: Throwable) {
+            override fun onFailure(call: Call<ExchangeRateResponseDTO>, t: Throwable) {
                 Log.d(TAG, "onFailure: ${t.toString()}")
             }
 
@@ -53,10 +52,4 @@ class ExchangeModel {
         editor.putBoolean("exchangeRateApplicationStatus",status)
         editor.apply()
     }
-
-
-
-
-
-
 }

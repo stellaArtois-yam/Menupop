@@ -1,4 +1,4 @@
-package com.example.menupop.mainActivity
+package com.example.menupop.mainActivity.profile
 
 import android.app.Dialog
 import android.content.Context
@@ -21,6 +21,8 @@ import com.example.menupop.databinding.DialogPaymentRegularBinding
 import com.example.menupop.databinding.DialogPaymentRewordBinding
 import com.example.menupop.databinding.DialogSelectPaymentTypeBinding
 import com.example.menupop.databinding.FragmentTicketPurchaseBinding
+import com.example.menupop.mainActivity.MainActivityEvent
+import com.example.menupop.mainActivity.MainActivityViewModel
 
 class TicketPurchaseFragment : Fragment() {
     val TAG = "TicketPurchaseFragment"

@@ -1,4 +1,4 @@
-package com.example.menupop.mainActivity
+package com.example.menupop.mainActivity.foodPreference
 
 interface FoodPreferenceItemClickListener {
     fun favoriteItemClick(foodName : String)

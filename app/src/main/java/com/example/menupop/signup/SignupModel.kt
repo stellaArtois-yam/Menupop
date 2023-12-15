@@ -1,6 +1,7 @@
 package com.example.menupop.signup
 
 import android.util.Log
+import com.example.menupop.SimpleResultDTO
 import com.example.menupop.RetrofitService
 import com.google.gson.Gson
 import com.google.gson.GsonBuilder
@@ -27,45 +28,45 @@ class SignupModel {
 
 
 
-    fun requestIdDuplication(id : String, callback: (ResultModel)-> Unit){
-        val call: Call<ResultModel> = service.checkDuplicateId(id)
+    fun requestIdDuplication(id : String, callback: (SimpleResultDTO)-> Unit){
+        val call: Call<SimpleResultDTO> = service.checkDuplicateId(id)
 
-        call.enqueue(object  : Callback<ResultModel>{
-            override fun onResponse(call: Call<ResultModel>, response: Response<ResultModel>) {
+        call.enqueue(object  : Callback<SimpleResultDTO>{
+            override fun onResponse(call: Call<SimpleResultDTO>, response: Response<SimpleResultDTO>) {
                 if(response.isSuccessful){
                     Log.d(TAG, "onResponse: ${response.body()}")
                     callback(response.body()!!)
                 }else{
                     Log.d(TAG, "onResponse: ${response.body()}")
-                    callback(ResultModel("isNotSuccessful"))
+                    callback(SimpleResultDTO("isNotSuccessful"))
                 }
             }
 
-            override fun onFailure(call: Call<ResultModel>, t: Throwable) {
+            override fun onFailure(call: Call<SimpleResultDTO>, t: Throwable) {
                 Log.d(TAG, "onFailure: ${t.message}")
-                callback(ResultModel("onFailure"))
+                callback(SimpleResultDTO("onFailure"))
             }
         })
     }
 
     fun sendUserInformation(id : String, password : String, email :String,
-                            identifier : Int, callback: (ResultModel) -> Unit){
-        val call : Call<ResultModel> = service.saveUserInformation(id, password, email, identifier)
+                            identifier : Int, callback: (SimpleResultDTO) -> Unit){
+        val call : Call<SimpleResultDTO> = service.saveUserInformation(id, password, email, identifier)
         Log.d(TAG, "$id, $password, $email, $identifier")
-        call.enqueue(object  : Callback<ResultModel>{
-            override fun onResponse(call: Call<ResultModel>, response: Response<ResultModel>) {
+        call.enqueue(object  : Callback<SimpleResultDTO>{
+            override fun onResponse(call: Call<SimpleResultDTO>, response: Response<SimpleResultDTO>) {
                 if(response.isSuccessful){
                     Log.d(TAG, "onResponse: ${response.body()}")
                     callback(response.body()!!)
                 }else{
                     Log.d(TAG, "onResponse: ${response}")
-                    callback(ResultModel("!isSuccessful"))
+                    callback(SimpleResultDTO("!isSuccessful"))
                 }
             }
 
-            override fun onFailure(call: Call<ResultModel>, t: Throwable) {
+            override fun onFailure(call: Call<SimpleResultDTO>, t: Throwable) {
                 Log.d(TAG, "onFailure: ${t.message}")
-                callback(ResultModel("onFailure"))
+                callback(SimpleResultDTO("onFailure"))
             }
         })
     }
@@ -93,11 +94,11 @@ class SignupModel {
         })
     }
 
-    fun checkEmailExistence(email:String,callback: (ResultModel) -> Unit){
+    fun checkEmailExistence(email:String,callback: (SimpleResultDTO) -> Unit){
 
-        service.checkEmailExistence(email).enqueue(object : Callback<ResultModel>{
+        service.checkEmailExistence(email).enqueue(object : Callback<SimpleResultDTO>{
 
-            override fun onResponse(call: Call<ResultModel>, response: Response<ResultModel>) {
+            override fun onResponse(call: Call<SimpleResultDTO>, response: Response<SimpleResultDTO>) {
 
                 if(response.isSuccessful && response.body() != null){
                     callback(response.body()!!)
@@ -107,9 +108,9 @@ class SignupModel {
                 }
             }
 
-            override fun onFailure(call: Call<ResultModel>, t: Throwable) {
+            override fun onFailure(call: Call<SimpleResultDTO>, t: Throwable) {
                 Log.d(TAG, "onFailure: ${t}")
-                callback(ResultModel("Exception"))
+                callback(SimpleResultDTO("Exception"))
             }
 
         })

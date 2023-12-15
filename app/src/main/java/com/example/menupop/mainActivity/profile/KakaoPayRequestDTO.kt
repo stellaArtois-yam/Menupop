@@ -1,4 +1,4 @@
-package com.example.menupop
+package com.example.menupop.mainActivity.profile
 
 data class KakaoPayRequestDTO(
     val cid : String,

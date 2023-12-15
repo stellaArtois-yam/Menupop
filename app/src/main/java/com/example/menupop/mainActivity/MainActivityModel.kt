@@ -1,27 +1,25 @@
 package com.example.menupop.mainActivity
 
-import android.annotation.SuppressLint
-import android.app.Activity
 import android.app.Application
 import android.content.SharedPreferences
 import android.os.Build
 import android.util.Log
 import androidx.annotation.RequiresApi
-import androidx.core.content.ContentProviderCompat.requireContext
-import androidx.work.OneTimeWorkRequestBuilder
+import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkInfo
 import androidx.work.WorkManager
 import com.example.menupop.BuildConfig
-import com.example.menupop.KakaoPayApproveResponse
-import com.example.menupop.KakaoPayRequestDTO
-import com.example.menupop.KakaoPayReadyResponse
+import com.example.menupop.mainActivity.profile.KakaoPayApproveResponseDTO
+import com.example.menupop.mainActivity.profile.KakaoPayRequestDTO
+import com.example.menupop.mainActivity.profile.KakaoPayReadyResponseDTO
 import com.example.menupop.MidnightResetWorker
 import com.example.menupop.RetrofitService
-import com.example.menupop.TicketSaveDTO
-import com.example.menupop.signup.ResultModel
+import com.example.menupop.mainActivity.profile.TicketSaveDTO
+import com.example.menupop.mainActivity.foodPreference.FoodPreferenceDataClass
+import com.example.menupop.mainActivity.foodPreference.FoodPreferenceSearchDTO
+import com.example.menupop.SimpleResultDTO
 import com.google.android.gms.ads.AdRequest
 import com.google.android.gms.ads.LoadAdError
-import com.google.android.gms.ads.OnUserEarnedRewardListener
 import com.google.android.gms.ads.rewarded.RewardedAd
 import com.google.android.gms.ads.rewarded.RewardedAdLoadCallback
 import com.google.gson.Gson
@@ -33,7 +31,6 @@ import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import retrofit2.converter.scalars.ScalarsConverterFactory
 import java.time.LocalDate
-import java.util.Calendar
 import java.util.concurrent.TimeUnit
 
 
@@ -105,15 +102,15 @@ class MainActivityModel(val application :Application) {
 
     }
 
-    fun savePaymentHistory(ticketSaveModel: TicketSaveDTO, callback: (ResultModel) -> Unit){
+    fun savePaymentHistory(ticketSaveModel: TicketSaveDTO, callback: (SimpleResultDTO) -> Unit){
 
-        val call : Call<ResultModel> = service.savePaymentHistory(ticketSaveModel.identifier,
+        val call : Call<SimpleResultDTO> = service.savePaymentHistory(ticketSaveModel.identifier,
             ticketSaveModel.tid, ticketSaveModel.paymentType, ticketSaveModel.item, ticketSaveModel.price,
             ticketSaveModel.approvedAt, ticketSaveModel.translationTicket, ticketSaveModel.foodTicket)
 
 
-        call.enqueue(object : Callback<ResultModel>{
-            override fun onResponse(call: Call<ResultModel>, response: Response<ResultModel>) {
+        call.enqueue(object : Callback<SimpleResultDTO>{
+            override fun onResponse(call: Call<SimpleResultDTO>, response: Response<SimpleResultDTO>) {
                 if(response.isSuccessful){
                     Log.d(TAG, "onResponse: ${response.body()}")
                     callback(response.body()!!)
@@ -122,17 +119,17 @@ class MainActivityModel(val application :Application) {
                 }
 
             }
-            override fun onFailure(call: Call<ResultModel>, t: Throwable) {
+            override fun onFailure(call: Call<SimpleResultDTO>, t: Throwable) {
                 Log.d(TAG, "onFailure: ${t.message}")
             }
         })
     }
 
-    fun requestUserInformation(identifier : Int, callback: (UserInformationData) -> Unit){
-        val call : Call<UserInformationData> = service.requestUserInformation(identifier)
+    fun requestUserInformation(identifier : Int, callback: (UserInformationDTO) -> Unit){
+        val call : Call<UserInformationDTO> = service.requestUserInformation(identifier)
 
-        call.enqueue(object : Callback<UserInformationData>{
-            override fun onResponse(call: Call<UserInformationData>, response: Response<UserInformationData>) {
+        call.enqueue(object : Callback<UserInformationDTO>{
+            override fun onResponse(call: Call<UserInformationDTO>, response: Response<UserInformationDTO>) {
                 if(response.isSuccessful){
                     Log.d(TAG, "onResponse: ${response.body()}")
                     callback(response.body()!!)
@@ -142,7 +139,7 @@ class MainActivityModel(val application :Application) {
                 }
             }
 
-            override fun onFailure(call: Call<UserInformationData>, t: Throwable) {
+            override fun onFailure(call: Call<UserInformationDTO>, t: Throwable) {
                 Log.d(TAG, "onFailure: ${t.message}")
             }
         })
@@ -168,7 +165,7 @@ class MainActivityModel(val application :Application) {
 
     @RequiresApi(Build.VERSION_CODES.O)
     fun createPaymentRequest(userId: String, item: String, quantity: String,
-                             totalAmount: String, callback: (KakaoPayReadyResponse) -> Unit){
+                             totalAmount: String, callback: (KakaoPayReadyResponseDTO) -> Unit){
 
         val requestModel = HashMap<String, String>()
 
@@ -181,11 +178,11 @@ class MainActivityModel(val application :Application) {
             requestModel[field.name] = value
         }
 
-        val call : Call<KakaoPayReadyResponse>
+        val call : Call<KakaoPayReadyResponseDTO>
                 = kakaoPayService.createPaymentRequest(API_KEY, requestModel)
 
-        call.enqueue(object  : Callback<KakaoPayReadyResponse>{
-            override fun onResponse(call: Call<KakaoPayReadyResponse>, response: Response<KakaoPayReadyResponse>
+        call.enqueue(object  : Callback<KakaoPayReadyResponseDTO>{
+            override fun onResponse(call: Call<KakaoPayReadyResponseDTO>, response: Response<KakaoPayReadyResponseDTO>
             ) {
                 if(response.isSuccessful){
                     Log.d(TAG, "onResponse: ${response.body()}")
@@ -195,7 +192,7 @@ class MainActivityModel(val application :Application) {
                 }
             }
 
-            override fun onFailure(call: Call<KakaoPayReadyResponse>, t: Throwable) {
+            override fun onFailure(call: Call<KakaoPayReadyResponseDTO>, t: Throwable) {
                 Log.d(TAG, "onFailure: ${t.message}")
             }
         })
@@ -217,24 +214,27 @@ class MainActivityModel(val application :Application) {
 
         })
     }
-    fun searchFood(query : String, callback:(FoodPreferenceSearchDataClass) -> Unit){
-//        callback(FoodPreferenceSearchDataClass("success", arrayListOf("낙지","오징어","ㅋㅋ","음식")))
-        service.searchFood(query).enqueue(object : Callback<FoodPreferenceSearchDataClass>{
+
+
+    fun searchFood(query : String, callback:(FoodPreferenceSearchDTO) -> Unit){
+        service.searchFood(query).enqueue(object : Callback<FoodPreferenceSearchDTO>{
             override fun onResponse(
-                call: Call<FoodPreferenceSearchDataClass>,
-                response: Response<FoodPreferenceSearchDataClass>
+                call: Call<FoodPreferenceSearchDTO>,
+                response: Response<FoodPreferenceSearchDTO>
             ) {
                 if(response.isSuccessful){
                     callback(response.body()!!)
                 }
             }
 
-            override fun onFailure(call: Call<FoodPreferenceSearchDataClass>, t: Throwable) {
+            override fun onFailure(call: Call<FoodPreferenceSearchDTO>, t: Throwable) {
                 Log.d(TAG, "onFailure: ${t}")
             }
 
         })
     }
+
+
 
     fun deleteFoodPreference(identifier: Int,foodName: String,callback: (String) -> Unit){
         service.deleteFoodPreference(identifier,foodName).enqueue(object : Callback<String>{
@@ -253,7 +253,7 @@ class MainActivityModel(val application :Application) {
 
     }
     @RequiresApi(Build.VERSION_CODES.O)
-    fun requestApprovePayment(tid : String, userId: String, pgToken : String, callback : (KakaoPayApproveResponse) -> Unit){
+    fun requestApprovePayment(tid : String, userId: String, pgToken : String, callback : (KakaoPayApproveResponseDTO) -> Unit){
 
         val requestModel = HashMap<String, String>()
         requestModel.put("cid", cid)
@@ -263,11 +263,11 @@ class MainActivityModel(val application :Application) {
         requestModel.put("pg_token", pgToken)
         Log.d(TAG, "requestModel: $requestModel")
 
-        val call : Call<KakaoPayApproveResponse>
+        val call : Call<KakaoPayApproveResponseDTO>
                 = kakaoPayService.requestApprovePayment(API_KEY, requestModel)
 
-        call.enqueue(object : Callback<KakaoPayApproveResponse>{
-            override fun onResponse(call: Call<KakaoPayApproveResponse>, response: Response<KakaoPayApproveResponse>
+        call.enqueue(object : Callback<KakaoPayApproveResponseDTO>{
+            override fun onResponse(call: Call<KakaoPayApproveResponseDTO>, response: Response<KakaoPayApproveResponseDTO>
             ) {
                 if(response.isSuccessful){
                     Log.d(TAG, "onResponse: ${response.body()}")
@@ -277,7 +277,7 @@ class MainActivityModel(val application :Application) {
                 }
             }
 
-            override fun onFailure(call: Call<KakaoPayApproveResponse>, t: Throwable) {
+            override fun onFailure(call: Call<KakaoPayApproveResponseDTO>, t: Throwable) {
                 Log.d(TAG, "onFailure: ${t.message}")
             }
         })
@@ -285,19 +285,14 @@ class MainActivityModel(val application :Application) {
 
 
     fun scheduleMidnightWork(application: Application, callback: (Boolean) -> Unit) {
-        val midnight = Calendar.getInstance().apply {
-            set(Calendar.HOUR_OF_DAY, 24) // 자정
-            set(Calendar.MINUTE, 0)
-            set(Calendar.SECOND, 0)
-        }
 
-        val currentTime = Calendar.getInstance()
-        val delay = midnight.timeInMillis - currentTime.timeInMillis
+//        val midnightWorkRequest
+//        = PeriodicWorkRequestBuilder<MidnightResetWorker>(1, TimeUnit.DAYS).build()
 
-        val midnightWorkRequest = OneTimeWorkRequestBuilder<MidnightResetWorker>()
-            .setInitialDelay(delay, TimeUnit.MILLISECONDS)
-            .addTag("midnightWork")
-            .build()
+        val midnightWorkRequest
+                = PeriodicWorkRequestBuilder<MidnightResetWorker>(15, TimeUnit.MINUTES).build()
+
+
 
         WorkManager.getInstance(application.applicationContext).enqueue(midnightWorkRequest)
 
@@ -309,13 +304,11 @@ class MainActivityModel(val application :Application) {
                     callback(true)
                 }
             }
-        //Application Context를 사용하되, 액티비티나 프래그먼트 Context 사용 x
-        //직접 참조 시 ViewModel 생명주기가 View보다 long 독립적인 각각의 생명주기가 꼬일 수 있고,
-        // View가 모두 종료돼도 ViewModel이 계속해서 참조 시 메모리 누수 발생 가능
     }
 
-    fun withDrawal(identifier: Int,email:String,id:String,date:String,callback: (String) -> Unit){
-        service.withDrawal(identifier, email, id, date).enqueue(object : Callback<String>{
+
+    fun withdrawal(identifier: Int,email:String,id:String,date:String,callback: (String) -> Unit){
+        service.withdrawal(identifier, email, id, date).enqueue(object : Callback<String>{
             override fun onResponse(call: Call<String>, response: Response<String>) {
                 if(response.isSuccessful && response.body() != null){
                     callback(response.body()!!)
@@ -363,7 +356,7 @@ class MainActivityModel(val application :Application) {
 
     fun logout(sharedPreferences: SharedPreferences) {
         val editor = sharedPreferences.edit()
-        editor.clear()
+        editor.remove("identifier")
         editor.commit()
     }
 

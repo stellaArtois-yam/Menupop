@@ -1,4 +1,4 @@
-package com.example.menupop.mainActivity
+package com.example.menupop.mainActivity.exchange
 
 import android.content.Context
 import android.os.Bundle

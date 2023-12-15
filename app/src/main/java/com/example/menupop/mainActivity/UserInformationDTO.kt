@@ -1,6 +1,6 @@
 package com.example.menupop.mainActivity
 
-data class UserInformationData(
+data class UserInformationDTO(
     var id : String,
     var email : String,
     var favoriteFood : String,
