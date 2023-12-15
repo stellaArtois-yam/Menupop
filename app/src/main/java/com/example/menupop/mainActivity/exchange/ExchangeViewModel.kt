@@ -1,4 +1,4 @@
-package com.example.menupop.mainActivity
+package com.example.menupop.mainActivity.exchange
 
 import android.content.SharedPreferences
 import android.util.Log
@@ -9,12 +9,12 @@ import androidx.lifecycle.ViewModel
 class ExchangeViewModel : ViewModel() {
     val TAG = "ExchangeViewModel"
 
-    private var callback: ((ExchangeRateDataClass) -> Unit)? = null
+    private var callback: ((ExchangeRateResponseDTO) -> Unit)? = null
     val exchangeModel = ExchangeModel()
 
     val isPossible = MutableLiveData<Boolean>()
 
-    lateinit var data: ExchangeRateDataClass
+    lateinit var data: ExchangeRateResponseDTO
 
     private var _targetCurrency = MutableLiveData<String>()
     val targetCurrency: LiveData<String>

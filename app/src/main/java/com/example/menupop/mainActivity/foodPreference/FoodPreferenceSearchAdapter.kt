@@ -1,8 +1,7 @@
-package com.example.menupop.mainActivity
+package com.example.menupop.mainActivity.foodPreference
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
-import android.widget.AdapterView
 import androidx.recyclerview.widget.RecyclerView
 import com.example.menupop.databinding.FoodPreferenceSearchItemBinding
 

@@ -1,8 +1,8 @@
-package com.example.menupop.mainActivity
+package com.example.menupop.mainActivity.exchange
 
 import com.google.gson.annotations.SerializedName
 
-data class ExchangeRateDataClass(
+data class ExchangeRateResponseDTO(
     @SerializedName("base_code")
     val baseCode: String,
     @SerializedName("conversion_rates")

@@ -1,14 +1,11 @@
-package com.example.menupop.mainActivity
+package com.example.menupop.mainActivity.foodPreference
 
-import android.graphics.Color
 import android.view.LayoutInflater
 import android.view.ViewGroup
-import android.widget.AdapterView
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
 import com.example.menupop.R
 import com.example.menupop.databinding.FoodPreferenceItemBinding
-import com.example.menupop.databinding.FoodPreferenceSearchItemBinding
 
 class FoodPreferenceAdapter(private val listener: FoodPreferenceClickListener) : RecyclerView.Adapter<FoodPreferenceAdapter.FoodPreferenceViewHolder>() {
     private var foodList = ArrayList<FoodPreference>()

@@ -1,4 +1,4 @@
-package com.example.menupop
+package com.example.menupop.mainActivity.profile
 
 import kotlinx.serialization.Serializable
 

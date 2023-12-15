@@ -7,6 +7,7 @@ import android.util.Patterns
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import com.example.menupop.SimpleResultDTO
 import java.util.concurrent.TimeUnit
 
 import java.util.regex.Pattern
@@ -17,7 +18,7 @@ class SignupViewModel : ViewModel() {
     val TAG = "SignupViewModel"
     var signupModel  = SignupModel()
     private var callback: ((String) -> Unit) ?= null // 콜백
-    private var callbackList : ((ResultModel) -> Unit) ?= null
+    private var callbackList : ((SimpleResultDTO) -> Unit) ?= null
 
 
     private val _idWarning = MutableLiveData<String>()

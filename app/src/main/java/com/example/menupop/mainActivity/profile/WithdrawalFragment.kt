@@ -1,4 +1,4 @@
-package com.example.menupop.mainActivity
+package com.example.menupop.mainActivity.profile
 
 import android.app.Dialog
 import android.content.Context
@@ -20,6 +20,9 @@ import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.ViewModelProvider
 import com.example.menupop.R
 import com.example.menupop.databinding.FragmentWithdrawalBinding
+import com.example.menupop.mainActivity.MainActivityEvent
+import com.example.menupop.mainActivity.MainActivityViewModel
+
 @RequiresApi(Build.VERSION_CODES.O)
 
 class WithdrawalFragment : Fragment() {
@@ -110,9 +113,8 @@ class WithdrawalFragment : Fragment() {
         agreeButton.setOnClickListener{
             dialog.dismiss()
             //회원 탈퇴
-            var sharedPreferences = context.getSharedPreferences("userInfo",
-                AppCompatActivity.MODE_PRIVATE)
-                withdrawalViewModel.withDrawal(sharedPreferences)
+            var sharedPreferences = context.getSharedPreferences("userInfo", AppCompatActivity.MODE_PRIVATE)
+            withdrawalViewModel.withdrawal(sharedPreferences)
 
         }
         val disagreeButton = dialog.findViewById<Button>(R.id.dialog_two_button_disagree)

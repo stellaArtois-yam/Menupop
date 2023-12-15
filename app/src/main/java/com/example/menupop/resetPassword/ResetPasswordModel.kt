@@ -2,7 +2,7 @@ package com.example.menupop.resetPassword
 
 import android.util.Log
 import com.example.menupop.RetrofitService
-import com.example.menupop.signup.ResultModel
+import com.example.menupop.SimpleResultDTO
 import com.google.gson.Gson
 import com.google.gson.GsonBuilder
 import retrofit2.Call
@@ -28,19 +28,19 @@ class ResetPasswordModel {
 
 
 
-    fun checkId(id:String,callback: (ResultModel) -> Unit){
-        service.checkDuplicateId(id).enqueue(object : Callback<ResultModel>{
-            override fun onResponse(call: Call<ResultModel>, response: Response<ResultModel>) {
+    fun checkId(id:String,callback: (SimpleResultDTO) -> Unit){
+        service.checkDuplicateId(id).enqueue(object : Callback<SimpleResultDTO>{
+            override fun onResponse(call: Call<SimpleResultDTO>, response: Response<SimpleResultDTO>) {
                 if(response.isSuccessful && response.body() != null) {
                     callback(response.body()!!)
                     Log.d(TAG, "onResponse: ${response.body()}")
                 }else{
-                    callback(ResultModel("ServerException"))
+                    callback(SimpleResultDTO("ServerException"))
                 }
             }
 
-            override fun onFailure(call: Call<ResultModel>, t: Throwable) {
-                callback(ResultModel("ServerException"))
+            override fun onFailure(call: Call<SimpleResultDTO>, t: Throwable) {
+                callback(SimpleResultDTO("ServerException"))
             }
 
         })

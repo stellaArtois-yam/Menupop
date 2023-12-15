@@ -1,4 +1,4 @@
-package com.example.menupop.mainActivity
+package com.example.menupop.mainActivity.profile
 
 import android.app.Dialog
 import android.content.Context
@@ -18,6 +18,8 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import com.example.menupop.R
 import com.example.menupop.databinding.FragmentProfileBinding
+import com.example.menupop.mainActivity.MainActivityEvent
+import com.example.menupop.mainActivity.MainActivityViewModel
 
 class ProfileFragment : Fragment() {
     val TAG = "ProfileFragment"
