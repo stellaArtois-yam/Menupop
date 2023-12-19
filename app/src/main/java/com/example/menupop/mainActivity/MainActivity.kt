@@ -26,6 +26,7 @@ import com.example.menupop.mainActivity.profile.TicketPurchaseFragment
 import com.example.menupop.mainActivity.profile.WithdrawalFragment
 import com.google.android.gms.ads.OnUserEarnedRewardListener
 import com.google.android.material.bottomnavigation.BottomNavigationView
+import java.util.Calendar
 
 
 class MainActivity : AppCompatActivity(), MainActivityEvent{
@@ -72,14 +73,14 @@ class MainActivity : AppCompatActivity(), MainActivityEvent{
         binding.appbarMenu.findViewById<TextView>(R.id.appbar_status).text = "음식 등록"
 
         /**
-         * 여기서 dailyTranslation, dailyReword 를 받아....!
+         * 여기서 dailyTranslation, dailyReward 를 받아....!
          */
         var sharedPreferences = getSharedPreferences("userInfo", MODE_PRIVATE)
         identifier = mainActivityViewModel.getUserInfo(sharedPreferences)
 
         mainActivityViewModel.requestUserInformation(identifier!!)
 
-        mainActivityViewModel.scheduleMidnightWork(application)
+
 
         mainActivityViewModel.rewardedAd.observe(this){
             it.show(this, OnUserEarnedRewardListener { rewardItem ->
@@ -92,11 +93,9 @@ class MainActivity : AppCompatActivity(), MainActivityEvent{
             })
         }
 
-        mainActivityViewModel.setRewarded(getSharedPreferences("userInfo", MODE_PRIVATE))
+//        mainActivityViewModel.setRewarded(getSharedPreferences("userInfo", MODE_PRIVATE))
 
-
-
-
+        mainActivityViewModel.scheduleMidnightWork(application)
 
 
         mainActivityViewModel.isLoading.observe(this, Observer {

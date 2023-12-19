@@ -71,7 +71,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
 
-                    android:text="@{ticketPurchaseViewModel.regularTranslationAmount}"
+                    android:text="@{ticketPurchaseViewModel.regularTranslationAmount.toString()}"
                     android:textColor="@color/black"
                     android:textSize="20sp"
                     android:textStyle="bold" />
@@ -147,7 +147,7 @@
                     android:id="@+id/regular_food_ticket_purchase_amount"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="@{ticketPurchaseViewModel.regularFoodAmount}"
+                    android:text="@{ticketPurchaseViewModel.regularFoodAmount.toString()}"
                     android:textColor="@color/black"
                     android:textSize="20sp"
                     android:textStyle="bold" />
