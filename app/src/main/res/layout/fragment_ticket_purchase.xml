@@ -22,7 +22,7 @@
             android:gravity="center">
 
             <LinearLayout
-                android:id="@+id/food_ticket_box"
+                android:id="@+id/translation_ticket_box"
                 android:layout_width="350dp"
                 android:layout_height="220dp"
                 android:orientation="vertical"
@@ -39,13 +39,13 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="음식 티켓"
+                    android:text="번역 티켓"
                     android:textColor="@color/black"
                     android:textStyle="bold"
                     android:textSize="20sp" />
                 
                 <TextView
-                    android:id="@+id/food_ticket_count"
+                    android:id="@+id/translation_ticket_count"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="10dp"
@@ -55,7 +55,7 @@
                     android:textSize="20sp"/>
 
                 <androidx.appcompat.widget.AppCompatButton
-                    android:id="@+id/food_ticket_purchase_button"
+                    android:id="@+id/translation_ticket_purchase_button"
                     android:layout_width="100dp"
                     android:layout_height="wrap_content"
                     android:background="@drawable/radius_30_stroke_light_gray"
@@ -71,7 +71,7 @@
             </LinearLayout>
 
             <LinearLayout
-                android:id="@+id/translation_ticket_box"
+                android:id="@+id/food_ticket_box"
                 android:layout_width="350dp"
                 android:layout_height="220dp"
                 android:orientation="vertical"
@@ -89,23 +89,23 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="번역 티켓"
+                    android:text="음식 티켓"
                     android:textColor="@color/black"
                     android:textStyle="bold"
                     android:textSize="20sp"/>
 
                 <TextView
-                    android:id="@+id/translation_ticket_count"
+                    android:id="@+id/food_ticket_count"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="10dp"
                     android:layout_marginBottom="10dp"
-                    android:text='@{"보유티켓: " + Integer.toString(ticketPurchaseViewModel.userInformation.translationTicket) + "개"}'
+                    android:text='@{"보유티켓: " + Integer.toString(ticketPurchaseViewModel.userInformation.foodTicket) + "개"}'
                     android:textColor="@color/black"
                     android:textSize="20sp"/>
 
                 <androidx.appcompat.widget.AppCompatButton
-                    android:id="@+id/translation_ticket_purchase_button"
+                    android:id="@+id/food_ticket_purchase_button"
                     android:layout_width="100dp"
                     android:layout_height="wrap_content"
                     android:background="@drawable/radius_30_stroke_light_gray"

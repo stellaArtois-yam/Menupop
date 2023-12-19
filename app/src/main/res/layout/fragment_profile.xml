@@ -82,7 +82,7 @@
                         android:layout_marginTop="10dp"
                         android:layout_marginBottom="10dp"
 
-                        android:text="3/3"
+                        android:text='@{Integer.toString(mainActivityViewModel.dailyTranslation) + "/3"}'
                         android:textColor="@color/black"
                         android:textSize="17sp" />
 
@@ -135,17 +135,17 @@
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="음식 티켓"
+                            android:text="번역 티켓"
                             android:textColor="@color/black"
                             android:textSize="20sp"
                             android:textStyle="bold" />
 
                         <TextView
-                            android:id="@+id/profile_food_ticket"
+                            android:id="@+id/profile_translation_ticket"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginStart="10dp"
-                            android:text='@{": " + Integer.toString(mainActivityViewModel.userInformation.foodTicket) + "개"}'
+                            android:text='@{": " + Integer.toString(mainActivityViewModel.userInformation.translationTicket) + "개"}'
 
                             android:textColor="@color/black"
                             android:textSize="20sp" />
@@ -161,17 +161,17 @@
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="번역 티켓"
+                            android:text="음식 티켓"
                             android:textColor="@color/black"
                             android:textSize="20sp"
                             android:textStyle="bold" />
 
                         <TextView
-                            android:id="@+id/profile_translation_ticket"
+                            android:id="@+id/profile_food_ticket"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginStart="10dp"
-                            android:text='@{": " + Integer.toString(mainActivityViewModel.userInformation.translationTicket) + "개"}'
+                            android:text='@{": " + Integer.toString(mainActivityViewModel.userInformation.foodTicket) + "개"}'
                             android:textColor="@color/black"
                             android:textSize="20sp" />
 
@@ -213,7 +213,7 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Reword"
+                        android:text="Reward"
                         android:textColor="@color/black"
                         android:textSize="20sp"
                         android:textStyle="bold" />
@@ -224,7 +224,7 @@
                         android:layout_height="wrap_content"
 
 
-                        android:text="@{mainActivityViewModel.haveRewarded}"
+                        android:text='@{Integer.toString(mainActivityViewModel.haveRewarded) + "/3"}'
                         android:textColor="@color/black"
                         android:textSize="17sp" />
 

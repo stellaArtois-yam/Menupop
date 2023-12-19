@@ -17,7 +17,7 @@
         android:orientation="vertical">
 
         <androidx.appcompat.widget.AppCompatButton
-            android:id="@+id/payment_reword_cancel"
+            android:id="@+id/payment_reward_cancel"
             android:layout_width="30dp"
             android:layout_height="30dp"
             android:layout_gravity="end"
@@ -25,7 +25,7 @@
             android:background="@drawable/cancel" />
 
         <LinearLayout
-            android:id="@+id/reword_translation_ticket_purchase_box"
+            android:id="@+id/reward_translation_ticket_purchase_box"
             android:layout_width="350dp"
             android:layout_height="150dp"
 
@@ -61,7 +61,7 @@
                     android:textStyle="bold" />
 
                 <ImageView
-                    android:id="@+id/reword_translation_ticket_purchase_plus_button"
+                    android:id="@+id/reward_translation_ticket_purchase_plus_button"
                     android:layout_width="30dp"
                     android:layout_height="30dp"
                     android:layout_marginStart="50dp"
@@ -69,16 +69,16 @@
                     android:src="@drawable/add_circle_24" />
 
                 <TextView
-                    android:id="@+id/reword_translation_ticket_purchase_amount"
+                    android:id="@+id/reward_translation_ticket_purchase_amount"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="01"
+                    android:text="@{ticketPurchaseViewModel.rewardTranslationAmount.toString()}"
                     android:textColor="@color/black"
                     android:textSize="20sp"
                     android:textStyle="bold" />
 
                 <ImageView
-                    android:id="@+id/reword_translation_ticket_purchase_minus_button"
+                    android:id="@+id/reward_translation_ticket_purchase_minus_button"
                     android:layout_width="30dp"
                     android:layout_height="30dp"
                     android:layout_marginStart="20dp"
@@ -91,7 +91,7 @@
         </LinearLayout>
 
         <LinearLayout
-            android:id="@+id/reword_food_ticket_purchase_box"
+            android:id="@+id/reward_food_ticket_purchase_box"
             android:layout_width="350dp"
             android:layout_height="150dp"
             android:layout_marginTop="30dp"
@@ -125,7 +125,7 @@
                     android:textStyle="bold" />
 
                 <ImageView
-                    android:id="@+id/reword_food_ticket_purchase_plus_button"
+                    android:id="@+id/reward_food_ticket_purchase_plus_button"
                     android:layout_width="30dp"
                     android:layout_height="30dp"
                     android:layout_marginStart="50dp"
@@ -133,16 +133,16 @@
                     android:src="@drawable/add_circle_24" />
 
                 <TextView
-                    android:id="@+id/reword_food_ticket_purchase_amount"
+                    android:id="@+id/reward_food_ticket_purchase_amount"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="01"
+                    android:text="@{ticketPurchaseViewModel.rewardFoodAmount.toString()}"
                     android:textColor="@color/black"
                     android:textSize="20sp"
                     android:textStyle="bold" />
 
                 <ImageView
-                    android:id="@+id/reword_food_ticket_purchase_minus_button"
+                    android:id="@+id/reward_food_ticket_purchase_minus_button"
                     android:layout_width="30dp"
                     android:layout_height="30dp"
                     android:layout_marginStart="20dp"
@@ -155,16 +155,27 @@
         </LinearLayout>
 
         <TextView
-            android:id="@+id/reword_ticket_purchase_available_rewords"
+            android:id="@+id/reward_ticket_purchase_available_rewards"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="사용 가능 리워드 : 2/3"
+            android:text='@{"사용 가능 리워드: " + Integer.toString(ticketPurchaseViewModel.haveRewarded) + "/3"}'
             android:textColor="@color/black"
             android:textSize="20sp"
             android:textStyle="bold" />
 
+        <TextView
+            android:id="@+id/reward_ticket_purchase_warning"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="사용 가능한 리워드를 초과하였습니다"
+            android:textColor="@color/red"
+            android:textSize="20sp"
+            android:textStyle="bold"
+            android:layout_marginTop="10dp"
+            android:visibility="gone"/>
+
         <androidx.appcompat.widget.AppCompatButton
-            android:id="@+id/reword_ticket_purchase_button"
+            android:id="@+id/reward_ticket_purchase_button"
             android:layout_width="350dp"
             android:layout_height="wrap_content"
             android:layout_marginTop="30dp"

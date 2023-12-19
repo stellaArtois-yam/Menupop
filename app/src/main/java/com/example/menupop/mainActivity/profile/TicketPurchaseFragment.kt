@@ -2,6 +2,7 @@ package com.example.menupop.mainActivity.profile
 
 import android.app.Dialog
 import android.content.Context
+import android.content.SharedPreferences
 import android.os.Build
 import android.os.Bundle
 import android.util.Log
@@ -12,13 +13,14 @@ import android.view.ViewGroup
 import android.view.Window
 import android.view.WindowManager
 import androidx.annotation.RequiresApi
+import androidx.appcompat.app.AppCompatActivity
 
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import com.example.menupop.R
 import com.example.menupop.databinding.DialogPaymentRegularBinding
-import com.example.menupop.databinding.DialogPaymentRewordBinding
+import com.example.menupop.databinding.DialogPaymentRewardBinding
 import com.example.menupop.databinding.DialogSelectPaymentTypeBinding
 import com.example.menupop.databinding.FragmentTicketPurchaseBinding
 import com.example.menupop.mainActivity.MainActivityEvent
@@ -31,6 +33,8 @@ class TicketPurchaseFragment : Fragment() {
     var event: MainActivityEvent? = null
     private lateinit var context: Context
     var identifier : Int ?= null
+
+    private lateinit var sharedPreferences : SharedPreferences
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
@@ -92,14 +96,27 @@ class TicketPurchaseFragment : Fragment() {
     fun clickListener() {
 
         binding.foodTicketPurchaseButton.setOnClickListener {
-            //다이얼로그를 띄워준다
-            paymentTypeDialog()
+            //receivedReward가 0초과면 paymentTypeDialog
+            Log.d(TAG, "haveReworded: ${ticketPurchaseViewModel.haveRewarded.value}")
+            if(ticketPurchaseViewModel.haveRewarded.value != 0){
+                paymentTypeDialog()
+            }else{
+                //0이면 바로 카카오페이(paymentRegularDialog) 호출
+                paymentRegularDialog()
+            }
+
+
 
         }
 
         binding.translationTicketPurchaseButton.setOnClickListener {
-            //다이얼로그를 띄워준다
-            paymentTypeDialog()
+
+            if(ticketPurchaseViewModel.haveRewarded.value != 0){
+                paymentTypeDialog()
+            }else{
+                paymentRegularDialog()
+            }
+
         }
 
 
@@ -135,9 +152,9 @@ class TicketPurchaseFragment : Fragment() {
 
         dialogBinding.paymentTypeReword.setOnClickListener {
             Log.d(TAG, "reword click")
-            ticketPurchaseViewModel.updatePaymentType("reword")
+            ticketPurchaseViewModel.updatePaymentType("reward")
             dialog.dismiss()
-            paymentRewordDialog()
+            paymentRewardDialog()
         }
 
     }
@@ -192,48 +209,71 @@ class TicketPurchaseFragment : Fragment() {
 
     }
 
-    fun paymentRewordDialog() {
-        val dialogReword = Dialog(context)
+    @RequiresApi(Build.VERSION_CODES.O)
+    fun paymentRewardDialog() {
+        val dialogReward = Dialog(context)
 
-        val dataBindingReword: DialogPaymentRewordBinding = DataBindingUtil.inflate(
+        val dataBindingReward: DialogPaymentRewardBinding = DataBindingUtil.inflate(
             LayoutInflater.from(context),
-            R.layout.dialog_payment_reword,
+            R.layout.dialog_payment_reward,
             null,
             false
         )
 
-        dataBindingReword.ticketPurchaseViewModel = ticketPurchaseViewModel
-        dataBindingReword.lifecycleOwner = this
+        dataBindingReward.ticketPurchaseViewModel = ticketPurchaseViewModel
+        dataBindingReward.lifecycleOwner = this
 
 
 
-        dialogReword.requestWindowFeature(Window.FEATURE_NO_TITLE)
-        dialogReword.setContentView(dataBindingReword.root)
-        dialogReword.show()
+        dialogReward.requestWindowFeature(Window.FEATURE_NO_TITLE)
+        dialogReward.setContentView(dataBindingReward.root)
+        dialogReward.show()
+
+        ticketPurchaseViewModel.isRewardExceeded.observe(viewLifecycleOwner, Observer {
+            if(it){
+                dataBindingReward.rewardTicketPurchaseWarning.visibility = View.VISIBLE
+            }else{
+                dataBindingReward.rewardTicketPurchaseWarning.visibility = View.GONE
+            }
+
+        })
+
+        ticketPurchaseViewModel.changeTicket.observe(viewLifecycleOwner, Observer {
+            if(it){
+                sharedPreferences = context.getSharedPreferences("userInfo", AppCompatActivity.MODE_PRIVATE)
+                ticketPurchaseViewModel.setRewarded(sharedPreferences)
+
+                dialogReward.dismiss()
+                event?.completePayment()
+            }
+        })
 
 
-        dataBindingReword.paymentRewordCancel.setOnClickListener {
-            dialogReword.dismiss()
+        dataBindingReward.paymentRewardCancel.setOnClickListener {
+            dialogReward.dismiss()
         }
 
-        dataBindingReword.rewordTranslationTicketPurchasePlusButton.setOnClickListener{
-            ticketPurchaseViewModel.addTranslationTicket()
+        dataBindingReward.rewardTranslationTicketPurchasePlusButton.setOnClickListener{
+            ticketPurchaseViewModel.addTranslationTicketReward()
         }
 
-        dataBindingReword.rewordTranslationTicketPurchaseMinusButton.setOnClickListener{
-            ticketPurchaseViewModel.removeTranslationTicket()
+        dataBindingReward.rewardTranslationTicketPurchaseMinusButton.setOnClickListener{
+            Log.d(TAG, "paymentRewardDialog: click")
+            ticketPurchaseViewModel.removeTranslationTicketReward()
         }
 
-        dataBindingReword.rewordFoodTicketPurchasePlusButton.setOnClickListener{
-            ticketPurchaseViewModel.addFoodTicket()
+        dataBindingReward.rewardFoodTicketPurchasePlusButton.setOnClickListener{
+            Log.d(TAG, "paymentRewardDialog: click")
+            ticketPurchaseViewModel.addFoodTicketReward()
         }
 
-        dataBindingReword.rewordFoodTicketPurchaseMinusButton.setOnClickListener{
-            ticketPurchaseViewModel.removeFoodTicket()
+        dataBindingReward.rewardFoodTicketPurchaseMinusButton.setOnClickListener{
+            ticketPurchaseViewModel.removeFoodTicketReward()
         }
 
-        dataBindingReword.rewordTicketPurchaseButton.setOnClickListener {
-            //가능한 리워드 내에서 결제하기
+        dataBindingReward.rewardTicketPurchaseButton.setOnClickListener {
+            ticketPurchaseViewModel.rewardPayment(identifier!!)
+
         }
     }
 }

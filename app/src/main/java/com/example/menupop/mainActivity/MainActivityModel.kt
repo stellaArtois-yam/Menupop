@@ -5,6 +5,7 @@ import android.content.SharedPreferences
 import android.os.Build
 import android.util.Log
 import androidx.annotation.RequiresApi
+import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkInfo
 import androidx.work.WorkManager
@@ -31,6 +32,7 @@ import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import retrofit2.converter.scalars.ScalarsConverterFactory
 import java.time.LocalDate
+import java.util.Calendar
 import java.util.concurrent.TimeUnit
 
 
@@ -52,13 +54,17 @@ class MainActivityModel(val application :Application) {
 
     fun getUserInfo(sharedPreferences: SharedPreferences) : HashMap<String, Int> {
         val hashmap = HashMap<String, Int>()
+
         val identifier = sharedPreferences.getInt("identifier", 0)
         val dailyTranslation = sharedPreferences.getInt("dailyTranslation", 0)
-        val dailyReword = sharedPreferences.getInt("dailyReword", 0)
+        val dailyReward = sharedPreferences.getInt("dailyReward", 0)
+        val rewarded = sharedPreferences.getInt("rewarded", 0)
 
         hashmap.put("identifier", identifier)
         hashmap.put("dailyTranslation", dailyTranslation)
-        hashmap.put("dailyReword", dailyReword)
+        hashmap.put("dailyReward", dailyReward)
+        hashmap.put("rewarded", rewarded)
+
 
         return hashmap
     }
@@ -286,22 +292,35 @@ class MainActivityModel(val application :Application) {
 
     fun scheduleMidnightWork(application: Application, callback: (Boolean) -> Unit) {
 
-//        val midnightWorkRequest
-//        = PeriodicWorkRequestBuilder<MidnightResetWorker>(1, TimeUnit.DAYS).build()
+        val midnight = Calendar.getInstance().apply {
+            set(Calendar.HOUR_OF_DAY, 19) // 자정
+            set(Calendar.MINUTE, 14)
+            set(Calendar.SECOND, 0)
+        }
 
-        val midnightWorkRequest
-                = PeriodicWorkRequestBuilder<MidnightResetWorker>(15, TimeUnit.MINUTES).build()
+        val currentTime = Calendar.getInstance()
+        val delay = midnight.timeInMillis - currentTime.timeInMillis
 
+        val midnightWorkRequest = OneTimeWorkRequestBuilder<MidnightResetWorker>()
+            .setInitialDelay(delay, TimeUnit.MILLISECONDS)
+            .build()
 
 
         WorkManager.getInstance(application.applicationContext).enqueue(midnightWorkRequest)
+
+        Log.d(TAG, "workManager first: ${WorkManager
+            .getInstance(application.applicationContext)
+            .getWorkInfoByIdLiveData(midnightWorkRequest.id)}")
 
         WorkManager.getInstance(application.applicationContext)
             .getWorkInfoByIdLiveData(midnightWorkRequest.id)
             .observeForever{
                 if(it != null && it.state == WorkInfo.State.SUCCEEDED){
-                    Log.d(TAG, "scheduleMidnightWork: success")
+                    Log.d(TAG, "WorkManager success? : ${it.state}")
                     callback(true)
+
+                }else{
+                    Log.d(TAG, "WorkManager: ${it.state}")
                 }
             }
     }
@@ -324,16 +343,21 @@ class MainActivityModel(val application :Application) {
     }
     fun rewardedPlus(sharedPreferences: SharedPreferences) : Int{
         var rewarded = sharedPreferences.getInt("rewarded",0)
+        var dailyReward = sharedPreferences.getInt("dailyReward", 0)
         rewarded += 1
-        sharedPreferences.edit().putInt("rewarded",rewarded).commit()
+        dailyReward -=1
+        Log.d(TAG, "rewardedPlus: rewarded_$rewarded dailyReward_$dailyReward")
+
+        val edit = sharedPreferences.edit()
+        edit.putInt("rewarded",rewarded)
+        edit.putInt("dailyReward", dailyReward)
+        edit.commit()
+
         return rewarded
     }
-    fun setRewarded(sharedPreferences: SharedPreferences) : String{
-
-        val rewarded = sharedPreferences.getInt("rewarded",0)
-
-        return "${rewarded}/3"
-
+    fun setRewarded(sharedPreferences: SharedPreferences, haveReward : Int) {
+        Log.d(TAG, "setRewarded: $haveReward")
+        sharedPreferences.edit().putInt("rewarded",haveReward).commit()
     }
 
     fun requestAd(key:String,callback: ((RewardedAd) -> Unit)){
