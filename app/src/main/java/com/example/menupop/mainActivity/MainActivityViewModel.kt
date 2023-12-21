@@ -57,10 +57,13 @@ class MainActivityViewModel(private val application: Application) :  AndroidView
         get() = _accountWithdrawal
 
 
+    // 가지고 있는 리워드
     private val _haveRewarded = MutableLiveData<Int>()
+
     val haveRewarded : LiveData<Int>
         get() = _haveRewarded
 
+    // 받은 리워드
     private val _todayRewarded = MutableLiveData<Int>()
 
     val todayRewarded : LiveData<Int>
@@ -170,6 +173,7 @@ class MainActivityViewModel(private val application: Application) :  AndroidView
         _dailyTranslation.value = userInfo.get("dailyTranslation")
         _dailyReward.value = userInfo.get("dailyReward")
         _haveRewarded.value = userInfo.get("rewarded")
+        _todayRewarded.value = userInfo.get("todayRewarded")
         Log.d(TAG, "first get \n identifier: $identifier\n dailyReward: ${_dailyReward.value}\n rewarded: ${_haveRewarded.value}")
 
         return identifier!!
@@ -199,6 +203,8 @@ class MainActivityViewModel(private val application: Application) :  AndroidView
         val rewarded = mainActivityModel.rewardedPlus(sharedPreferences)
         Log.d(TAG, "rewardedSuccess: $rewarded")
         _haveRewarded.value = rewarded.first
+        _todayRewarded.value = rewarded.first
+
         _dailyReward.value = rewarded.second
     }
 
@@ -522,6 +528,7 @@ class MainActivityViewModel(private val application: Application) :  AndroidView
     val dailyTranslation : LiveData<Int>
         get() = _dailyTranslation
 
+    //reward 받을 수 있는 개수
     private val _dailyReward = MutableLiveData<Int>()
     val dailyReward : LiveData<Int>
         get() = _dailyReward

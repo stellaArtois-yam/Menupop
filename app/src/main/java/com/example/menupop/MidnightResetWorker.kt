@@ -23,15 +23,16 @@ class MidnightResetWorker(
             applicationContext.getSharedPreferences("userInfo", Context.MODE_PRIVATE)
         val editor = sharedPreferences.edit()
 
-        if(isMidnight()){
+//        if(isMidnight()){
             editor.putInt("dailyTranslation", 3) //초기화 값
             editor.putInt("dailyReward", 3)
             editor.putInt("rewarded", 0)
+            editor.putInt("todayRewarded", 0)
             editor.commit()
 
 
             Log.d(TAG, "몇 번이나 실행되는겨")
-        }
+//        }
 
         Result.success()
     }
@@ -39,8 +40,8 @@ class MidnightResetWorker(
     private fun isMidnight(): Boolean {
         val currentTime = Calendar.getInstance()
         val midnight = Calendar.getInstance().apply {
-            set(Calendar.HOUR_OF_DAY, 19) // 자정
-            set(Calendar.MINUTE, 14)
+            set(Calendar.HOUR_OF_DAY, 15) // 자정
+            set(Calendar.MINUTE, 43)
             set(Calendar.SECOND, 0)
         }
 

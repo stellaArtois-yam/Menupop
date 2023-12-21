@@ -59,11 +59,13 @@ class MainActivityModel(val application :Application) {
         val dailyTranslation = sharedPreferences.getInt("dailyTranslation", 0)
         val dailyReward = sharedPreferences.getInt("dailyReward", 0)
         val rewarded = sharedPreferences.getInt("rewarded", 0)
+        val todayRewarded = sharedPreferences.getInt("todayRewarded", 0)
 
         hashmap.put("identifier", identifier)
         hashmap.put("dailyTranslation", dailyTranslation)
         hashmap.put("dailyReward", dailyReward)
         hashmap.put("rewarded", rewarded)
+        hashmap.put("todayRewarded", todayRewarded)
 
 
         return hashmap
@@ -311,8 +313,8 @@ class MainActivityModel(val application :Application) {
     fun scheduleMidnightWork(application: Application, callback: (Boolean) -> Unit) {
 
         val midnight = Calendar.getInstance().apply {
-            set(Calendar.HOUR_OF_DAY, 19) // 자정
-            set(Calendar.MINUTE, 14)
+            set(Calendar.HOUR_OF_DAY, 16) // 자정
+            set(Calendar.MINUTE, 8)
             set(Calendar.SECOND, 0)
         }
 
@@ -362,16 +364,20 @@ class MainActivityModel(val application :Application) {
     fun rewardedPlus(sharedPreferences: SharedPreferences) : Pair<Int,Int>{
         var rewarded = sharedPreferences.getInt("rewarded",0)
         var dailyReward = sharedPreferences.getInt("dailyReward", 0)
+        var todayRewarded = sharedPreferences.getInt("todayRewarded", 0)
         rewarded += 1
-        dailyReward +=1
+        dailyReward -=1
+        todayRewarded += 1
+
         Log.d(TAG, "rewardedPlus: rewarded_$rewarded dailyReward_$dailyReward")
 
         val edit = sharedPreferences.edit()
         edit.putInt("rewarded",rewarded)
         edit.putInt("dailyReward", dailyReward)
+        edit.putInt("todayRewarded", todayRewarded)
         edit.commit()
 
-        return Pair<Int,Int>(rewarded,dailyReward)
+        return Pair<Int,Int>(todayRewarded,dailyReward)
     }
     fun setRewarded(sharedPreferences: SharedPreferences, haveReward : Int) {
         Log.d(TAG, "setRewarded: $haveReward")

@@ -133,6 +133,14 @@ interface RetrofitService {
     fun minusTranslationTicket(@Field("identifier") identifier: Int) : Call<String>
     @POST("Withdrawal.php")
     @FormUrlEncoded
-    fun withdrawal(@Field("identifier") identifier: Int,@Field("email") email: String,@Field("id") id : String,@Field("date") date:String) : Call<String>
+    fun withdrawal(@Field("identifier") identifier: Int,
+                   @Field("email") email: String,
+                   @Field("id") id : String,
+                   @Field("date") date:String) : Call<String>
+
+    @POST("/")
+    @FormUrlEncoded
+    fun requestTranslation(@Field("text") text : String,
+                           @Field("language") language: String): Call<String>
 
 }

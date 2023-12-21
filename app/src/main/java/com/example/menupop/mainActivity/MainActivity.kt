@@ -1,12 +1,16 @@
 package com.example.menupop.mainActivity
 
+import android.app.Dialog
 import android.content.Intent
+import android.graphics.Color
+import android.graphics.drawable.ColorDrawable
 import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.MenuItem
 import android.view.View
+import android.view.Window
 import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
@@ -86,16 +90,6 @@ class MainActivity : AppCompatActivity(), MainActivityEvent{
 
 
 
-        mainActivityViewModel.rewardedAd.observe(this){
-            it.show(this, OnUserEarnedRewardListener { rewardItem ->
-                // Handle the reward.
-                val rewardAmount = rewardItem.amount
-                val rewardType = rewardItem.type
-                Log.d(TAG, "User earned the reward. ${rewardAmount} ${rewardType}")
-                val sharedPreferences = getSharedPreferences("userInfo", MODE_PRIVATE)
-                mainActivityViewModel.rewardedSuccess(sharedPreferences)
-            })
-        }
 
         mainActivityViewModel.checkingTranslationTicket.observe(this){ result ->
             Log.d(TAG, "푸드 티켓 확인 값: ${result}")
@@ -111,6 +105,9 @@ class MainActivity : AppCompatActivity(), MainActivityEvent{
 
 //        mainActivityViewModel.setRewarded(getSharedPreferences("userInfo", MODE_PRIVATE))
 
+        /**
+         * 초기화
+         */
         mainActivityViewModel.scheduleMidnightWork(application)
 
 
@@ -130,6 +127,28 @@ class MainActivity : AppCompatActivity(), MainActivityEvent{
             }
         })
 
+    }
+
+    fun loadingDialog(){
+        val dialog = Dialog(this)
+        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
+        dialog.setContentView(R.layout.progressbar)
+        dialog.window!!.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+        dialog.findViewById<TextView>(R.id.progress_text).visibility = View.GONE
+        dialog.show()
+
+        mainActivityViewModel.rewardedAd.observe(this){
+
+            it.show(this, OnUserEarnedRewardListener { rewardItem ->
+                // Handle the reward.
+                dialog.dismiss()
+                val rewardAmount = rewardItem.amount
+                val rewardType = rewardItem.type
+                Log.d(TAG, "User earned the reward. ${rewardAmount} ${rewardType}")
+                val sharedPreferences = getSharedPreferences("userInfo", MODE_PRIVATE)
+                mainActivityViewModel.rewardedSuccess(sharedPreferences)
+            })
+        }
 
 
 
@@ -141,6 +160,8 @@ class MainActivity : AppCompatActivity(), MainActivityEvent{
         val foodTicket = mainActivityViewModel.userInformation.value?.foodTicket.toString()
         val translationTicket = mainActivityViewModel.userInformation.value?.translationTicket.toString()
         bottomSheetDialog.setContentView(bindingDialog.root)
+
+
         bindingDialog.dialogTicketBottomFoodTicket.text = "음식 티켓 $foodTicket 개"
         bindingDialog.dialogTicketBottomTranslationTicket.text = "번역 티켓 $translationTicket 개"
         bindingDialog.dialogTicketBottomButton.setOnClickListener {
@@ -239,13 +260,14 @@ class MainActivity : AppCompatActivity(), MainActivityEvent{
     }
 
     override fun moveToAdvertisement() {
-        val rewarded = getSharedPreferences("userInfo", MODE_PRIVATE).getInt("dailyReward",0)
-        Log.d(TAG, "showDialog: ${rewarded}")
-        if(rewarded >= 3){
+//        val dailyReward = getSharedPreferences("userInfo", MODE_PRIVATE).getInt("dailyReward",0)
+//        Log.d(TAG, "showDialog: ${dailyReward}")
+        if(mainActivityViewModel.dailyReward.value!! == 0){
             Toast.makeText(this,"하루에 받을 수 있는 리워드를 초과했습니다.", Toast.LENGTH_SHORT).show()
         }else{
             val key = BuildConfig.GOOGLE_AD_ID
             mainActivityViewModel.loadAd(key)
+            loadingDialog()
         }
     }
 
