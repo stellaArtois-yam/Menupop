@@ -102,6 +102,11 @@ dependencies {
     implementation ("com.github.fondesa:kpermissions-rx3:3.4.0")
     implementation ("com.github.fondesa:kpermissions-coroutines:3.4.0")
 
+    implementation("com.google.mlkit:language-id:17.0.4")
+    implementation("com.google.android.gms:play-services-mlkit-language-id:17.0.0")
+//    implementation("com.google.mlkit:translate:17.0.2")
+    implementation("com.google.mlkit:text-recognition:16.0.0")
+
 
 
 
