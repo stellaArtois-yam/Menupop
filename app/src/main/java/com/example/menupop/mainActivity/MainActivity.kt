@@ -4,6 +4,7 @@ import android.content.Intent
 import android.os.Build
 import android.os.Bundle
 import android.util.Log
+import android.view.LayoutInflater
 import android.view.MenuItem
 import android.view.View
 import android.widget.ImageView
@@ -17,6 +18,7 @@ import androidx.lifecycle.ViewModelProvider
 import com.example.menupop.BuildConfig
 import com.example.menupop.R
 import com.example.menupop.databinding.ActivityMainBinding
+import com.example.menupop.databinding.DialogTicketBottomBinding
 import com.example.menupop.login.LoginActivity
 import com.example.menupop.mainActivity.exchange.ExchangeFragment
 import com.example.menupop.mainActivity.foodPreference.FoodPreferenceFragment
@@ -24,8 +26,10 @@ import com.example.menupop.mainActivity.profile.KakaoPayWebView
 import com.example.menupop.mainActivity.profile.ProfileFragment
 import com.example.menupop.mainActivity.profile.TicketPurchaseFragment
 import com.example.menupop.mainActivity.profile.WithdrawalFragment
+import com.example.menupop.mainActivity.translation.CameraActivity
 import com.google.android.gms.ads.OnUserEarnedRewardListener
 import com.google.android.material.bottomnavigation.BottomNavigationView
+import com.google.android.material.bottomsheet.BottomSheetDialog
 import java.util.Calendar
 
 
@@ -93,6 +97,18 @@ class MainActivity : AppCompatActivity(), MainActivityEvent{
             })
         }
 
+        mainActivityViewModel.checkingTranslationTicket.observe(this){ result ->
+            Log.d(TAG, "푸드 티켓 확인 값: ${result}")
+            if (result){ // 티켓이 있을때
+                val intent = Intent(this,CameraActivity::class.java)
+                startActivity(intent)
+                mainActivityViewModel.translationTicketMinus(sharedPreferences)
+            }else { // 티켓이 없을때
+                emptyTicketShowDialog()
+            }
+
+        }
+
 //        mainActivityViewModel.setRewarded(getSharedPreferences("userInfo", MODE_PRIVATE))
 
         mainActivityViewModel.scheduleMidnightWork(application)
@@ -119,6 +135,23 @@ class MainActivity : AppCompatActivity(), MainActivityEvent{
 
     }
 
+    fun emptyTicketShowDialog(){
+        val bindingDialog : DialogTicketBottomBinding = DataBindingUtil.inflate(LayoutInflater.from(this), R.layout.dialog_ticket_bottom, null, false);
+        val bottomSheetDialog = BottomSheetDialog(this)
+        val foodTicket = mainActivityViewModel.userInformation.value?.foodTicket.toString()
+        val translationTicket = mainActivityViewModel.userInformation.value?.translationTicket.toString()
+        bottomSheetDialog.setContentView(bindingDialog.root)
+        bindingDialog.dialogTicketBottomFoodTicket.text = "음식 티켓 $foodTicket 개"
+        bindingDialog.dialogTicketBottomTranslationTicket.text = "번역 티켓 $translationTicket 개"
+        bindingDialog.dialogTicketBottomButton.setOnClickListener {
+            Log.d(TAG, "favoriteItemClick: 결제 화면 띄우기")
+            moveToTicketPurchase()
+            bottomSheetDialog.dismiss()
+        }
+
+        bottomSheetDialog.show()
+    }
+
     private fun settingListener() {
         // 선택 리스너 등록
         binding.bottomNavigation.setOnItemSelectedListener(TabSelectedListener())
@@ -135,12 +168,11 @@ class MainActivity : AppCompatActivity(), MainActivityEvent{
                     binding.appbarMenu.findViewById<TextView>(R.id.appbar_status).text = "음식 등록"
                     return true
                 }
-//                R.id.camera -> {
-//                    supportFragmentManager.beginTransaction()
-//                        .replace(R.id.home_ly, DogFragment())
-//                        .commit()
-//                    return true
-//                }
+                R.id.tab_camera -> {
+                    Log.d(TAG, "onNavigationItemSelected: 카메라 탭 선택")
+                    mainActivityViewModel.checkingTranslationTicket()
+                    return false
+                }
                 R.id.tab_exchange -> {
                     supportFragmentManager.beginTransaction()
                         .replace(R.id.home_frame_layout, ExchangeFragment())
@@ -207,7 +239,7 @@ class MainActivity : AppCompatActivity(), MainActivityEvent{
     }
 
     override fun moveToAdvertisement() {
-        val rewarded = getSharedPreferences("userInfo", MODE_PRIVATE).getInt("rewarded",0)
+        val rewarded = getSharedPreferences("userInfo", MODE_PRIVATE).getInt("dailyReward",0)
         Log.d(TAG, "showDialog: ${rewarded}")
         if(rewarded >= 3){
             Toast.makeText(this,"하루에 받을 수 있는 리워드를 초과했습니다.", Toast.LENGTH_SHORT).show()

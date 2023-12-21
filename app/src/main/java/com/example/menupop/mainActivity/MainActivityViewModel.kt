@@ -61,6 +61,11 @@ class MainActivityViewModel(private val application: Application) :  AndroidView
     val haveRewarded : LiveData<Int>
         get() = _haveRewarded
 
+    private val _todayRewarded = MutableLiveData<Int>()
+
+    val todayRewarded : LiveData<Int>
+        get() = _todayRewarded
+
 
     /**
      * 메인
@@ -77,7 +82,12 @@ class MainActivityViewModel(private val application: Application) :  AndroidView
     val userInformation : LiveData<UserInformationDTO>
         get() = _userInformation
 
-    fun ticketMinus(sharedPreferences: SharedPreferences){
+    private val _checkingTranslationTicket = MutableLiveData<Boolean>()
+
+    val checkingTranslationTicket : LiveData<Boolean>
+        get() =_checkingTranslationTicket
+
+    fun foodTicketMinus(sharedPreferences: SharedPreferences){
         Log.d(TAG, "ticketMinus: ${_userInformation.value!!.foodTicket}")
         val userInfo = mainActivityModel.getUserInfo(sharedPreferences)
         val identifier = userInfo.get("identifier")
@@ -91,6 +101,20 @@ class MainActivityViewModel(private val application: Application) :  AndroidView
         mainActivityModel.minusFoodTicket(identifier!!,callbackResult!!)
         Log.d(TAG, "ticketMinus 반역: ${_userInformation.value!!.foodTicket}")
     }
+    fun translationTicketMinus(sharedPreferences: SharedPreferences){
+        Log.d(TAG, "ticketMinus: ${_userInformation.value!!.foodTicket}")
+        val userInfo = mainActivityModel.getUserInfo(sharedPreferences)
+        val identifier = userInfo.get("identifier")
+
+        callbackResult = {result ->
+            Log.d(TAG, "ticketMinus: $result")
+            if(result.trim() == "success"){
+                _userInformation.value?.translationTicket= _userInformation.value?.translationTicket?.minus(1)!!
+            }
+        }
+        mainActivityModel.minusTranslationTicket(identifier!!,callbackResult!!)
+        Log.d(TAG, "ticketMinus 반역: ${_userInformation.value!!.foodTicket}")
+    }
 
     fun foodPreferenceRegister(sharedPreferences: SharedPreferences,foodName:String,classification:String){
         Log.d(TAG, "foodPreferenceRegister: 호출됨")
@@ -101,6 +125,11 @@ class MainActivityViewModel(private val application: Application) :  AndroidView
             _registerResult.value = result == "success"
         }
         mainActivityModel.foodPreferenceRegister(identifier!!,foodName,classification,callbackResult!!)
+    }
+
+    fun checkingTranslationTicket(){
+        _checkingTranslationTicket.value = userInformation.value?.translationTicket!! > 0
+
     }
 
     fun deleteFoodPreference(sharedPreferences: SharedPreferences,foodName: String){
@@ -169,7 +198,8 @@ class MainActivityViewModel(private val application: Application) :  AndroidView
     fun rewardedSuccess(sharedPreferences: SharedPreferences){
         val rewarded = mainActivityModel.rewardedPlus(sharedPreferences)
         Log.d(TAG, "rewardedSuccess: $rewarded")
-        _haveRewarded.value = rewarded
+        _haveRewarded.value = rewarded.first
+        _dailyReward.value = rewarded.second
     }
 
 

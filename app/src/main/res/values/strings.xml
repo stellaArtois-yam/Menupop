@@ -43,7 +43,7 @@
 
     <string-array name="currencies">
         <item>선택</item>
-        <item >원</item>
+        <item>원</item>
         <item>달러</item>
         <item>엔</item>
         <item>위안</item>
@@ -53,9 +53,7 @@
         <item>달러</item>
 
 
-
     </string-array>
-
 
 
     <string name="exchange_warning">메뉴판에 원화로 나타내고 싶으시면\n하단에 스위치를 켜주세요.</string>

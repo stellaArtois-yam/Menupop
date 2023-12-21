@@ -69,6 +69,24 @@ class MainActivityModel(val application :Application) {
         return hashmap
     }
 
+    fun minusTranslationTicket(identifier: Int,callback: (String) -> Unit){
+        service.minusTranslationTicket(identifier).enqueue(object : Callback<String>{
+            override fun onResponse(call: Call<String>, response: Response<String>) {
+                Log.d(TAG, "onResponse:  minusTicket $response")
+                if(response.isSuccessful){
+
+                    callback(response.body()!!)
+                }
+            }
+
+            override fun onFailure(call: Call<String>, t: Throwable) {
+                Log.d(TAG, "onFailure: ${t}")
+                callback("failed")
+            }
+
+        })
+    }
+
     fun minusFoodTicket(identifier: Int,callback: (String) -> Unit){
         service.minusFoodTicket(identifier).enqueue(object : Callback<String>{
             override fun onResponse(call: Call<String>, response: Response<String>) {
@@ -341,11 +359,11 @@ class MainActivityModel(val application :Application) {
 
         })
     }
-    fun rewardedPlus(sharedPreferences: SharedPreferences) : Int{
+    fun rewardedPlus(sharedPreferences: SharedPreferences) : Pair<Int,Int>{
         var rewarded = sharedPreferences.getInt("rewarded",0)
         var dailyReward = sharedPreferences.getInt("dailyReward", 0)
         rewarded += 1
-        dailyReward -=1
+        dailyReward +=1
         Log.d(TAG, "rewardedPlus: rewarded_$rewarded dailyReward_$dailyReward")
 
         val edit = sharedPreferences.edit()
@@ -353,7 +371,7 @@ class MainActivityModel(val application :Application) {
         edit.putInt("dailyReward", dailyReward)
         edit.commit()
 
-        return rewarded
+        return Pair<Int,Int>(rewarded,dailyReward)
     }
     fun setRewarded(sharedPreferences: SharedPreferences, haveReward : Int) {
         Log.d(TAG, "setRewarded: $haveReward")

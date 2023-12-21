@@ -227,7 +227,7 @@ class FoodPreferenceFragment : Fragment() {
                     AppCompatActivity.MODE_PRIVATE
                 )
                 existBottomSheetDialog.dismiss()
-                mainViewModel.ticketMinus(sharedPreferences)
+                mainViewModel.foodTicketMinus(sharedPreferences)
 
                 val imm = context.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
                 imm.hideSoftInputFromWindow(requireActivity().currentFocus?.windowToken, 0)

@@ -94,6 +94,14 @@ dependencies {
 
     implementation("com.google.android.gms:play-services-ads:22.6.0")
 
+    implementation ("com.github.zynkware:Document-Scanning-Android-SDK:1.1.1")
+    implementation ("com.github.bumptech.glide:glide:4.12.0")
+
+    implementation ("com.github.fondesa:kpermissions:3.4.0")
+    implementation ("com.github.fondesa:kpermissions-rx2:3.4.0")
+    implementation ("com.github.fondesa:kpermissions-rx3:3.4.0")
+    implementation ("com.github.fondesa:kpermissions-coroutines:3.4.0")
+
 
 
 

@@ -3,6 +3,10 @@
     xmlns:tools="http://schemas.android.com/tools">
 
     <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
+    <uses-permission android:name="android.permission.READ_MEDIA_IMAGES"/>
+    <uses-permission android:name="android.permission.ACCESS_MEDIA_LOCATION"/>
 
     <application
         android:allowBackup="true"
@@ -15,9 +19,15 @@
         android:theme="@style/Theme.Menupop"
         android:usesCleartextTraffic="true"
         tools:targetApi="31">
+        <activity
+            android:name=".mainActivity.translation.CameraActivity"
+            android:screenOrientation="portrait"
+            android:theme="@style/Theme.AppCompat.NoActionBar"  />
+
         <meta-data
             android:name="com.google.android.gms.ads.APPLICATION_ID"
-            android:value="ca-app-pub-1245093859457840~5142119221"/>
+            android:value="ca-app-pub-1245093859457840~5142119221" />
+
         <activity
             android:name=".resetPassword.ResetPasswordActivity"
             android:exported="false" />
@@ -32,32 +42,28 @@
         </activity>
         <activity
             android:name=".signup.SignupActivity"
-            android:exported="true">
-        </activity>
-
-        <activity android:name=".mainActivity.MainActivity"
-            android:exported="true">
-        </activity>
+            android:exported="true"></activity>
+        <activity
+            android:name=".mainActivity.MainActivity"
+            android:exported="true"></activity>
         <activity
             android:name="com.kakao.sdk.auth.AuthCodeHandlerActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
+
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.BROWSABLE" />
 
                 <!-- Redirect URI: "kakao${NATIVE_APP_KEY}://oauth" -->
-                <data android:host="oauth"
+                <data
+                    android:host="oauth"
                     android:scheme="kakaofe1d6a53a867dde6f04ab070936d5898" />
             </intent-filter>
         </activity>
-
-        <activity android:name=".findId.FindIdActivity"
-            android:exported="false"/>
-
+        <activity
+            android:name=".findId.FindIdActivity"
+            android:exported="false" />
     </application>
-
-
-    <uses-permission android:name="android.permission.INTERNET"/>
 
 </manifest>
