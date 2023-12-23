@@ -108,6 +108,25 @@ class FoodPreferenceFragment : Fragment() {
         spannableString.setSpan(StyleSpan(android.graphics.Typeface.BOLD), startIndex2, endIndex2, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
         return spannableString
     }
+    fun existFreeTicketShowDialog(foodName:String,classfication : String){
+        val bindingDialog : DialogTicketBottomBinding = DataBindingUtil.inflate(LayoutInflater.from(context), R.layout.dialog_ticket_bottom, null, false);
+        val foodTicket = mainViewModel.userInformation.value?.freeFoodTicket.toString()
+        existBottomSheetDialog.setContentView(bindingDialog.root)
+        bindingDialog.dialogTicketBottomFoodTicket.text = "무료 음식 티켓 ${foodTicket} 개"
+        bindingDialog.dialogTicketBottomTranslationTicket.visibility = View.GONE
+        bindingDialog.dialogTicketBottomButton.text = "등록하기"
+        bindingDialog.dialogTicketBottomText.text = setTextBold("[${foodName}]를 [${classfication}] 음식으로\n등록하시겠습니까?",foodName,classfication)
+        bindingDialog.dialogTicketBottomButton.setOnClickListener {
+            Log.d(TAG, "existTicketShowDialog: 클릭 됨")
+            var sharedPreferences = context.getSharedPreferences("userInfo",
+                AppCompatActivity.MODE_PRIVATE
+            )
+            mainViewModel.foodPreferenceRegister(sharedPreferences,foodName,classfication)
+
+        }
+
+        existBottomSheetDialog.show()
+    }
     fun existTicketShowDialog(foodName:String,classfication : String){
         val bindingDialog : DialogTicketBottomBinding = DataBindingUtil.inflate(LayoutInflater.from(context), R.layout.dialog_ticket_bottom, null, false);
         val foodTicket = mainViewModel.userInformation.value?.foodTicket.toString()
@@ -168,7 +187,12 @@ class FoodPreferenceFragment : Fragment() {
                 if(checkTicketEmpty()){
                     emptyTicketShowDialog()
                 } else{
-                    existTicketShowDialog(foodName,"호")
+                    if(mainViewModel.userInformation.value?.freeFoodTicket!! > 0){
+                        existFreeTicketShowDialog(foodName,"호")
+                    }else {
+
+                        existTicketShowDialog(foodName,"호")
+                    }
                 }
 
             }
@@ -178,7 +202,12 @@ class FoodPreferenceFragment : Fragment() {
                 if(checkTicketEmpty()){
                     emptyTicketShowDialog()
                 } else{
-                    existTicketShowDialog(foodName,"불호")
+                    if(mainViewModel.userInformation.value?.freeFoodTicket!! > 0){
+                        existFreeTicketShowDialog(foodName,"불호")
+                    }else {
+
+                        existTicketShowDialog(foodName,"불호")
+                    }
                 }
             }
 
@@ -227,7 +256,12 @@ class FoodPreferenceFragment : Fragment() {
                     AppCompatActivity.MODE_PRIVATE
                 )
                 existBottomSheetDialog.dismiss()
-                mainViewModel.foodTicketMinus(sharedPreferences)
+                if (mainViewModel.userInformation.value?.freeFoodTicket!! > 0) {
+                    mainViewModel.freeFoodTicketMinus(sharedPreferences)
+
+                }else {
+                    mainViewModel.foodTicketMinus(sharedPreferences)
+                }
 
                 val imm = context.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
                 imm.hideSoftInputFromWindow(requireActivity().currentFocus?.windowToken, 0)

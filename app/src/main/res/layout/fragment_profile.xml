@@ -102,7 +102,7 @@
                         android:layout_marginTop="10dp"
                         android:layout_marginBottom="10dp"
 
-                        android:text="3/3"
+                        android:text='@{Integer.toString(mainActivityViewModel.userInformation.freeFoodTicket) + "/3"}'
                         android:textColor="@color/black"
                         android:textSize="17sp" />
 
@@ -224,7 +224,7 @@
                         android:layout_height="wrap_content"
 
 
-                        android:text='@{Integer.toString(mainActivityViewModel.todayRewarded) + "/3"}'
+                        android:text='@{Integer.toString(mainActivityViewModel.dailyReward) + "/3"}'
                         android:textColor="@color/black"
                         android:textSize="17sp" />
 

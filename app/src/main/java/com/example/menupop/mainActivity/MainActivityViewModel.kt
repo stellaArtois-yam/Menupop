@@ -90,6 +90,21 @@ class MainActivityViewModel(private val application: Application) :  AndroidView
     val checkingTranslationTicket : LiveData<Boolean>
         get() =_checkingTranslationTicket
 
+    fun freeFoodTicketMinus(sharedPreferences: SharedPreferences){
+        Log.d(TAG, "ticketMinus: ${_userInformation.value!!.foodTicket}")
+        val userInfo = mainActivityModel.getUserInfo(sharedPreferences)
+        val identifier = userInfo.get("identifier")
+
+        callbackResult = {result ->
+            Log.d(TAG, "ticketMinus: $result")
+            if(result.trim() == "success"){
+                _userInformation.value?.freeFoodTicket = _userInformation.value?.freeFoodTicket?.minus(1)!!
+            }
+        }
+        mainActivityModel.minusFreeFoodTicket(identifier!!,callbackResult!!)
+        Log.d(TAG, "ticketMinus 반역: ${_userInformation.value!!.foodTicket}")
+    }
+
     fun foodTicketMinus(sharedPreferences: SharedPreferences){
         Log.d(TAG, "ticketMinus: ${_userInformation.value!!.foodTicket}")
         val userInfo = mainActivityModel.getUserInfo(sharedPreferences)
@@ -183,7 +198,7 @@ class MainActivityViewModel(private val application: Application) :  AndroidView
         Log.d(TAG, "requestUserInformation: ????")
         callbackUserInfo = {response ->
             _userInformation.value = response
-            Log.d(TAG, "requestUserInformation: ${response.id}, ${response.email}")
+            Log.d(TAG, "requestUserInformation: ${response.id}, ${response.email} ${_userInformation.value!!.freeFoodTicket} ${response}")
             _isLoading.value = response.id != null && response.email!=null
         }
         mainActivityModel.requestUserInformation(identifier, callbackUserInfo!!)

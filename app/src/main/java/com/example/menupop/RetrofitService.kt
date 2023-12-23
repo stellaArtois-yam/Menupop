@@ -128,6 +128,9 @@ interface RetrofitService {
     @POST("MinusFoodTicket.php")
     @FormUrlEncoded
     fun minusFoodTicket(@Field("identifier") identifier: Int) : Call<String>
+    @POST("MinusFreeFoodTicket.php")
+    @FormUrlEncoded
+    fun minusFreeFoodTicket(@Field("identifier") identifier: Int) : Call<String>
     @FormUrlEncoded
     @POST("MinusTranslationTicket.php")
     fun minusTranslationTicket(@Field("identifier") identifier: Int) : Call<String>
