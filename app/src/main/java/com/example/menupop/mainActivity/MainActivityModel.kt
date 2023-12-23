@@ -89,6 +89,24 @@ class MainActivityModel(val application :Application) {
         })
     }
 
+    fun minusFreeFoodTicket(identifier: Int,callback: (String) -> Unit){
+        service.minusFreeFoodTicket(identifier).enqueue(object : Callback<String>{
+            override fun onResponse(call: Call<String>, response: Response<String>) {
+                Log.d(TAG, "onResponse:  minusTicket $response")
+                if(response.isSuccessful){
+
+                    callback(response.body()!!)
+                }
+            }
+
+            override fun onFailure(call: Call<String>, t: Throwable) {
+                Log.d(TAG, "onFailure: ${t}")
+                callback("failed")
+            }
+
+        })
+    }
+
     fun minusFoodTicket(identifier: Int,callback: (String) -> Unit){
         service.minusFoodTicket(identifier).enqueue(object : Callback<String>{
             override fun onResponse(call: Call<String>, response: Response<String>) {
