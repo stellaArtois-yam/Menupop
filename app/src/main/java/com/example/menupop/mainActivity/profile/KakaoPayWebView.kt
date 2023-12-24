@@ -134,7 +134,15 @@ class KakaoPayWebView : Fragment() {
 
                 Log.d(TAG, "webView Clear")
 
+            }else if(url.contains("KakaoPayCancel")){
 
+                viewModel.setPaymentResponse()
+                event?.completePayment()
+
+            }else if(url.contains("KakaoPayFail")){
+
+                viewModel.setPaymentResponse()
+                event?.completePayment()
             }
 
             view!!.loadUrl(url)

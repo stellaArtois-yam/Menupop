@@ -397,7 +397,8 @@ class MainActivityViewModel(private val application: Application) :  AndroidView
     fun countTicket(ticketAmount: MutableLiveData<Int>,
                     otherTicketAmount: MutableLiveData<Int>): Int{
         if(ticketAmount.value!! > 0 && otherTicketAmount.value!! >0){
-            return 2
+
+            return ticketAmount.value!! + otherTicketAmount.value!!
         }else{
             return 1
         }
@@ -462,18 +463,24 @@ class MainActivityViewModel(private val application: Application) :  AndroidView
 
     }
 
+    fun setPaymentResponse(){
+        _paymentResponse.value = null
+    }
+
     @RequiresApi(Build.VERSION_CODES.O)
     fun completePayment(tid : String, userId: String, pgToken : String){
         callbackApprove = {response ->
             Log.d(TAG, "completePayment: $response")
-
             _paymentResponse.value = null
 
             // db에 티켓 개수도 수정
             // 구매 이력 저장
-            savePaymentHistory(response.partner_user_id.toInt(),
-                response.tid, response.payment_method_type,
-                response.item_name, response.amount.total.toInt(), response.approved_at)
+
+            if(response.approved_at != null){
+                savePaymentHistory(response.partner_user_id.toInt(),
+                    response.tid, response.payment_method_type,
+                    response.item_name, response.amount.total.toInt(), response.approved_at)
+            }
 
         }
         mainActivityModel.requestApprovePayment(tid, userId, pgToken, callbackApprove!!)
@@ -489,20 +496,20 @@ class MainActivityViewModel(private val application: Application) :  AndroidView
         var ticketSaveModel : TicketSaveDTO?= null
 
         callback = {response ->
-            Log.d(TAG, "savePaymentHistory: ${response.result}")
             //여기서 클라이언트 티켓 개수 수정
             if(response.result == "success"){
+                _changeTicket.value = true
+                Log.d(TAG, "savePaymentHistory: ${response.result}")
 
                 if(_paymentType.value == "regular"){
                     _userInformation.value!!.foodTicket = _userInformation.value!!.foodTicket + _regularFoodAmount.value!!
                     _userInformation.value!!.translationTicket = _userInformation.value!!.translationTicket + _regularTranslationAmount.value!!
-                    _changeTicket.value = true
+
 
                 }else if(_paymentType.value == "reward"){
                     _haveRewarded.value = _haveRewarded.value!! - 1
                     _userInformation.value!!.foodTicket = _userInformation.value!!.foodTicket + _rewardFoodAmount.value!!
                     _userInformation.value!!.translationTicket = _userInformation.value!!.translationTicket + _rewardTranslationAmount.value!!
-                    _changeTicket.value = true
 
                 }
 
