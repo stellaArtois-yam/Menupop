@@ -2,7 +2,6 @@ package com.example.menupop.login
 
 import android.app.Dialog
 import android.content.Intent
-import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import android.view.Window
@@ -14,7 +13,6 @@ import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
-import com.airbnb.lottie.BuildConfig
 import com.example.menupop.mainActivity.MainActivity
 import com.example.menupop.R
 import com.example.menupop.signup.SignupActivity
@@ -35,10 +33,6 @@ import com.kakao.sdk.common.KakaoSdk
 import com.kakao.sdk.common.util.Utility
 import com.kakao.sdk.user.UserApiClient
 import com.navercorp.nid.NaverIdLoginSDK
-import com.navercorp.nid.oauth.NidOAuthLogin
-import com.navercorp.nid.oauth.OAuthLoginCallback
-import com.navercorp.nid.profile.NidProfileCallback
-import com.navercorp.nid.profile.data.NidProfileResponse
 import kotlinx.coroutines.launch
 
 
@@ -67,7 +61,7 @@ class LoginActivity : AppCompatActivity() {
     }
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.login)
+        setContentView(R.layout.activity_login)
 
         IdentitySaveCheck()
 
@@ -109,7 +103,7 @@ class LoginActivity : AppCompatActivity() {
         }
     }
     fun init() {
-        binding = DataBindingUtil.setContentView(this, R.layout.login)
+        binding = DataBindingUtil.setContentView(this, R.layout.activity_login)
 
         loginViewModel = ViewModelProvider(this).get(LoginViewModel::class.java)
         binding.loginViewModel = loginViewModel

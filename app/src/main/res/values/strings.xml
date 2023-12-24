@@ -52,7 +52,15 @@
         <item>바트</item>
         <item>달러</item>
 
+    </string-array>
 
+    <string-array name="profile">
+        <item>bald</item>
+        <item>man</item>
+        <item>bowlcuthair</item>
+        <item>longhair</item>
+        <item>bobhair</item>
+        <item>puccahair</item>
     </string-array>
 
 

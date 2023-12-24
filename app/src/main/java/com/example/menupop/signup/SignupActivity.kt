@@ -33,7 +33,7 @@ class SignupActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        val binding: SignupBinding = DataBindingUtil.setContentView(this, R.layout.signup)
+        val binding: SignupBinding = DataBindingUtil.setContentView(this, R.layout.activity_signup)
 
         signupViewModel = ViewModelProvider(this).get(SignupViewModel::class.java)
         binding.viewModel = signupViewModel
