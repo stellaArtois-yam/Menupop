@@ -41,7 +41,7 @@ class CameraModel {
 
     private val service = retrofit.create(RetrofitService::class.java)
 
-    fun requestTranslation(text : String, language : String, callback: (String) -> Unit){
+    fun  requestTranslation(text : String, language : String, callback: (String) -> Unit){
         service.requestTranslation(text, language).enqueue(object : Callback<String> {
             override fun onResponse(call: Call<String>, response: Response<String>) {
                 if(response.isSuccessful){
