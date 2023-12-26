@@ -17,7 +17,7 @@
             android:layout_width="0dp"
             android:layout_height="50dp"
             android:layout_weight="0.2"
-            android:background="@drawable/radius_30_stroke_light_gray"
+            android:background="@drawable/circle_empty"
             android:text="@{items.classification}"
             android:textColor="@color/black"
             android:textSize="18sp"

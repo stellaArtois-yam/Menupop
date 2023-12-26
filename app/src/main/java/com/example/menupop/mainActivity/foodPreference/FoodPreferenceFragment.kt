@@ -158,17 +158,13 @@ class FoodPreferenceFragment : Fragment() {
             mainViewModel.deletedResult.observe(viewLifecycleOwner){ result ->
                 if(result){
                     dialog.dismiss()
-                    var sharedPreferences = context.getSharedPreferences("userInfo",
-                        AppCompatActivity.MODE_PRIVATE
-                    )
-                    mainViewModel.getFoodPreference(sharedPreferences)
+
+                    mainViewModel.getFoodPreference()
                 }else{
                     Toast.makeText(context,"잠시 후 다시 시도해주세요.",Toast.LENGTH_SHORT).show()
                 }
             }
-            var sharedPreferences = context.getSharedPreferences("userInfo",
-                AppCompatActivity.MODE_PRIVATE
-            )
+
             mainViewModel.deleteFoodPreference(foodName)
         }
         binding.dialogDeletePreferenceCancelButton.setOnClickListener {
@@ -226,10 +222,8 @@ class FoodPreferenceFragment : Fragment() {
         binding.foodPreferenceRecyclerview.adapter = foodPreferenceAdapter
         binding.foodPreferenceRecyclerview.layoutManager = LinearLayoutManager(context)
 
-        var sharedPreferences = context.getSharedPreferences("userInfo",
-            AppCompatActivity.MODE_PRIVATE
-        )
-        mainViewModel.getFoodPreference(sharedPreferences)
+
+        mainViewModel.getFoodPreference()
 
         mainViewModel.foodPreferenceList.observe(viewLifecycleOwner){ it->
             if (it.result.trim() == "success") {
@@ -252,9 +246,7 @@ class FoodPreferenceFragment : Fragment() {
         mainViewModel.registerResult.observe(viewLifecycleOwner){ result ->
             Log.d(TAG, "existTicketShowDialog: ${result}")
             if(result) {
-                var sharedPreferences = context.getSharedPreferences("userInfo",
-                    AppCompatActivity.MODE_PRIVATE
-                )
+
                 existBottomSheetDialog.dismiss()
                 if (mainViewModel.userInformation.value?.freeFoodTicket!! > 0) {
                     mainViewModel.freeFoodTicketMinus()
@@ -269,7 +261,7 @@ class FoodPreferenceFragment : Fragment() {
                 binding.foodPreferenceRecyclerview.visibility = View.VISIBLE
                 binding.foodPreferenceSearchRecyclerview.visibility = View.GONE
 
-                mainViewModel.getFoodPreference(sharedPreferences)
+                mainViewModel.getFoodPreference()
                 mainViewModel.registerVariableReset()
 
             } else {

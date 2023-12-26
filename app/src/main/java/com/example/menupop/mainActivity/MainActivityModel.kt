@@ -340,36 +340,55 @@ class MainActivityModel(val application :Application) {
     fun scheduleMidnightWork(application: Application, callback: (Boolean) -> Unit) {
 
         val midnight = Calendar.getInstance().apply {
-            set(Calendar.HOUR_OF_DAY, 16) // 자정
-            set(Calendar.MINUTE, 8)
+            set(Calendar.HOUR_OF_DAY, 24) // 자정
+            set(Calendar.MINUTE, 0)
             set(Calendar.SECOND, 0)
         }
 
+
         val currentTime = Calendar.getInstance()
+
         val delay = midnight.timeInMillis - currentTime.timeInMillis
+
+        Log.d(TAG, "WorkManager dueDate: ${midnight.timeInMillis}")
+        Log.d(TAG, "WorkManager currentTime: ${currentTime.timeInMillis}")
+
 
         val midnightWorkRequest = OneTimeWorkRequestBuilder<MidnightResetWorker>()
             .setInitialDelay(delay, TimeUnit.MILLISECONDS)
             .build()
 
+        Log.d(TAG, "scheduleMidnightWork: ${midnightWorkRequest.id.toString()}")
+
 
         WorkManager.getInstance(application.applicationContext).enqueue(midnightWorkRequest)
 
-        Log.d(TAG, "workManager first: ${WorkManager
-            .getInstance(application.applicationContext)
-            .getWorkInfoByIdLiveData(midnightWorkRequest.id)}")
+        Log.d(TAG, "workManager first: ${midnightWorkRequest.id}")
 
         WorkManager.getInstance(application.applicationContext)
             .getWorkInfoByIdLiveData(midnightWorkRequest.id)
-            .observeForever{
-                if(it != null && it.state == WorkInfo.State.SUCCEEDED){
+            .observeForever {
+                if (it != null && it.state == WorkInfo.State.SUCCEEDED) {
                     Log.d(TAG, "WorkManager success? : ${it.state}")
                     callback(true)
+
+                    /**
+                     * 처음 1번이 성공하면 다른 Request를 작업에 넣는 형식 이게 되는건지는 모르겠다
+                     */
+
+                    var againWorkRequest = OneTimeWorkRequestBuilder<MidnightResetWorker>()
+                        .setInitialDelay(delay, TimeUnit.MILLISECONDS)
+                        .build()
+
+                    WorkManager.getInstance(application.applicationContext).enqueue(againWorkRequest)
+                    Log.d(TAG, "WorkManager enqueue again: ${againWorkRequest.id}")
 
                 }else{
                     Log.d(TAG, "WorkManager: ${it.state}")
                 }
             }
+
+
     }
 
 

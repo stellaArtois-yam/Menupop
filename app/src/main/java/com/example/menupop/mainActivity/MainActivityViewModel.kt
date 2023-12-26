@@ -209,12 +209,12 @@ class MainActivityViewModel(private val application: Application) :  AndroidView
         val userInfo = mainActivityModel.getUserInfo(sharedPreferences)
         _identifier.value = userInfo["identifier"]
 
-        _dailyTranslation.value = userInfo.get("dailyTranslation")
-        _dailyReward.value = userInfo.get("dailyReward")
-        _haveRewarded.value = userInfo.get("rewarded")
-        _todayRewarded.value = userInfo.get("todayRewarded")
+        _dailyTranslation.value = userInfo["dailyTranslation"]
+        _dailyReward.value = userInfo["dailyReward"]
+        _haveRewarded.value = userInfo["rewarded"]
+        _todayRewarded.value = userInfo["todayRewarded"]
 
-        Log.d(TAG, "first get \n identifier: $identifier\n dailyReward: ${_dailyReward.value}\n rewarded: ${_haveRewarded.value}")
+        Log.d(TAG, "first get \n identifier: ${identifier.value}\n dailyReward: ${_dailyReward.value}\n rewarded: ${_haveRewarded.value}")
 
     }
 
@@ -296,9 +296,7 @@ class MainActivityViewModel(private val application: Application) :  AndroidView
         mainActivityModel.withdrawal(_identifier.value!!,email!!,id!!,localDate.toString(),callbackResult!!)
     }
 
-    fun getFoodPreference(sharedPreferences: SharedPreferences){
-        Log.d(TAG, "getFoodPreference: ???")
-        val identifier = getUserInfo(sharedPreferences)
+    fun getFoodPreference(){
         callbackFoodPreference = { foodPreferenceDataClass ->
             Log.d(TAG, "getFoodPreference: ${foodPreferenceDataClass}")
             _foodPreferenceList.value = foodPreferenceDataClass
@@ -618,6 +616,7 @@ class MainActivityViewModel(private val application: Application) :  AndroidView
                 _dailyTranslation.value = 3
                 _dailyReward.value = 3
                 _haveRewarded.value = 0
+                _todayRewarded.value = 0
             }else{
                 Log.d(TAG, "scheduleMidnightWork: false")
             }

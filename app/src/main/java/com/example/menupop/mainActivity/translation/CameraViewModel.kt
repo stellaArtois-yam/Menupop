@@ -51,6 +51,8 @@ class CameraViewModel : ViewModel() {
 
             if (visionText != null) {
 
+                Log.d(TAG, "getRecognizedText: ${visionText.text}")
+
                 _textPosition.value = getPosition(visionText,"position")
 
                 val resultText = getPosition(visionText,"request")
@@ -85,34 +87,38 @@ class CameraViewModel : ViewModel() {
     fun requestTranslation(text : String, langCode : String){
         callbackString = {
             if(it != null){
-                val decode = decodeKorean(it)
-                Log.d(TAG, "requestTranslation: $decode")
-                if(decode != null){
-                    _translatedText.value = decode
-                    _isDecode.value = true
-                }
+//                val decode = decodeKorean(it)
+//                Log.d(TAG, "requestTranslation: $decode")
+//                if(decode != null){
+//                    _translatedText.value = decode
+//                    _isDecode.value = true
+//                }
             }
         }
         cameraModel.requestTranslation(text, langCode, callbackString!!)
     }
 
     fun getPosition(text: Text, type: String): String {
-        var json = JsonObject()
 
+        var list = ArrayList<String>()
         for (block in text.textBlocks) {
 
-            for (line in block.lines) {
+            for (line in  block.lines) {
                 val lineText = line.text.lowercase()
                 val lineFrame = line.boundingBox
+                Log.d(TAG, "lineText: ${lineText}\nlineFrame : $lineFrame")
 
-//                Log.d(TAG, "lineText: $lineText")
-//                Log.d(TAG, "line 좌표: $lineFrame")
+                Log.d(TAG, "getPosition type: $type")
+                    if(type == "request"){
+////                    json.add(lineText, JsonPrimitive(lineText))
 
-                if(type == "request"){
-                    json.add(lineText, JsonPrimitive(lineText))
-                }else{
-                    json.add(lineText, JsonPrimitive(lineFrame.toString()))
+                        list.add(lineText)
+                    }else{
+////                    json.add(lineText, JsonPrimitive(lineFrame.toString()))
+                        list.add(lineFrame.toString())
+//
                 }
+
 
 //                for (element in line.elements) {
 //                    val elementText = element.text.lowercase()
@@ -131,8 +137,9 @@ class CameraViewModel : ViewModel() {
 
 
             }
+
         }
-        return json.toString()
+        return list.toString()
     }
 
     fun decodeKorean(jsonString: String): String {

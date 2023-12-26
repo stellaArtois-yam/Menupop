@@ -25,7 +25,7 @@ class FoodPreferenceAdapter(private val listener: FoodPreferenceClickListener) :
 
     override fun onBindViewHolder(holder: FoodPreferenceViewHolder, position: Int) {
         holder.binding.items = foodList[position]
-        val backgroundDrawable = ContextCompat.getDrawable(holder.itemView.context, R.drawable.radius_30_stroke_light_gray)
+        val backgroundDrawable = ContextCompat.getDrawable(holder.itemView.context, R.drawable.circle_empty)
         var color = ContextCompat.getColor(holder.itemView.context, R.color.yellow)
         if (foodList[position].classification == "호"){
             color = ContextCompat.getColor(holder.itemView.context, R.color.orange) // 색상 리소스 가져오기
