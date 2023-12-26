@@ -1,5 +1,7 @@
 package com.example.menupop.mainActivity
 
+import android.graphics.drawable.Drawable
+
 data class UserInformationDTO(
     var id : String,
     var email : String,

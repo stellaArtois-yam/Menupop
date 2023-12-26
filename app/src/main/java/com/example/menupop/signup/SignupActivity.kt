@@ -18,9 +18,9 @@ import androidx.core.widget.addTextChangedListener
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
-import com.example.menupop.databinding.SignupBinding
 import androidx.lifecycle.lifecycleScope
 import com.example.menupop.R
+import com.example.menupop.databinding.ActivitySignupBinding
 import com.example.menupop.login.LoginActivity
 import kotlinx.coroutines.launch
 
@@ -33,7 +33,7 @@ class SignupActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        val binding: SignupBinding = DataBindingUtil.setContentView(this, R.layout.signup)
+        val binding: ActivitySignupBinding = DataBindingUtil.setContentView(this, R.layout.activity_signup)
 
         signupViewModel = ViewModelProvider(this).get(SignupViewModel::class.java)
         binding.viewModel = signupViewModel

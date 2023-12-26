@@ -16,4 +16,6 @@ interface MainActivityEvent {
 
     fun moveToProfile()
 
+    fun moveToProfileSelection()
+
 }

@@ -28,6 +28,7 @@ import com.example.menupop.mainActivity.exchange.ExchangeFragment
 import com.example.menupop.mainActivity.foodPreference.FoodPreferenceFragment
 import com.example.menupop.mainActivity.profile.KakaoPayWebView
 import com.example.menupop.mainActivity.profile.ProfileFragment
+import com.example.menupop.mainActivity.profile.ProfileSelectionFragment
 import com.example.menupop.mainActivity.profile.TicketPurchaseFragment
 import com.example.menupop.mainActivity.profile.WithdrawalFragment
 import com.example.menupop.mainActivity.translation.CameraActivity
@@ -35,6 +36,7 @@ import com.google.android.gms.ads.OnUserEarnedRewardListener
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import java.util.Calendar
+import kotlin.math.log
 
 
 class MainActivity : AppCompatActivity(), MainActivityEvent{
@@ -49,8 +51,6 @@ class MainActivity : AppCompatActivity(), MainActivityEvent{
 
     lateinit var ticketPurchaseFragment: TicketPurchaseFragment
 
-
-    var identifier : Int? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -80,13 +80,19 @@ class MainActivity : AppCompatActivity(), MainActivityEvent{
 
         binding.appbarMenu.findViewById<TextView>(R.id.appbar_status).text = "음식 등록"
 
+
         /**
-         * 여기서 dailyTranslation, dailyReward 를 받아....!
+         * 초기 유저 정보 세팅
          */
         var sharedPreferences = getSharedPreferences("userInfo", MODE_PRIVATE)
-        identifier = mainActivityViewModel.getUserInfo(sharedPreferences)
+        mainActivityViewModel.getUserInfo(sharedPreferences)
 
-        mainActivityViewModel.requestUserInformation(identifier!!)
+        mainActivityViewModel.identifier.observe(this, Observer{
+            if(it != null){
+                mainActivityViewModel.requestUserInformation(it)
+            }
+        })
+
 
 
 
@@ -96,7 +102,7 @@ class MainActivity : AppCompatActivity(), MainActivityEvent{
             if (result){ // 티켓이 있을때
                 val intent = Intent(this,CameraActivity::class.java)
                 startActivity(intent)
-                mainActivityViewModel.translationTicketMinus(sharedPreferences)
+                mainActivityViewModel.translationTicketMinus()
             }else { // 티켓이 없을때
                 emptyTicketShowDialog()
             }
@@ -123,7 +129,7 @@ class MainActivity : AppCompatActivity(), MainActivityEvent{
                 }
 
             }else{
-                //
+
             }
         })
 
@@ -214,11 +220,26 @@ class MainActivity : AppCompatActivity(), MainActivityEvent{
         }
     }
 
+    override fun moveToProfileSelection() {
+        Log.d(TAG, "moveToProfileSelection: 호출")
+        supportFragmentManager.beginTransaction().apply {
+            replace(R.id.home_frame_layout, ProfileSelectionFragment())
+            commit()
+            binding.appbarMenu.findViewById<TextView>(R.id.appbar_status).text = "프로필 선택"
+            binding.appbarMenu.findViewById<ImageView>(R.id.appbar_back).visibility = View.VISIBLE
+
+            binding.appbarMenu.findViewById<ImageView>(R.id.appbar_back).setOnClickListener{
+               moveToProfile()
+            }
+
+        }
+    }
+
     override fun moveToTicketPurchase() {
         Log.d(TAG, "moveToTicketPurchase: 호출")
 
         val bundle = Bundle()
-        bundle.putInt("identifier", identifier!!)
+        bundle.putInt("identifier", mainActivityViewModel.identifier.value!!)
         ticketPurchaseFragment.arguments = bundle
         binding.bottomNavigation.selectedItemId = R.id.tab_profile
 
@@ -230,13 +251,7 @@ class MainActivity : AppCompatActivity(), MainActivityEvent{
             binding.appbarMenu.findViewById<ImageView>(R.id.appbar_back).visibility = View.VISIBLE
 
             binding.appbarMenu.findViewById<ImageView>(R.id.appbar_back).setOnClickListener{
-                supportFragmentManager.beginTransaction().apply {
-                    replace(R.id.home_frame_layout, ProfileFragment())
-                    commit()
-                    binding.appbarMenu.findViewById<TextView>(R.id.appbar_status).text = "프로필 확인"
-                    binding.appbarMenu.findViewById<ImageView>(R.id.appbar_back).visibility = View.GONE
-
-                }
+                moveToProfile()
             }
 
             Log.d(TAG, "moveToTicketPurchase Main: ")
@@ -290,6 +305,8 @@ class MainActivity : AppCompatActivity(), MainActivityEvent{
         supportFragmentManager.beginTransaction().apply {
             replace(R.id.home_frame_layout, profileFragment)
                 .commit()
+            binding.appbarMenu.findViewById<TextView>(R.id.appbar_status).text = "프로필 확인"
+            binding.appbarMenu.findViewById<ImageView>(R.id.appbar_back).visibility = View.GONE
         }
     }
 

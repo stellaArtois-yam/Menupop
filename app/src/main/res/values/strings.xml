@@ -52,7 +52,17 @@
         <item>바트</item>
         <item>달러</item>
 
+    </string-array>
 
+    <string-array name="profile">
+        <item>bald</item>
+        <item>man</item>
+        <item>bowl_cut_hair</item>
+        <item>glasses_man</item>
+        <item>long_hair</item>
+        <item>bob_hair</item>
+        <item>pucca_hair</item>
+        <item>woman</item>
     </string-array>
 
 

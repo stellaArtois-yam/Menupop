@@ -121,7 +121,7 @@ class FoodPreferenceFragment : Fragment() {
             var sharedPreferences = context.getSharedPreferences("userInfo",
                 AppCompatActivity.MODE_PRIVATE
             )
-            mainViewModel.foodPreferenceRegister(sharedPreferences,foodName,classfication)
+            mainViewModel.foodPreferenceRegister(foodName,classfication)
 
         }
 
@@ -141,7 +141,7 @@ class FoodPreferenceFragment : Fragment() {
             var sharedPreferences = context.getSharedPreferences("userInfo",
                 AppCompatActivity.MODE_PRIVATE
             )
-            mainViewModel.foodPreferenceRegister(sharedPreferences,foodName,classfication)
+            mainViewModel.foodPreferenceRegister(foodName,classfication)
 
         }
 
@@ -169,7 +169,7 @@ class FoodPreferenceFragment : Fragment() {
             var sharedPreferences = context.getSharedPreferences("userInfo",
                 AppCompatActivity.MODE_PRIVATE
             )
-            mainViewModel.deleteFoodPreference(sharedPreferences,foodName)
+            mainViewModel.deleteFoodPreference(foodName)
         }
         binding.dialogDeletePreferenceCancelButton.setOnClickListener {
             dialog.dismiss()
@@ -257,10 +257,10 @@ class FoodPreferenceFragment : Fragment() {
                 )
                 existBottomSheetDialog.dismiss()
                 if (mainViewModel.userInformation.value?.freeFoodTicket!! > 0) {
-                    mainViewModel.freeFoodTicketMinus(sharedPreferences)
+                    mainViewModel.freeFoodTicketMinus()
 
                 }else {
-                    mainViewModel.foodTicketMinus(sharedPreferences)
+                    mainViewModel.foodTicketMinus()
                 }
 
                 val imm = context.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
