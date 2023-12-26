@@ -1,36 +1,39 @@
 package com.example.menupop.mainActivity.profile
 
-import android.graphics.drawable.Drawable
 import android.view.LayoutInflater
-import android.view.View
 import android.view.ViewGroup
-import android.widget.ImageView
 import androidx.recyclerview.widget.RecyclerView
-import androidx.recyclerview.widget.RecyclerView.Recycler
-import com.example.menupop.R
 
-class ProfileAdapter(private val drawableList: List<Drawable>) : RecyclerView.Adapter<ProfileAdapter.ProfileAdapterViewHolder>() {
-    private val imageList = ArrayList<ProfileSelectionDTO>()
+import com.example.menupop.databinding.ProfileSelectionItemBinding
 
-    class ProfileAdapterViewHolder(itemView : View) :  RecyclerView.ViewHolder(itemView){
-        val imageView : ImageView = itemView.findViewById(R.id.profile_selection_item)
-    }
+class ProfileAdapter(val clickListener: ProfileSelectionClickListener) : RecyclerView.Adapter<ProfileAdapter.ProfileAdapterViewHolder>() {
+    private var imageList = ArrayList<ProfileSelectionDTO>()
+
+    class ProfileAdapterViewHolder(val binding : ProfileSelectionItemBinding) :  RecyclerView.ViewHolder(binding.root)
 
     override fun onCreateViewHolder(
         parent: ViewGroup,
-        viewType: Int): ProfileAdapter.ProfileAdapterViewHolder {
+        viewType: Int): ProfileAdapterViewHolder{
 
-        val view = LayoutInflater.from(parent.context).inflate(R.layout.fragment_profile_selection, parent, false)
-        return ProfileAdapterViewHolder(view)
+       val binding = ProfileSelectionItemBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+        return ProfileAdapterViewHolder(binding)
     }
 
     override fun onBindViewHolder(holder: ProfileAdapterViewHolder, position: Int) {
-        val drawable = drawableList[position]
-        holder.imageView.setImageDrawable(drawable)
+        holder.binding.items = imageList[position]
+
+        holder.binding.profileSelectionItem.setOnClickListener{
+            clickListener.onItemClick(position)
+        }
     }
 
     override fun getItemCount(): Int {
-        return drawableList.size
+        return imageList.size
+    }
+
+    fun setProfileSelection(imageList : ArrayList<ProfileSelectionDTO>){
+        this.imageList = imageList
+        notifyDataSetChanged()
     }
 
 

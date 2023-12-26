@@ -2,6 +2,7 @@ package com.example.menupop.mainActivity.profile
 
 import android.app.Dialog
 import android.content.Context
+import android.content.Context.MODE_PRIVATE
 import android.content.SharedPreferences
 import android.os.Bundle
 import android.util.Log
@@ -13,6 +14,7 @@ import android.view.Window
 import android.view.WindowManager
 import android.widget.Button
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.net.toUri
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
@@ -69,18 +71,35 @@ class ProfileFragment : Fragment() {
         binding.mainActivityViewModel = profileViewModel
         binding.lifecycleOwner = this
 
-        profileViewModel.userInformation.observe(viewLifecycleOwner, Observer{
-            if(it.id != null){
-                Log.d(TAG, "init: ${it.id}")
-                binding.profileId.text = it.id
+        sharedPreferences = context.getSharedPreferences("userInfo", MODE_PRIVATE)
+
+        profileViewModel.getProfileImage(sharedPreferences, resources)
+
+//        profileViewModel.userInformation.observe(viewLifecycleOwner, Observer{
+//            if(it.id != null){
+//
+//            }else{
+//                Log.d(TAG, "init: null")
+//            }
+//        })
+
+        profileViewModel.profileImage.observe(viewLifecycleOwner, Observer {
+            if(it != null){
+                Log.d(TAG, "profileImage Observe: not null ")
+
             }else{
-                Log.d(TAG, "init: null")
+                binding.profileImage.setImageResource(R.drawable.profile_unselected)
             }
         })
 
     }
 
     fun setClick(){
+
+        binding.profileImage.setOnClickListener{
+            event?.moveToProfileSelection()
+        }
+
         //티켓 구매를 누르면 티켓 프래그먼트로 이동
         binding.profileBuyTicketButton.setOnClickListener{
             event?.moveToTicketPurchase()

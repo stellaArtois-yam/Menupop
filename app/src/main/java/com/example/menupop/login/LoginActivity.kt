@@ -15,8 +15,9 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import com.example.menupop.mainActivity.MainActivity
 import com.example.menupop.R
+import com.example.menupop.databinding.ActivityLoginBinding
 import com.example.menupop.signup.SignupActivity
-import com.example.menupop.databinding.LoginBinding
+
 import com.example.menupop.findId.FindIdActivity
 import com.example.menupop.resetPassword.ResetPasswordActivity
 import com.google.android.gms.auth.api.signin.GoogleSignIn
@@ -39,7 +40,7 @@ import kotlinx.coroutines.launch
 class LoginActivity : AppCompatActivity() {
     private lateinit var loginViewModel: LoginViewModel
     private  val TAG = "LoginActivity"
-    private lateinit var binding : LoginBinding
+    private lateinit var binding : ActivityLoginBinding
     lateinit var kakaoCallback: (OAuthToken?, Throwable?) -> Unit
     private val googleSignInClient: GoogleSignInClient by lazy { getGoogleClient() }
     private var mGoogleSignInClient: GoogleSignInClient? = null

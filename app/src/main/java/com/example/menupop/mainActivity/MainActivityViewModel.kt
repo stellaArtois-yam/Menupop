@@ -2,23 +2,30 @@ package com.example.menupop.mainActivity
 
 import android.app.Application
 import android.content.SharedPreferences
+import android.content.res.Resources
+import android.graphics.drawable.Drawable
+
 import android.os.Build
 import android.util.Log
 import androidx.annotation.RequiresApi
+import androidx.core.net.toUri
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import com.example.menupop.R
 import com.example.menupop.mainActivity.profile.KakaoPayApproveResponseDTO
 import com.example.menupop.mainActivity.profile.KakaoPayReadyResponseDTO
 import com.example.menupop.mainActivity.profile.TicketSaveDTO
 import com.example.menupop.mainActivity.foodPreference.FoodPreferenceDataClass
 import com.example.menupop.mainActivity.foodPreference.FoodPreferenceSearchDTO
 import com.example.menupop.SimpleResultDTO
+import com.example.menupop.mainActivity.profile.ProfileSelectionDTO
 import com.google.android.gms.ads.rewarded.RewardedAd
 import java.text.DecimalFormat
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.util.Calendar
+import kotlin.coroutines.coroutineContext
 
 class MainActivityViewModel(private val application: Application) :  AndroidViewModel(application){
     val TAG = "MainActivityViewModel"
@@ -69,6 +76,20 @@ class MainActivityViewModel(private val application: Application) :  AndroidView
     val todayRewarded : LiveData<Int>
         get() = _todayRewarded
 
+    fun getProfileList(resources : Resources) : ArrayList<ProfileSelectionDTO>{
+        val imageNames = resources.getStringArray(R.array.profile)
+        var imageList : ArrayList<ProfileSelectionDTO> = ArrayList()
+
+        for(name in imageNames){
+            val imageName = resources.getIdentifier(name, "drawable", application.packageName)
+            val image = resources.getDrawable(imageName)
+            imageList.add(ProfileSelectionDTO(image))
+        }
+
+        return imageList
+    }
+
+
 
     /**
      * 메인
@@ -87,13 +108,15 @@ class MainActivityViewModel(private val application: Application) :  AndroidView
 
     private val _checkingTranslationTicket = MutableLiveData<Boolean>()
 
+    private val _profileImage = MutableLiveData<Drawable>()
+    val profileImage : LiveData<Drawable>
+        get() = _profileImage
+
     val checkingTranslationTicket : LiveData<Boolean>
         get() =_checkingTranslationTicket
 
-    fun freeFoodTicketMinus(sharedPreferences: SharedPreferences){
+    fun freeFoodTicketMinus(){
         Log.d(TAG, "ticketMinus: ${_userInformation.value!!.foodTicket}")
-        val userInfo = mainActivityModel.getUserInfo(sharedPreferences)
-        val identifier = userInfo.get("identifier")
 
         callbackResult = {result ->
             Log.d(TAG, "ticketMinus: $result")
@@ -101,14 +124,13 @@ class MainActivityViewModel(private val application: Application) :  AndroidView
                 _userInformation.value?.freeFoodTicket = _userInformation.value?.freeFoodTicket?.minus(1)!!
             }
         }
-        mainActivityModel.minusFreeFoodTicket(identifier!!,callbackResult!!)
+        mainActivityModel.minusFreeFoodTicket(_identifier.value!!,callbackResult!!)
         Log.d(TAG, "ticketMinus 반역: ${_userInformation.value!!.foodTicket}")
     }
 
-    fun foodTicketMinus(sharedPreferences: SharedPreferences){
+    fun foodTicketMinus(){
         Log.d(TAG, "ticketMinus: ${_userInformation.value!!.foodTicket}")
-        val userInfo = mainActivityModel.getUserInfo(sharedPreferences)
-        val identifier = userInfo.get("identifier")
+
 
         callbackResult = {result ->
             Log.d(TAG, "ticketMinus: $result")
@@ -116,13 +138,11 @@ class MainActivityViewModel(private val application: Application) :  AndroidView
                 _userInformation.value?.foodTicket = _userInformation.value?.foodTicket?.minus(1)!!
             }
         }
-        mainActivityModel.minusFoodTicket(identifier!!,callbackResult!!)
+        mainActivityModel.minusFoodTicket(_identifier.value!!,callbackResult!!)
         Log.d(TAG, "ticketMinus 반역: ${_userInformation.value!!.foodTicket}")
     }
-    fun translationTicketMinus(sharedPreferences: SharedPreferences){
+    fun translationTicketMinus(){
         Log.d(TAG, "ticketMinus: ${_userInformation.value!!.foodTicket}")
-        val userInfo = mainActivityModel.getUserInfo(sharedPreferences)
-        val identifier = userInfo.get("identifier")
 
         callbackResult = {result ->
             Log.d(TAG, "ticketMinus: $result")
@@ -130,19 +150,18 @@ class MainActivityViewModel(private val application: Application) :  AndroidView
                 _userInformation.value?.translationTicket= _userInformation.value?.translationTicket?.minus(1)!!
             }
         }
-        mainActivityModel.minusTranslationTicket(identifier!!,callbackResult!!)
+        mainActivityModel.minusTranslationTicket(_identifier.value!!,callbackResult!!)
         Log.d(TAG, "ticketMinus 반역: ${_userInformation.value!!.foodTicket}")
     }
 
-    fun foodPreferenceRegister(sharedPreferences: SharedPreferences,foodName:String,classification:String){
+    fun foodPreferenceRegister(foodName:String,classification:String){
         Log.d(TAG, "foodPreferenceRegister: 호출됨")
-        val userInfo = mainActivityModel.getUserInfo(sharedPreferences)
-        val identifier = userInfo.get("identifier")
+
         callbackResult = { result ->
             Log.d(TAG, "foodPreferenceRegister: ${result}")
             _registerResult.value = result == "success"
         }
-        mainActivityModel.foodPreferenceRegister(identifier!!,foodName,classification,callbackResult!!)
+        mainActivityModel.foodPreferenceRegister(_identifier.value!!,foodName,classification,callbackResult!!)
     }
 
     fun checkingTranslationTicket(){
@@ -150,7 +169,7 @@ class MainActivityViewModel(private val application: Application) :  AndroidView
 
     }
 
-    fun deleteFoodPreference(sharedPreferences: SharedPreferences,foodName: String){
+    fun deleteFoodPreference(foodName: String){
         callbackResult = {result ->
             Log.d(TAG, "deleteFoodPreference:$result d ${result == "success"}")
             if(result.trim() == "success"){
@@ -160,10 +179,8 @@ class MainActivityViewModel(private val application: Application) :  AndroidView
                 _deletedResult.value= false
             }
         }
-        val userInfo = mainActivityModel.getUserInfo(sharedPreferences)
-        val identifier = userInfo.get("identifier")
 
-        mainActivityModel.deleteFoodPreference(identifier!!,foodName,callbackResult!!)
+        mainActivityModel.deleteFoodPreference(_identifier.value!!,foodName,callbackResult!!)
 
     }
 
@@ -181,21 +198,29 @@ class MainActivityViewModel(private val application: Application) :  AndroidView
 
     }
 
+    private val _identifier = MutableLiveData<Int>()
+    val identifier : LiveData<Int>
+        get() = _identifier
 
-    fun getUserInfo(sharedPreferences: SharedPreferences) : Int{
+
+
+
+    fun getUserInfo(sharedPreferences: SharedPreferences){
         val userInfo = mainActivityModel.getUserInfo(sharedPreferences)
-        val identifier = userInfo.get("identifier")
+        _identifier.value = userInfo["identifier"]
+
         _dailyTranslation.value = userInfo.get("dailyTranslation")
         _dailyReward.value = userInfo.get("dailyReward")
         _haveRewarded.value = userInfo.get("rewarded")
         _todayRewarded.value = userInfo.get("todayRewarded")
+
         Log.d(TAG, "first get \n identifier: $identifier\n dailyReward: ${_dailyReward.value}\n rewarded: ${_haveRewarded.value}")
 
-        return identifier!!
     }
 
+
     fun requestUserInformation(identifier : Int){
-        Log.d(TAG, "requestUserInformation: ????")
+
         callbackUserInfo = {response ->
             _userInformation.value = response
             Log.d(TAG, "requestUserInformation: ${response.id}, ${response.email} ${_userInformation.value!!.freeFoodTicket} ${response}")
@@ -213,6 +238,38 @@ class MainActivityViewModel(private val application: Application) :  AndroidView
     }
     fun setRewarded(sharedPreferences: SharedPreferences){
        mainActivityModel.setRewarded(sharedPreferences, _haveRewarded.value!!)
+    }
+
+    private val _isChangedProfile = MutableLiveData<Boolean>()
+    val isChangedProfile : LiveData<Boolean>
+        get() = _isChangedProfile
+
+    fun saveSelectedProfile(imageName: String, sharedPreferences: SharedPreferences, resources: Resources){
+
+        callbackResult = {
+            if(it == "success"){
+                Log.d(TAG, "saveSelectedProfile: $it")
+                val image = resources.getIdentifier(imageName, "drawable", application.packageName)
+                _profileImage.value = resources.getDrawable(image)
+                _isChangedProfile.value = true
+            }
+        }
+        mainActivityModel.saveSelectedProfile(imageName, sharedPreferences, callbackResult!!)
+
+    }
+
+
+    fun getProfileImage(sharedPreferences: SharedPreferences, resources: Resources){
+        val getResult = mainActivityModel.getProfileImage(sharedPreferences)
+        Log.d(TAG, "getProfileImage: $getResult")
+
+        if(getResult != null){
+            val image = resources.getIdentifier(getResult, "drawable", application.packageName)
+            _profileImage.value = resources.getDrawable(image)
+        }else{
+            _profileImage.value = null
+        }
+
     }
     fun rewardedSuccess(sharedPreferences: SharedPreferences){
         val rewarded = mainActivityModel.rewardedPlus(sharedPreferences)
@@ -233,11 +290,10 @@ class MainActivityViewModel(private val application: Application) :  AndroidView
                 logout(sharedPreferences)
             }
         }
-        val identifier = getUserInfo(sharedPreferences)
         val email = userInformation.value?.email
         val id = userInformation.value?.id
         val localDate: LocalDate = LocalDate.now()
-        mainActivityModel.withdrawal(identifier,email!!,id!!,localDate.toString(),callbackResult!!)
+        mainActivityModel.withdrawal(_identifier.value!!,email!!,id!!,localDate.toString(),callbackResult!!)
     }
 
     fun getFoodPreference(sharedPreferences: SharedPreferences){
@@ -247,7 +303,7 @@ class MainActivityViewModel(private val application: Application) :  AndroidView
             Log.d(TAG, "getFoodPreference: ${foodPreferenceDataClass}")
             _foodPreferenceList.value = foodPreferenceDataClass
         }
-        mainActivityModel.getFoodPreference(identifier,callbackFoodPreference!!)
+        mainActivityModel.getFoodPreference(_identifier.value!!,callbackFoodPreference!!)
     }
 
 

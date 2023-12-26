@@ -52,7 +52,7 @@ class MainActivityModel(val application :Application) {
     private val service = retrofit.create(RetrofitService::class.java)
 
 
-    fun getUserInfo(sharedPreferences: SharedPreferences) : HashMap<String, Int> {
+    fun getUserInfo(sharedPreferences: SharedPreferences) : HashMap<String, Int>{
         val hashmap = HashMap<String, Int>()
 
         val identifier = sharedPreferences.getInt("identifier", 0)
@@ -67,8 +67,17 @@ class MainActivityModel(val application :Application) {
         hashmap.put("rewarded", rewarded)
         hashmap.put("todayRewarded", todayRewarded)
 
-
         return hashmap
+    }
+
+    fun getProfileImage(sharedPreferences: SharedPreferences) : String?{
+        val image = sharedPreferences.getString("profileImage", "")
+
+        if(image != ""){
+            return image
+        }
+
+        return null
     }
 
     fun minusTranslationTicket(identifier: Int,callback: (String) -> Unit){
@@ -400,6 +409,15 @@ class MainActivityModel(val application :Application) {
     fun setRewarded(sharedPreferences: SharedPreferences, haveReward : Int) {
         Log.d(TAG, "setRewarded: $haveReward")
         sharedPreferences.edit().putInt("rewarded",haveReward).commit()
+    }
+
+    fun saveSelectedProfile(drawable : String, sharedPreferences: SharedPreferences, callback: (String) -> Unit){
+        if(sharedPreferences.edit().putString("profileImage", drawable).commit()){
+            callback("success")
+        }else{
+            callback("failed")
+        }
+
     }
 
     fun requestAd(key:String,callback: ((RewardedAd) -> Unit)){
