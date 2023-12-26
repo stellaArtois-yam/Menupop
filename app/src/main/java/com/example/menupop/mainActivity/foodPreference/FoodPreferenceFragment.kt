@@ -87,6 +87,9 @@ class FoodPreferenceFragment : Fragment() {
         bottomSheetDialog.setContentView(bindingDialog.root)
         bindingDialog.dialogTicketBottomFoodTicket.text = "음식 티켓 $foodTicket 개"
         bindingDialog.dialogTicketBottomTranslationTicket.text = "번역 티켓 $translationTicket 개"
+        bindingDialog.dialogTicketBottomDown.setOnClickListener {
+            bottomSheetDialog.dismiss()
+        }
         bindingDialog.dialogTicketBottomButton.setOnClickListener {
             Log.d(TAG, "favoriteItemClick: 결제 화면 띄우기")
             event?.moveToTicketPurchase()
@@ -116,6 +119,9 @@ class FoodPreferenceFragment : Fragment() {
         bindingDialog.dialogTicketBottomTranslationTicket.visibility = View.GONE
         bindingDialog.dialogTicketBottomButton.text = "등록하기"
         bindingDialog.dialogTicketBottomText.text = setTextBold("[${foodName}]를 [${classfication}] 음식으로\n등록하시겠습니까?",foodName,classfication)
+        bindingDialog.dialogTicketBottomDown.setOnClickListener {
+            existBottomSheetDialog.dismiss()
+        }
         bindingDialog.dialogTicketBottomButton.setOnClickListener {
             Log.d(TAG, "existTicketShowDialog: 클릭 됨")
             var sharedPreferences = context.getSharedPreferences("userInfo",
@@ -136,6 +142,9 @@ class FoodPreferenceFragment : Fragment() {
         bindingDialog.dialogTicketBottomTranslationTicket.text = "번역 티켓 ${translationTicket} 개"
         bindingDialog.dialogTicketBottomButton.text = "등록하기"
         bindingDialog.dialogTicketBottomText.text = setTextBold("[${foodName}]를 [${classfication}] 음식으로\n등록하시겠습니까?",foodName,classfication)
+        bindingDialog.dialogTicketBottomDown.setOnClickListener {
+            existBottomSheetDialog.dismiss()
+        }
         bindingDialog.dialogTicketBottomButton.setOnClickListener {
             Log.d(TAG, "existTicketShowDialog: 클릭 됨")
             var sharedPreferences = context.getSharedPreferences("userInfo",
