@@ -188,6 +188,11 @@ class MainActivityViewModel(private val application: Application) :  AndroidView
         callbackSearchData = {result ->
             Log.d(TAG, "searchFood: test")
             if(result.result == "success"){
+                val foodPreferenceLists = ArrayList<String>()
+                _foodPreferenceList.value?.foodList?.forEach { it ->
+                    foodPreferenceLists.add(it.foodName)
+                }
+                result.foodList.removeAll(foodPreferenceLists)
                 _searchFood.value = result.foodList
             } else if(result.result == "notFound"){
                 Log.d(TAG, "searchFood: 찾을 수 없음")

@@ -167,6 +167,10 @@ class MainActivity : AppCompatActivity(), MainActivityEvent{
         val translationTicket = mainActivityViewModel.userInformation.value?.translationTicket.toString()
         bottomSheetDialog.setContentView(bindingDialog.root)
 
+        bindingDialog.dialogTicketBottomDown.setOnClickListener {
+            bottomSheetDialog.dismiss()
+        }
+
 
         bindingDialog.dialogTicketBottomFoodTicket.text = "음식 티켓 $foodTicket 개"
         bindingDialog.dialogTicketBottomTranslationTicket.text = "번역 티켓 $translationTicket 개"

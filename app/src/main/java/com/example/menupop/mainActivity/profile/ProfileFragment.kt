@@ -1,5 +1,6 @@
 package com.example.menupop.mainActivity.profile
 
+import android.annotation.SuppressLint
 import android.app.Dialog
 import android.content.Context
 import android.content.Context.MODE_PRIVATE
@@ -22,7 +23,7 @@ import com.example.menupop.R
 import com.example.menupop.databinding.FragmentProfileBinding
 import com.example.menupop.mainActivity.MainActivityEvent
 import com.example.menupop.mainActivity.MainActivityViewModel
-
+@SuppressLint("ResourceAsColor")
 class ProfileFragment : Fragment() {
     val TAG = "ProfileFragment"
     lateinit var binding: FragmentProfileBinding
@@ -82,6 +83,15 @@ class ProfileFragment : Fragment() {
 //                Log.d(TAG, "init: null")
 //            }
 //        })
+
+        profileViewModel.userInformation.observe(viewLifecycleOwner){
+            if(it.freeFoodTicket == 0){
+                binding.profileFoodCount.text = "무료티켓 소진"
+                binding.profileFoodCount.setTextColor(R.color.red)
+            }
+
+        }
+
 
         profileViewModel.profileImage.observe(viewLifecycleOwner, Observer {
             if(it != null){
