@@ -37,6 +37,21 @@ class CameraActivity : ScanActivity() {
     lateinit var image : InputImage
     lateinit var sharedPreferences: SharedPreferences
 
+    private val callback = object : OnBackPressedCallback(true) {
+        override fun handleOnBackPressed() {
+            backPressed()
+            Log.d(TAG, "뒤로가기 클릭")
+        }
+    }
+
+    fun backPressed(){
+        val intent = Intent(this,MainActivity::class.java)
+        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
+        intent.putExtra("checkedTranslation", true)
+        startActivity(intent)
+        finish()
+    }
+
     val TAG = "CameraActivityTAG"
     fun init(){
         val configuration = DocumentScanner.Configuration()
@@ -61,7 +76,6 @@ class CameraActivity : ScanActivity() {
 
         }
 
-
         cameraViewModel.failed.observe(this){
             if(it){
                 val intent = Intent(this,MainActivity::class.java)
@@ -69,6 +83,8 @@ class CameraActivity : ScanActivity() {
                 finish()
             }
         }
+
+        this.onBackPressedDispatcher.addCallback(this, callback)
     }
 
     override fun onClose() {
@@ -96,15 +112,6 @@ class CameraActivity : ScanActivity() {
 
     }
 
-    override fun onBackPressed() {
-        super.onBackPressed()
-        val intent = Intent(this,MainActivity::class.java)
-        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
-        intent.putExtra("checkedTranslation", true)
-        startActivity(intent)
-        finish()
-        Log.d(TAG, "onBackPressed: ??")
-    }
 
     val File.size get() = if (!exists()) 0.0 else length().toDouble()
     val File.sizeInKb get() = size / 1024
