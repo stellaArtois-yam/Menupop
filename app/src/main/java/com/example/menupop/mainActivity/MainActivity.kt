@@ -40,7 +40,7 @@ import kotlin.math.log
 
 
 class MainActivity : AppCompatActivity(), MainActivityEvent{
-    val TAG = "MainActivity"
+    val TAG = "MainActivityTAG"
 
     lateinit var mainActivityViewModel: MainActivityViewModel
     lateinit var binding : ActivityMainBinding
@@ -50,6 +50,7 @@ class MainActivity : AppCompatActivity(), MainActivityEvent{
     lateinit var profileFragment: ProfileFragment
 
     lateinit var ticketPurchaseFragment: TicketPurchaseFragment
+    var checkingTranslation : Boolean = false
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -93,6 +94,10 @@ class MainActivity : AppCompatActivity(), MainActivityEvent{
             }
         })
 
+        checkingTranslation = intent.getBooleanExtra("checkedTranslation", false)
+        Log.d(TAG, "init checkingTranslation: $checkingTranslation")
+
+
 
 
 
@@ -102,7 +107,7 @@ class MainActivity : AppCompatActivity(), MainActivityEvent{
             if (result){ // 티켓이 있을때
                 val intent = Intent(this,CameraActivity::class.java)
                 startActivity(intent)
-                mainActivityViewModel.translationTicketMinus()
+
             }else { // 티켓이 없을때
                 emptyTicketShowDialog()
             }
@@ -119,6 +124,14 @@ class MainActivity : AppCompatActivity(), MainActivityEvent{
 
         mainActivityViewModel.isLoading.observe(this, Observer {
             if(it){
+
+                if(checkingTranslation){
+                    mainActivityViewModel.translationTicketMinus()
+                    Log.d(TAG, "init Translation Ticket: ${mainActivityViewModel.userInformation.value!!.translationTicket}")
+
+                }else{
+                    Log.d(TAG, "init Translation Ticket: ")
+                }
 
                 binding.appbarMenu.visibility = View.VISIBLE
                 binding.homeFrameLayout.visibility = View.VISIBLE

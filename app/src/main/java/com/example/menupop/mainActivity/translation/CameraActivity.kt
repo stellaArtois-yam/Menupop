@@ -2,6 +2,8 @@ package com.example.menupop.mainActivity.translation
 
 import android.app.Activity
 import android.app.Dialog
+import android.content.Intent
+import android.content.SharedPreferences
 import android.graphics.Bitmap
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
@@ -11,12 +13,14 @@ import android.os.Bundle
 import android.util.Log
 import android.view.Window
 import android.widget.ImageView
+import androidx.activity.OnBackPressedCallback
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.Observer
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.example.menupop.R
 import com.example.menupop.databinding.ActivityCameraBinding
+import com.example.menupop.mainActivity.MainActivity
 import com.google.mlkit.vision.common.InputImage
 import com.zynksoftware.documentscanner.ScanActivity
 import com.zynksoftware.documentscanner.model.DocumentScannerErrorModel
@@ -27,10 +31,13 @@ import java.io.IOException
 import kotlin.math.log
 
 class CameraActivity : ScanActivity() {
+
     lateinit var binding : ActivityCameraBinding
     lateinit var cameraViewModel: CameraViewModel
     lateinit var image : InputImage
-    val TAG = "CameraActivity"
+    lateinit var sharedPreferences: SharedPreferences
+
+    val TAG = "CameraActivityTAG"
     fun init(){
         val configuration = DocumentScanner.Configuration()
         configuration.imageQuality = 100
@@ -44,6 +51,7 @@ class CameraActivity : ScanActivity() {
             val uri = Uri.fromFile(result.croppedImageFile)
             Log.d(TAG, "uri: $uri")
             try {
+                sharedPreferences = getSharedPreferences("util", MODE_PRIVATE)
                 image = InputImage.fromFilePath(applicationContext, uri)
                 cameraViewModel.getRecognizedText(image)
                 showDialog()
@@ -51,28 +59,29 @@ class CameraActivity : ScanActivity() {
                 e.printStackTrace()
             }
 
-
-//            result.croppedImageFile?.let {  binding.cropImage.setImageFile(it) }
         }
 
-        cameraViewModel.isDecode.observe(this, Observer {
+
+        cameraViewModel.failed.observe(this){
             if(it){
-                cameraViewModel.drawTranslatedText()
+                val intent = Intent(this,MainActivity::class.java)
+                startActivity(intent)
+                finish()
             }
-        })
-
-
+        }
     }
+
     override fun onClose() {
         finish()
     }
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = DataBindingUtil.setContentView(this, R.layout.activity_camera)
         addFragmentContentLayout()
         cameraViewModel = CameraViewModel()
-
+        
         init()
     }
 
@@ -85,6 +94,16 @@ class CameraActivity : ScanActivity() {
         Log.d(TAG, "onSuccess: ${scannerResults}")
 
 
+    }
+
+    override fun onBackPressed() {
+        super.onBackPressed()
+        val intent = Intent(this,MainActivity::class.java)
+        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
+        intent.putExtra("checkedTranslation", true)
+        startActivity(intent)
+        finish()
+        Log.d(TAG, "onBackPressed: ??")
     }
 
     val File.size get() = if (!exists()) 0.0 else length().toDouble()

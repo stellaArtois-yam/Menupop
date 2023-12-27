@@ -15,7 +15,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="30dp"
-        android:text="잠시만 기다려주세요 :)\n\n1분정도 소요됩니다"
+        android:text="잠시만 기다려주세요 :)\n\n최대 1분정도 소요됩니다"
         android:textColor="@color/white"
         android:textSize="20sp"
         android:textStyle="bold"

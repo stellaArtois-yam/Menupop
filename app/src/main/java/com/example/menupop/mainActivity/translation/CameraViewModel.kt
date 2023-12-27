@@ -19,30 +19,35 @@ import com.google.gson.JsonPrimitive
 import com.google.mlkit.vision.common.InputImage
 import com.google.mlkit.vision.text.Text
 import com.zynksoftware.documentscanner.model.ScannerResults
+import org.json.JSONArray
 import org.json.JSONObject
 import java.net.URLDecoder
+import java.util.Collections.list
 
 
 class CameraViewModel : ViewModel() {
 
     val TAG = "CameraViewModel"
     private val _scannerResult = MutableLiveData<ScannerResults>()
-    val scannerResult : LiveData<ScannerResults>
+    val scannerResult: LiveData<ScannerResults>
         get() = _scannerResult
     val cameraModel = CameraModel()
 
-    private var callbackString : ((String) -> Unit) ?= null
+    private var callbackString: ((String) -> Unit)? = null
     private var callbackText: ((Text) -> Unit)? = null
 
-    fun successScanning(scannerResults: ScannerResults){
+    fun successScanning(scannerResults: ScannerResults) {
         _scannerResult.value = scannerResults
-
 
     }
 
-    private val _textPosition = MutableLiveData<String>()
+    private val _failed = MutableLiveData<Boolean>()
+    val failed : LiveData<Boolean>
+        get() = _failed
+
+    private val _textPosition = MutableLiveData<ArrayList<Rect>>()
     private val _image = MutableLiveData<Drawable>()
-    val image : LiveData<Drawable>
+    val image: LiveData<Drawable>
         get() = _image
 
     fun getRecognizedText(image: InputImage) {
@@ -53,13 +58,14 @@ class CameraViewModel : ViewModel() {
 
                 Log.d(TAG, "getRecognizedText: ${visionText.text}")
 
-                _textPosition.value = getPosition(visionText,"position")
-
-                val resultText = getPosition(visionText,"request")
+                val resultText = getText(visionText)
                 Log.d(TAG, "resultText: $resultText")
+                Log.d(TAG, "textPosition: ${_textPosition.value}")
 
                 checkLanguage(resultText)
 
+            }else{
+                _failed.value = true
             }
         }
 
@@ -72,99 +78,61 @@ class CameraViewModel : ViewModel() {
                 requestTranslation(text, langCode)
             } else {
                 Log.d(TAG, "checkLanguage else: $langCode")
+                _failed.value = true
             }
         }
 
         cameraModel.checkLanguage(text, callbackString!!)
     }
 
-    private val _isDecode = MutableLiveData<Boolean>()
-    val isDecode : LiveData<Boolean>
-        get() = _isDecode
 
-    private val _translatedText = MutableLiveData<String>()
 
-    fun requestTranslation(text : String, langCode : String){
+    fun requestTranslation(text: String, langCode: String) {
         callbackString = {
-            if(it != null){
-//                val decode = decodeKorean(it)
-//                Log.d(TAG, "requestTranslation: $decode")
-//                if(decode != null){
-//                    _translatedText.value = decode
-//                    _isDecode.value = true
-//                }
+            if (it != null) {
+                val jsonArray = JSONArray(it)
+                var decode = jsonArray.getString(0).replace("[", "")
+                decode = decode.replace("]", "")
+                val decodeList = decode.split(", ")
+
+
+                Log.d(TAG, "requestTranslation: $decodeList")
+                if (decode != null) {
+
+                    drawTranslatedText(decodeList)
+                }
+            }else{
+                _failed.value = true
             }
         }
         cameraModel.requestTranslation(text, langCode, callbackString!!)
     }
 
-    fun getPosition(text: Text, type: String): String {
-
+    fun getText(text: Text): String {
+        var positionList = ArrayList<Rect>()
         var list = ArrayList<String>()
+
         for (block in text.textBlocks) {
 
-            for (line in  block.lines) {
+            for (line in block.lines) {
                 val lineText = line.text.lowercase()
                 val lineFrame = line.boundingBox
-                Log.d(TAG, "lineText: ${lineText}\nlineFrame : $lineFrame")
-
-                Log.d(TAG, "getPosition type: $type")
-                    if(type == "request"){
-////                    json.add(lineText, JsonPrimitive(lineText))
-
-                        list.add(lineText)
-                    }else{
-////                    json.add(lineText, JsonPrimitive(lineFrame.toString()))
-                        list.add(lineFrame.toString())
-//
-                }
-
-
-//                for (element in line.elements) {
-//                    val elementText = element.text.lowercase()
-//                    val elementFrame = element.boundingBox
-//
-//                    Log.d(TAG, "elementText: $elementText")
-//                    Log.d(TAG, "element 좌표: $elementFrame")
-//
-//
-//                if(type == "request"){
-//                    json.add(elementText, JsonPrimitive(elementText))
-//                }else{
-//                    json.add(elementText, JsonPrimitive(elementFrame.toString()))
-//                }
-//             }
-
-
+                list.add(lineText)
+                positionList.add(lineFrame!!)
             }
 
+            _textPosition.value = positionList
+
         }
+
+        Log.d(TAG, "getText text size: ${list.size}")
+        Log.d(TAG, "getText position size: ${positionList.size}")
         return list.toString()
     }
 
-    fun decodeKorean(jsonString: String): String {
-        try {
-            val jsonObject = JSONObject(jsonString)
-            val decodedJson = JSONObject()
 
-            // 받아온 JSON 데이터의 키와 값을 반복하여 디코딩
-            val keys = jsonObject.keys()
-            while (keys.hasNext()) {
-                val key = keys.next()
-                val value = jsonObject.getString(key)
-                val decodedValue = URLDecoder.decode(value, "UTF-8") // 값도 디코딩
-                decodedJson.put(key, decodedValue)
-            }
 
-            return decodedJson.toString() // 디코딩된 JSON 형식의 문자열 반환
-
-        } catch (e: Exception) {
-            e.printStackTrace()
-        }
-        return "" // 예외 발생 시 빈 문자열 반환 혹은 에러 처리
-    }
-
-    fun drawTranslatedText(){
+    fun drawTranslatedText(textList: List<String>) {
 
         val filePath = scannerResult.value!!.croppedImageFile!!.path
         Log.d(TAG, "filePath: $filePath")
@@ -174,54 +142,37 @@ class CameraViewModel : ViewModel() {
         val mutableBitmap = bitmap.copy(Bitmap.Config.ARGB_8888, true)
         val canvas = Canvas(mutableBitmap)
 
-        val translatedText = JSONObject(_translatedText.value)
-        val textPosition = JSONObject(_textPosition.value)
+        val paintText = Paint().apply {
+            color = Color.BLACK // 텍스트 색상
+            textSize = 50f
+            typeface = Typeface.DEFAULT_BOLD
+        }
 
 
-        val keys = translatedText.keys()
-        while (keys.hasNext()) {
+        val paintRect = Paint().apply {
+            color = Color.WHITE
+            style = Paint.Style.FILL
+        }
 
-            val key = keys.next()
-            val text = translatedText.getString(key)
-            Log.d(TAG, "drawTranslatedText: $text")
-            val position = textPosition.getString(key)
-            val rect = stringToRect(position)
+        Log.d(TAG, "textList size: ${textList.size}")
+        Log.d(TAG, "textPosition size: ${_textPosition.value!!.size}")
 
 
-            val paintText = Paint().apply {
-                color = Color.BLACK // 텍스트 색상
-                textSize = 50f
-                typeface = Typeface.DEFAULT_BOLD
-            }
-
-            val paintRect = Paint().apply {
-                color = Color.WHITE
-                style = Paint.Style.FILL
-            }
-
-            val left = rect!!.left.toFloat()
-            val top = rect!!.top.toFloat()
-            val right = rect!!.right.toFloat()
-            val bottom = rect!!.bottom.toFloat()
+        for(i:Int in textList.indices){
+            val left = _textPosition.value!![i].left.toFloat()
+            val top = _textPosition.value!![i].top.toFloat()
+            val right = _textPosition.value!![i].right.toFloat()
+            val bottom = _textPosition.value!![i].bottom.toFloat()
 
             canvas.drawRect(left, top, right, bottom, paintRect)
-            canvas.drawText(text, left, bottom, paintText)
+            canvas.drawText(textList[i], left, bottom, paintText)
         }
 
         _image.value = BitmapDrawable(mutableBitmap)
 
     }
 
-    fun stringToRect(input: String): Rect? {
-        val rectPattern = Regex("Rect\\((-?\\d+), (-?\\d+) - (-?\\d+), (-?\\d+)\\)")
-        val matchResult = rectPattern.find(input)
-
-        return matchResult?.destructured?.let { (left, top, right, bottom) ->
-            Rect(left.toInt(), top.toInt(), right.toInt(), bottom.toInt())
-        }
-    }
-
-
 
 
 }
+

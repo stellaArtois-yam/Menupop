@@ -25,18 +25,18 @@ class CameraModel {
     val gson: Gson = GsonBuilder()
         .setLenient()
         .create()
-
-    private val okHttpClient = OkHttpClient.Builder()
-        .connectTimeout(1, TimeUnit.MINUTES)
-        .readTimeout(1, TimeUnit.MINUTES)
-        .writeTimeout(1, TimeUnit.MINUTES)
-        .build()
+//
+//    private val okHttpClient = OkHttpClient.Builder()
+//        .connectTimeout(30, TimeUnit.SECONDS)
+//        .readTimeout(30, TimeUnit.SECONDS)
+//        .writeTimeout(30, TimeUnit.SECONDS)
+//        .build()
 
     private val retrofit = Retrofit.Builder()
         .baseUrl("http://3.135.51.201:9876")
         .addConverterFactory(ScalarsConverterFactory.create())
         .addConverterFactory(GsonConverterFactory.create(gson))
-        .client(okHttpClient)
+//        .client(okHttpClient)
         .build()
 
     private val service = retrofit.create(RetrofitService::class.java)
