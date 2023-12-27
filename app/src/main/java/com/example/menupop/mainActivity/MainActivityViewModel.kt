@@ -153,6 +153,12 @@ class MainActivityViewModel(private val application: Application) :  AndroidView
         mainActivityModel.minusTranslationTicket(_identifier.value!!,callbackResult!!)
         Log.d(TAG, "ticketMinus 반역: ${_userInformation.value!!.foodTicket}")
     }
+    fun freeTranslationTicketMinus(sharedPreferences: SharedPreferences){
+        if(mainActivityModel.freeTranslationTicketMinus(sharedPreferences)){
+            _dailyTranslation.value?.minus(1)
+            Log.d(TAG, "freeTranslationTicketMinus: ${_dailyTranslation.value}")
+        }
+    }
 
     fun foodPreferenceRegister(foodName:String,classification:String){
         Log.d(TAG, "foodPreferenceRegister: 호출됨")
@@ -165,8 +171,11 @@ class MainActivityViewModel(private val application: Application) :  AndroidView
     }
 
     fun checkingTranslationTicket(){
-        _checkingTranslationTicket.value = userInformation.value?.translationTicket!! > 0
+        _checkingTranslationTicket.value = userInformation.value?.translationTicket!! > 0  || _dailyTranslation.value!! > 0
 
+    }
+    fun checkTranslationTicket(sharedPreferences: SharedPreferences) : Int{
+        return mainActivityModel.checkTranslationTicket(sharedPreferences)
     }
 
     fun deleteFoodPreference(foodName: String){
@@ -219,7 +228,7 @@ class MainActivityViewModel(private val application: Application) :  AndroidView
         _haveRewarded.value = userInfo["rewarded"]
         _todayRewarded.value = userInfo["todayRewarded"]
 
-        Log.d(TAG, "first get \n identifier: ${identifier.value}\n dailyReward: ${_dailyReward.value}\n rewarded: ${_haveRewarded.value}")
+        Log.d(TAG, "first get \n identifier: ${identifier.value}\n dailyReward: ${_dailyReward.value}\n rewarded: ${_haveRewarded.value}\ndailyTranslation: ${_dailyTranslation.value}")
 
     }
 

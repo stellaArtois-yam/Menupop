@@ -126,8 +126,13 @@ class MainActivity : AppCompatActivity(), MainActivityEvent{
             if(it){
 
                 if(checkingTranslation){
-                    mainActivityViewModel.translationTicketMinus()
-                    Log.d(TAG, "init Translation Ticket: ${mainActivityViewModel.userInformation.value!!.translationTicket}")
+                    if(mainActivityViewModel.checkTranslationTicket(sharedPreferences) > 0){
+                        mainActivityViewModel.freeTranslationTicketMinus(sharedPreferences)
+                    }else {
+
+                        mainActivityViewModel.translationTicketMinus()
+                    }
+                    Log.d(TAG, "init Translation Ticket: ${mainActivityViewModel.userInformation.value!!.translationTicket} ")
 
                 }else{
                     Log.d(TAG, "init Translation Ticket: ")

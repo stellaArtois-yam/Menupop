@@ -50,6 +50,11 @@ class CameraViewModel : ViewModel() {
     val image: LiveData<Drawable>
         get() = _image
 
+    fun checkTranslationTicket(sharedPreferences: SharedPreferences){
+
+    }
+
+
     fun getRecognizedText(image: InputImage) {
 
         callbackText = { visionText ->
