@@ -75,6 +75,10 @@ class CameraModel {
 
     }
 
+    fun checkTranslationTicket(){
+
+    }
+
     fun checkLanguage(text: String, callback: (String) -> Unit) {
 
         val languageIdentifier = LanguageIdentification.getClient()

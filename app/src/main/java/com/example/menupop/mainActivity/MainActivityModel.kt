@@ -154,6 +154,18 @@ class MainActivityModel(val application :Application) {
         })
 
     }
+    fun checkTranslationTicket(sharedPreferences: SharedPreferences) : Int{
+        return sharedPreferences.getInt("dailyTranslation",0)
+    }
+    fun freeTranslationTicketMinus(sharedPreferences: SharedPreferences): Boolean{
+
+        val edit = sharedPreferences.edit()
+
+        val freeTranslationTicket = sharedPreferences.getInt("dailyTranslation",0)
+        var result = if(freeTranslationTicket != 0) freeTranslationTicket -1 else freeTranslationTicket
+        edit.putInt("dailyTranslation",result)
+        return edit.commit()
+    }
 
     fun savePaymentHistory(ticketSaveModel: TicketSaveDTO, callback: (SimpleResultDTO) -> Unit){
 
