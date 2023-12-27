@@ -193,10 +193,10 @@ class MainActivityViewModel(private val application: Application) :  AndroidView
                     foodPreferenceLists.add(it.foodName)
                 }
                 result.foodList.removeAll(foodPreferenceLists)
-                _searchFood.value = result.foodList
             } else if(result.result == "notFound"){
                 Log.d(TAG, "searchFood: 찾을 수 없음")
             }
+            _searchFood.value = result.foodList
             Log.d(TAG, "searchFood: $result")
         }
         mainActivityModel.searchFood(query,callbackSearchData!!)
