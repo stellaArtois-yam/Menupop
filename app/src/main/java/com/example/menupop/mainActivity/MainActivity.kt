@@ -246,7 +246,7 @@ class MainActivity : AppCompatActivity(), MainActivityEvent{
             binding.appbarMenu.findViewById<ImageView>(R.id.appbar_back).visibility = View.VISIBLE
 
             binding.appbarMenu.findViewById<ImageView>(R.id.appbar_back).setOnClickListener{
-               moveToProfile()
+                moveToProfile()
             }
 
         }
