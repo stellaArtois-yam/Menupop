@@ -25,6 +25,7 @@ import com.example.menupop.databinding.ActivityMainBinding
 import com.example.menupop.databinding.DialogTicketBottomBinding
 import com.example.menupop.login.LoginActivity
 import com.example.menupop.mainActivity.exchange.ExchangeFragment
+import com.example.menupop.mainActivity.foodPreference.FoodPreferenceDataClass
 import com.example.menupop.mainActivity.foodPreference.FoodPreferenceFragment
 import com.example.menupop.mainActivity.profile.KakaoPayWebView
 import com.example.menupop.mainActivity.profile.ProfileFragment
@@ -106,6 +107,7 @@ class MainActivity : AppCompatActivity(), MainActivityEvent{
             Log.d(TAG, "푸드 티켓 확인 값: ${result}")
             if (result){ // 티켓이 있을때
                 val intent = Intent(this,CameraActivity::class.java)
+                intent.putExtra("foodPreference",mainActivityViewModel.foodPreferenceList.value?.foodList)
                 startActivity(intent)
 
             }else { // 티켓이 없을때

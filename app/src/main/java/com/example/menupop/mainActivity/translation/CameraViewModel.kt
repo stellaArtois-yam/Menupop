@@ -14,6 +14,8 @@ import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import com.example.menupop.mainActivity.foodPreference.FoodPreference
+import com.example.menupop.mainActivity.foodPreference.FoodPreferenceDataClass
 import com.google.gson.JsonObject
 import com.google.gson.JsonPrimitive
 import com.google.mlkit.vision.common.InputImage
@@ -47,12 +49,25 @@ class CameraViewModel : ViewModel() {
 
     private val _textPosition = MutableLiveData<ArrayList<Rect>>()
     private val _image = MutableLiveData<Drawable>()
+
+    lateinit var likesFoodList : ArrayList<String>
+    lateinit var unLikesFoodList : ArrayList<String>
     val image: LiveData<Drawable>
         get() = _image
 
     fun checkTranslationTicket(sharedPreferences: SharedPreferences){
 
     }
+
+    fun setFoodPreference(foodPreference: ArrayList<FoodPreference>){
+        if(foodPreference != null){
+            val (likesFoodList, unLikesFoodList) = splitFoodPreferenceList(foodPreference)
+            this.likesFoodList = likesFoodList
+            this.unLikesFoodList = unLikesFoodList
+            Log.d(TAG, "setFoodPreference: ${likesFoodList} , ${unLikesFoodList}")
+        }
+    }
+
 
 
     fun getRecognizedText(image: InputImage) {
@@ -88,6 +103,21 @@ class CameraViewModel : ViewModel() {
         }
 
         cameraModel.checkLanguage(text, callbackString!!)
+    }
+
+    fun splitFoodPreferenceList(foodPreferenceList: List<FoodPreference>): Pair<ArrayList<String>, ArrayList<String>> {
+        val likes = ArrayList<String>()
+        val dislikes = ArrayList<String>()
+
+        for (foodPreference in foodPreferenceList) {
+            if (foodPreference.classification == "호") {
+                likes.add(foodPreference.foodName)
+            } else if (foodPreference.classification == "불호") {
+                dislikes.add(foodPreference.foodName)
+            }
+        }
+
+        return Pair(likes, dislikes)
     }
 
 
@@ -139,6 +169,8 @@ class CameraViewModel : ViewModel() {
 
     fun drawTranslatedText(textList: List<String>) {
 
+        Log.d(TAG, "drawTranslatedText: ${textList}")
+
         val filePath = scannerResult.value!!.croppedImageFile!!.path
         Log.d(TAG, "filePath: $filePath")
         val bitmap = BitmapFactory.decodeFile(filePath)
@@ -147,14 +179,14 @@ class CameraViewModel : ViewModel() {
         val mutableBitmap = bitmap.copy(Bitmap.Config.ARGB_8888, true)
         val canvas = Canvas(mutableBitmap)
 
-        val paintText = Paint().apply {
+        var paintText = Paint().apply {
             color = Color.BLACK // 텍스트 색상
             textSize = 50f
             typeface = Typeface.DEFAULT_BOLD
         }
 
 
-        val paintRect = Paint().apply {
+        var paintRect = Paint().apply {
             color = Color.WHITE
             style = Paint.Style.FILL
         }
@@ -168,6 +200,19 @@ class CameraViewModel : ViewModel() {
             val top = _textPosition.value!![i].top.toFloat()
             val right = _textPosition.value!![i].right.toFloat()
             val bottom = _textPosition.value!![i].bottom.toFloat()
+            if(textList[i] in likesFoodList){
+                paintText = Paint().apply {
+                    color = Color.GREEN // 텍스트 색상
+                    textSize = 50f
+                    typeface = Typeface.DEFAULT_BOLD
+                }
+            }else if(textList[i] in unLikesFoodList){
+                paintText = Paint().apply {
+                    color = Color.RED // 텍스트 색상
+                    textSize = 50f
+                    typeface = Typeface.DEFAULT_BOLD
+                }
+            }
 
             canvas.drawRect(left, top, right, bottom, paintRect)
             canvas.drawText(textList[i], left, bottom, paintText)

@@ -21,6 +21,8 @@ import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.example.menupop.R
 import com.example.menupop.databinding.ActivityCameraBinding
 import com.example.menupop.mainActivity.MainActivity
+import com.example.menupop.mainActivity.foodPreference.FoodPreference
+import com.example.menupop.mainActivity.foodPreference.FoodPreferenceDataClass
 import com.google.mlkit.vision.common.InputImage
 import com.zynksoftware.documentscanner.ScanActivity
 import com.zynksoftware.documentscanner.model.DocumentScannerErrorModel
@@ -36,6 +38,7 @@ class CameraActivity : ScanActivity() {
     lateinit var cameraViewModel: CameraViewModel
     lateinit var image : InputImage
     lateinit var sharedPreferences: SharedPreferences
+    lateinit var foodPreferenceData : ArrayList<FoodPreference>
 
     private val callback = object : OnBackPressedCallback(true) {
         override fun handleOnBackPressed() {
@@ -54,6 +57,11 @@ class CameraActivity : ScanActivity() {
 
     val TAG = "CameraActivityTAG"
     fun init(){
+        val intent = intent
+        foodPreferenceData = intent.getSerializableExtra("foodPreference") as ArrayList<FoodPreference>
+
+        cameraViewModel.setFoodPreference(foodPreferenceData)
+
         val configuration = DocumentScanner.Configuration()
         configuration.imageQuality = 100
         configuration.imageSize = 1000000 // 1 MB
