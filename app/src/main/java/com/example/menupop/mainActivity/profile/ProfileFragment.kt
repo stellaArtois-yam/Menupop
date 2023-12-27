@@ -5,6 +5,7 @@ import android.app.Dialog
 import android.content.Context
 import android.content.Context.MODE_PRIVATE
 import android.content.SharedPreferences
+import android.graphics.Color
 import android.os.Bundle
 import android.util.Log
 import androidx.fragment.app.Fragment
@@ -87,7 +88,7 @@ class ProfileFragment : Fragment() {
         profileViewModel.userInformation.observe(viewLifecycleOwner){
             if(it.freeFoodTicket == 0){
                 binding.profileFoodCount.text = "무료티켓 소진"
-                binding.profileFoodCount.setTextColor(R.color.red)
+                binding.profileFoodCount.setTextColor(Color.RED)
             }
 
         }

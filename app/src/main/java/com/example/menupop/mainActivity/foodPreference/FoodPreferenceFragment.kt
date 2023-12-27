@@ -22,6 +22,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.menupop.R
 import com.example.menupop.databinding.DialogDeletePreferenceBinding
 import com.example.menupop.databinding.DialogTicketBottomBinding
+import com.example.menupop.databinding.DialogWarningBinding
 import com.example.menupop.databinding.FragmentFoodPreferenceBinding
 import com.example.menupop.mainActivity.MainActivityEvent
 import com.example.menupop.mainActivity.MainActivityViewModel
@@ -80,7 +81,7 @@ class FoodPreferenceFragment : Fragment() {
         return false
     }
     fun emptyTicketShowDialog(){
-        val bindingDialog : DialogTicketBottomBinding = DataBindingUtil.inflate(LayoutInflater.from(context), R.layout.dialog_ticket_bottom, null, false);
+        val bindingDialog : DialogTicketBottomBinding = DataBindingUtil.inflate(LayoutInflater.from(context), R.layout.dialog_ticket_bottom, null, false)
         val bottomSheetDialog = BottomSheetDialog(context)
         val foodTicket = mainViewModel.userInformation.value?.foodTicket.toString()
         val translationTicket = mainViewModel.userInformation.value?.translationTicket.toString()
@@ -235,6 +236,7 @@ class FoodPreferenceFragment : Fragment() {
         mainViewModel.getFoodPreference()
 
         mainViewModel.foodPreferenceList.observe(viewLifecycleOwner){ it->
+            Log.d(TAG, "init: ${it.result}")
             if (it.result.trim() == "success") {
                 foodPreferenceAdapter.setFoodList(it.foodList)
                 binding.foodPreferenceEmptyListWarring.visibility = View.GONE
@@ -246,8 +248,15 @@ class FoodPreferenceFragment : Fragment() {
 
         mainViewModel.searchFood.observe(viewLifecycleOwner){ it ->
 
-            Log.d(TAG, "init: ${it}")
-            searchAdapter.setFoodList(it)
+            Log.d(TAG, "init ㅁㅇㄴㄹ: ${it}")
+            if( it != null ){
+                binding.foodPreferenceSearchRecyclerview.visibility = View.VISIBLE
+                binding.foodPreferenceRecyclerview.visibility = View.GONE
+                searchAdapter.setFoodList(it)
+            }else{
+                Log.d(TAG, "init: 실패")
+                showCustomDialog()
+            }
 
         }
 
@@ -279,14 +288,20 @@ class FoodPreferenceFragment : Fragment() {
         }
 
     }
-
+    private fun showCustomDialog() {
+        val dialog = Dialog(context)
+        val bindingDialog : DialogWarningBinding = DataBindingUtil.inflate(LayoutInflater.from(context), R.layout.dialog_warning, null, false);
+        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
+        dialog.setContentView(bindingDialog.root)
+        bindingDialog.dialogTitle.text = "검색 결과 없음"
+        bindingDialog.dialogContent.text = "검색 결과가 없습니다. \n추후 업데이트 예정 혹은 없는 음식입니다."
+        dialog.show()
+    }
     fun setListener(){
         binding.foodPreferenceSearchview.setOnQueryTextListener(object  : androidx.appcompat.widget.SearchView.OnQueryTextListener{
             override fun onQueryTextSubmit(query: String?): Boolean {
                 Log.d(TAG, "onQueryTextSubmit: ${query}")
                 if(query!=null){
-                    binding.foodPreferenceSearchRecyclerview.visibility = View.VISIBLE
-                    binding.foodPreferenceRecyclerview.visibility = View.GONE
                     mainViewModel.searchFood(query)
                     val imm = context.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
                     imm.hideSoftInputFromWindow(requireActivity().currentFocus?.windowToken, 0)
