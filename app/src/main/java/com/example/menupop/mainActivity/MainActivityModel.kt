@@ -352,8 +352,8 @@ class MainActivityModel(val application :Application) {
     fun scheduleMidnightWork(application: Application, callback: (Boolean) -> Unit) {
 
         val midnight = Calendar.getInstance().apply {
-            set(Calendar.HOUR_OF_DAY, 24) // 자정
-            set(Calendar.MINUTE, 0)
+            set(Calendar.HOUR_OF_DAY, 16) // 자정
+            set(Calendar.MINUTE, 50)
             set(Calendar.SECOND, 0)
         }
 

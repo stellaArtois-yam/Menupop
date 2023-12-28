@@ -49,11 +49,13 @@ class CameraModel {
                     callback(response.body()!!)
                 }else{
                     Log.d(TAG, "is not Successful: ${response.body()}")
+                    callback("failed")
                 }
             }
 
             override fun onFailure(call: Call<String>, t: Throwable) {
                 Log.d(TAG, "onFailure: ${t.message}")
+                callback("failed")
             }
         })
     }
@@ -97,6 +99,7 @@ class CameraModel {
             }
             .addOnFailureListener {
                 Log.d(TAG, "checkLanguage e: ${it.message}")
+                callback("failed")
             }
 
     }

@@ -1,6 +1,5 @@
 package com.example.menupop.mainActivity.translation
 
-import android.app.Activity
 import android.app.Dialog
 import android.content.Intent
 import android.content.SharedPreferences
@@ -8,7 +7,6 @@ import android.graphics.Bitmap
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.net.Uri
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
 import android.view.Window
@@ -22,7 +20,6 @@ import com.example.menupop.R
 import com.example.menupop.databinding.ActivityCameraBinding
 import com.example.menupop.mainActivity.MainActivity
 import com.example.menupop.mainActivity.foodPreference.FoodPreference
-import com.example.menupop.mainActivity.foodPreference.FoodPreferenceDataClass
 import com.google.mlkit.vision.common.InputImage
 import com.zynksoftware.documentscanner.ScanActivity
 import com.zynksoftware.documentscanner.model.DocumentScannerErrorModel
@@ -30,7 +27,6 @@ import com.zynksoftware.documentscanner.model.ScannerResults
 import com.zynksoftware.documentscanner.ui.DocumentScanner
 import java.io.File
 import java.io.IOException
-import kotlin.math.log
 
 class CameraActivity : ScanActivity() {
 

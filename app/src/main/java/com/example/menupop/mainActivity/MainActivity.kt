@@ -129,10 +129,11 @@ class MainActivity : AppCompatActivity(), MainActivityEvent{
 
                 if(checkingTranslation){
                     if(mainActivityViewModel.checkTranslationTicket(sharedPreferences) > 0){
+                        Log.d(TAG, "freeTicketMinus")
                         mainActivityViewModel.freeTranslationTicketMinus(sharedPreferences)
                     }else {
-
                         mainActivityViewModel.translationTicketMinus()
+                        Log.d(TAG, "ticket minus")
                     }
                     Log.d(TAG, "init Translation Ticket: ${mainActivityViewModel.userInformation.value!!.translationTicket} ")
 
@@ -149,7 +150,7 @@ class MainActivity : AppCompatActivity(), MainActivityEvent{
                 }
 
             }else{
-
+                loadingDialog()
             }
         })
 
@@ -174,6 +175,12 @@ class MainActivity : AppCompatActivity(), MainActivityEvent{
                 val sharedPreferences = getSharedPreferences("userInfo", MODE_PRIVATE)
                 mainActivityViewModel.rewardedSuccess(sharedPreferences)
             })
+        }
+
+        mainActivityViewModel.isLoading.observe(this){
+            if(it){
+                dialog.dismiss()
+            }
         }
 
 
