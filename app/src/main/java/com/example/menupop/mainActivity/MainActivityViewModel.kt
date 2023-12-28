@@ -147,7 +147,7 @@ class MainActivityViewModel(private val application: Application) :  AndroidView
         callbackResult = {result ->
             Log.d(TAG, "ticketMinus: $result")
             if(result.trim() == "success"){
-                _userInformation.value?.translationTicket= _userInformation.value?.translationTicket?.minus(1)!!
+                _userInformation.value?.translationTicket = _userInformation.value?.translationTicket?.minus(1)!!
             }
         }
         mainActivityModel.minusTranslationTicket(_identifier.value!!,callbackResult!!)
@@ -155,7 +155,8 @@ class MainActivityViewModel(private val application: Application) :  AndroidView
     }
     fun freeTranslationTicketMinus(sharedPreferences: SharedPreferences){
         if(mainActivityModel.freeTranslationTicketMinus(sharedPreferences)){
-            _dailyTranslation.value?.minus(1)
+            _dailyTranslation.value!!.minus(1)
+//            _dailyTranslation.value = _dailyTranslation.value!! - 1
             Log.d(TAG, "freeTranslationTicketMinus: ${_dailyTranslation.value}")
         }
     }
