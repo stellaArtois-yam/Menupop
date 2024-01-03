@@ -116,17 +116,15 @@ class MainActivity : AppCompatActivity(), MainActivityEvent{
 
         }
 
-//        mainActivityViewModel.setRewarded(getSharedPreferences("userInfo", MODE_PRIVATE))
 
         /**
          * 초기화
          */
-        mainActivityViewModel.scheduleMidnightWork(application)
+//        mainActivityViewModel.scheduleMidnightWork(application)
 
 
         mainActivityViewModel.isLoading.observe(this, Observer {
             if(it){
-
                 if(checkingTranslation){
                     if(mainActivityViewModel.checkTranslationTicket(sharedPreferences) > 0){
                         Log.d(TAG, "freeTicketMinus")
@@ -137,8 +135,6 @@ class MainActivity : AppCompatActivity(), MainActivityEvent{
                     }
                     Log.d(TAG, "init Translation Ticket: ${mainActivityViewModel.userInformation.value!!.translationTicket} ")
 
-                }else{
-                    Log.d(TAG, "init Translation Ticket: ")
                 }
 
                 binding.appbarMenu.visibility = View.VISIBLE
@@ -157,24 +153,26 @@ class MainActivity : AppCompatActivity(), MainActivityEvent{
     }
 
     fun loadingDialog(){
+
         val dialog = Dialog(this)
         dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
         dialog.setContentView(R.layout.progressbar)
         dialog.window!!.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
         dialog.findViewById<TextView>(R.id.progress_text).visibility = View.GONE
+
         dialog.show()
 
         mainActivityViewModel.rewardedAd.observe(this){
 
             it.show(this, OnUserEarnedRewardListener { rewardItem ->
                 // Handle the reward.
-                dialog.dismiss()
                 val rewardAmount = rewardItem.amount
                 val rewardType = rewardItem.type
                 Log.d(TAG, "User earned the reward. ${rewardAmount} ${rewardType}")
                 val sharedPreferences = getSharedPreferences("userInfo", MODE_PRIVATE)
                 mainActivityViewModel.rewardedSuccess(sharedPreferences)
             })
+
         }
 
         mainActivityViewModel.isLoading.observe(this){
@@ -306,14 +304,13 @@ class MainActivity : AppCompatActivity(), MainActivityEvent{
     }
 
     override fun moveToAdvertisement() {
-//        val dailyReward = getSharedPreferences("userInfo", MODE_PRIVATE).getInt("dailyReward",0)
-//        Log.d(TAG, "showDialog: ${dailyReward}")
         if(mainActivityViewModel.dailyReward.value!! == 0){
             Toast.makeText(this,"하루에 받을 수 있는 리워드를 초과했습니다.", Toast.LENGTH_SHORT).show()
         }else{
+            loadingDialog()
             val key = BuildConfig.GOOGLE_AD_ID
             mainActivityViewModel.loadAd(key)
-            loadingDialog()
+
         }
     }
 

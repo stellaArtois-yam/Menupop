@@ -11,6 +11,7 @@ import android.os.Bundle
 import android.util.Log
 import android.view.Window
 import android.widget.ImageView
+import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.Observer
@@ -35,6 +36,7 @@ class CameraActivity : ScanActivity() {
     lateinit var image : InputImage
     lateinit var sharedPreferences: SharedPreferences
     lateinit var foodPreferenceData : ArrayList<FoodPreference>
+    var isImageSuccess = false
 
     private val callback = object : OnBackPressedCallback(true) {
         override fun handleOnBackPressed() {
@@ -46,7 +48,7 @@ class CameraActivity : ScanActivity() {
     fun backPressed(){
         val intent = Intent(this,MainActivity::class.java)
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
-        intent.putExtra("checkedTranslation", true)
+        intent.putExtra("checkedTranslation", isImageSuccess)
         startActivity(intent)
         finish()
     }
@@ -70,6 +72,7 @@ class CameraActivity : ScanActivity() {
             val uri = Uri.fromFile(result.croppedImageFile)
             Log.d(TAG, "uri: $uri")
             try {
+                //여기서 스위치 on/off checking
                 sharedPreferences = getSharedPreferences("util", MODE_PRIVATE)
                 image = InputImage.fromFilePath(applicationContext, uri)
                 cameraViewModel.getRecognizedText(image)
@@ -82,6 +85,7 @@ class CameraActivity : ScanActivity() {
 
         cameraViewModel.failed.observe(this){
             if(it){
+                Toast.makeText(applicationContext, "서버에 문제가 발생하였습니다.\n잠시 후 다시 시도해주세요.", Toast.LENGTH_LONG).show()
                 val intent = Intent(this,MainActivity::class.java)
                 startActivity(intent)
                 finish()
@@ -100,7 +104,7 @@ class CameraActivity : ScanActivity() {
         super.onCreate(savedInstanceState)
         binding = DataBindingUtil.setContentView(this, R.layout.activity_camera)
         addFragmentContentLayout()
-        cameraViewModel = CameraViewModel()
+        cameraViewModel = CameraViewModel(application)
         
         init()
     }
@@ -129,6 +133,7 @@ class CameraActivity : ScanActivity() {
 
 
     fun showDialog(){
+
         var dialog = Dialog(this)
         dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
         dialog.setContentView(R.layout.progressbar)
@@ -141,8 +146,11 @@ class CameraActivity : ScanActivity() {
             if(it != null){
                 dialog.dismiss()
                 binding.cropImage.setImageDrawable(it)
+                isImageSuccess = true
             }
         })
+
+
 
     }
 }

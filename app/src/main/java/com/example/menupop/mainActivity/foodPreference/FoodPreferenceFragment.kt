@@ -44,7 +44,6 @@ class FoodPreferenceFragment : Fragment() {
         this.context = context
         if(context is MainActivityEvent){
             event = context
-            Log.d(TAG, "onAttach: 호출")
         }else{
             throw RuntimeException(
                 context.toString()
@@ -83,11 +82,14 @@ class FoodPreferenceFragment : Fragment() {
     fun emptyTicketShowDialog(){
         val bindingDialog : DialogTicketBottomBinding = DataBindingUtil.inflate(LayoutInflater.from(context), R.layout.dialog_ticket_bottom, null, false)
         val bottomSheetDialog = BottomSheetDialog(context)
+
         val foodTicket = mainViewModel.userInformation.value?.foodTicket.toString()
         val translationTicket = mainViewModel.userInformation.value?.translationTicket.toString()
+
         bottomSheetDialog.setContentView(bindingDialog.root)
         bindingDialog.dialogTicketBottomFoodTicket.text = "음식 티켓 $foodTicket 개"
         bindingDialog.dialogTicketBottomTranslationTicket.text = "번역 티켓 $translationTicket 개"
+
         bindingDialog.dialogTicketBottomDown.setOnClickListener {
             bottomSheetDialog.dismiss()
         }
@@ -187,6 +189,7 @@ class FoodPreferenceFragment : Fragment() {
         mainViewModel = ViewModelProvider(requireActivity()).get(MainActivityViewModel::class.java)
         binding.mainActivityViewModel = mainViewModel
         binding.lifecycleOwner = this
+
         searchAdapter = FoodPreferenceSearchAdapter(object : FoodPreferenceItemClickListener {
             override fun favoriteItemClick(foodName: String) {
                 Log.d(TAG, "favoriteItemClick: 좋아하는 음식 ${foodName} 클릭됨 ")
@@ -237,10 +240,14 @@ class FoodPreferenceFragment : Fragment() {
 
         mainViewModel.foodPreferenceList.observe(viewLifecycleOwner){ it->
             Log.d(TAG, "init: ${it.result}")
+
             if (it.result.trim() == "success") {
+
                 foodPreferenceAdapter.setFoodList(it.foodList)
                 binding.foodPreferenceEmptyListWarring.visibility = View.GONE
+
             }else if(it.result.trim()=="notRegister"){
+
                 binding.foodPreferenceEmptyListWarring.visibility = View.VISIBLE
                 binding.foodPreferenceRecyclerview.visibility = View.INVISIBLE
             }
@@ -264,7 +271,6 @@ class FoodPreferenceFragment : Fragment() {
         mainViewModel.registerResult.observe(viewLifecycleOwner){ result ->
             Log.d(TAG, "existTicketShowDialog: ${result}")
             if(result) {
-
                 existBottomSheetDialog.dismiss()
                 if (mainViewModel.userInformation.value?.freeFoodTicket!! > 0) {
                     mainViewModel.freeFoodTicketMinus()

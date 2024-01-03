@@ -58,13 +58,13 @@ class MainActivityModel(val application :Application) {
         val identifier = sharedPreferences.getInt("identifier", 0)
         val dailyTranslation = sharedPreferences.getInt("dailyTranslation", 0)
         val dailyReward = sharedPreferences.getInt("dailyReward", 0)
-        val rewarded = sharedPreferences.getInt("rewarded", 0)
+        val haveReward = sharedPreferences.getInt("haveReward", 0)
         val todayRewarded = sharedPreferences.getInt("todayRewarded", 0)
 
         hashmap.put("identifier", identifier)
         hashmap.put("dailyTranslation", dailyTranslation)
         hashmap.put("dailyReward", dailyReward)
-        hashmap.put("rewarded", rewarded)
+        hashmap.put("haveReward", haveReward)
         hashmap.put("todayRewarded", todayRewarded)
 
         return hashmap
@@ -163,7 +163,9 @@ class MainActivityModel(val application :Application) {
 
         val freeTranslationTicket = sharedPreferences.getInt("dailyTranslation",0)
         var result = if(freeTranslationTicket != 0) freeTranslationTicket -1 else freeTranslationTicket
+        Log.d(TAG, "freeTranslationTicketMinus result: $result")
         edit.putInt("dailyTranslation",result)
+
         return edit.commit()
     }
 
@@ -352,8 +354,8 @@ class MainActivityModel(val application :Application) {
     fun scheduleMidnightWork(application: Application, callback: (Boolean) -> Unit) {
 
         val midnight = Calendar.getInstance().apply {
-            set(Calendar.HOUR_OF_DAY, 16) // 자정
-            set(Calendar.MINUTE, 50)
+            set(Calendar.HOUR_OF_DAY, 22) // 자정
+            set(Calendar.MINUTE, 10)
             set(Calendar.SECOND, 0)
         }
 
@@ -420,17 +422,18 @@ class MainActivityModel(val application :Application) {
         })
     }
     fun rewardedPlus(sharedPreferences: SharedPreferences) : Pair<Int,Int>{
-        var rewarded = sharedPreferences.getInt("rewarded",0)
-        var dailyReward = sharedPreferences.getInt("dailyReward", 0)
+        var haveReward = sharedPreferences.getInt("haveReward",0)
         var todayRewarded = sharedPreferences.getInt("todayRewarded", 0)
-        rewarded += 1
-        dailyReward -=1
-        todayRewarded += 1
+        var dailyReward = sharedPreferences.getInt("dailyReward", 0)
 
-        Log.d(TAG, "rewardedPlus: rewarded_$rewarded dailyReward_$dailyReward")
+        haveReward += 1
+        dailyReward -= 1
+        todayRewarded = 3 - dailyReward
+
+        Log.d(TAG, "rewardedPlus: haveReward_$haveReward dailyReward_$dailyReward")
 
         val edit = sharedPreferences.edit()
-        edit.putInt("rewarded",rewarded)
+        edit.putInt("haveReward",haveReward)
         edit.putInt("dailyReward", dailyReward)
         edit.putInt("todayRewarded", todayRewarded)
         edit.commit()
@@ -439,7 +442,7 @@ class MainActivityModel(val application :Application) {
     }
     fun setRewarded(sharedPreferences: SharedPreferences, haveReward : Int) {
         Log.d(TAG, "setRewarded: $haveReward")
-        sharedPreferences.edit().putInt("rewarded",haveReward).commit()
+        sharedPreferences.edit().putInt("haveReward",haveReward).commit()
     }
 
     fun saveSelectedProfile(drawable : String, sharedPreferences: SharedPreferences, callback: (String) -> Unit){

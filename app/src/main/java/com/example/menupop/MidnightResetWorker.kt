@@ -32,7 +32,7 @@ class MidnightResetWorker(
 
         editor.putInt("dailyTranslation", 3) //초기화 값
         editor.putInt("dailyReward", 3)
-        editor.putInt("rewarded", 0)
+        editor.putInt("haveReward", 0)
         editor.putInt("todayRewarded", 0)
         editor.commit()
 

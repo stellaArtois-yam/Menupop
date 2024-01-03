@@ -124,9 +124,6 @@ class ExchangeFragment : Fragment() {
                     return
                 }
 
-
-
-
             }
 
             override fun onNothingSelected(parent: AdapterView<*>?) {

@@ -116,48 +116,47 @@ class MainActivityViewModel(private val application: Application) :  AndroidView
         get() =_checkingTranslationTicket
 
     fun freeFoodTicketMinus(){
-        Log.d(TAG, "ticketMinus: ${_userInformation.value!!.foodTicket}")
+        Log.d(TAG, "free food ticket Minus: ${_userInformation.value!!.foodTicket}")
 
         callbackResult = {result ->
-            Log.d(TAG, "ticketMinus: $result")
+            Log.d(TAG, "free food ticket Minus: $result")
             if(result.trim() == "success"){
                 _userInformation.value?.freeFoodTicket = _userInformation.value?.freeFoodTicket?.minus(1)!!
             }
         }
         mainActivityModel.minusFreeFoodTicket(_identifier.value!!,callbackResult!!)
-        Log.d(TAG, "ticketMinus 반역: ${_userInformation.value!!.foodTicket}")
+        Log.d(TAG, "free food ticket Minus: ${_userInformation.value!!.foodTicket}")
     }
 
     fun foodTicketMinus(){
-        Log.d(TAG, "ticketMinus: ${_userInformation.value!!.foodTicket}")
-
+        Log.d(TAG, "food ticket minus: ${_userInformation.value!!.foodTicket}")
 
         callbackResult = {result ->
-            Log.d(TAG, "ticketMinus: $result")
+            Log.d(TAG, "food ticket minus: $result")
             if(result.trim() == "success"){
                 _userInformation.value?.foodTicket = _userInformation.value?.foodTicket?.minus(1)!!
             }
         }
         mainActivityModel.minusFoodTicket(_identifier.value!!,callbackResult!!)
-        Log.d(TAG, "ticketMinus 반역: ${_userInformation.value!!.foodTicket}")
+        Log.d(TAG, "food ticket minus: ${_userInformation.value!!.foodTicket}")
     }
     fun translationTicketMinus(){
-        Log.d(TAG, "ticketMinus: ${_userInformation.value!!.foodTicket}")
+        Log.d(TAG, "translation ticket minus : ${_userInformation.value!!.translationTicket}")
 
         callbackResult = {result ->
-            Log.d(TAG, "ticketMinus: $result")
+            Log.d(TAG, "translation ticket minus result: $result")
             if(result.trim() == "success"){
                 _userInformation.value?.translationTicket = _userInformation.value?.translationTicket?.minus(1)!!
             }
         }
         mainActivityModel.minusTranslationTicket(_identifier.value!!,callbackResult!!)
-        Log.d(TAG, "ticketMinus 반역: ${_userInformation.value!!.foodTicket}")
+        Log.d(TAG, "translation ticket minus: ${_userInformation.value!!.translationTicket}")
     }
     fun freeTranslationTicketMinus(sharedPreferences: SharedPreferences){
         if(mainActivityModel.freeTranslationTicketMinus(sharedPreferences)){
-            _dailyTranslation.value!!.minus(1)
-//            _dailyTranslation.value = _dailyTranslation.value!! - 1
-            Log.d(TAG, "freeTranslationTicketMinus: ${_dailyTranslation.value}")
+            _dailyTranslation.value = _dailyTranslation.value!! - 1
+
+            Log.d(TAG, "free Translation Ticket Minus: ${_dailyTranslation.value}")
         }
     }
 
@@ -225,11 +224,16 @@ class MainActivityViewModel(private val application: Application) :  AndroidView
         _identifier.value = userInfo["identifier"]
 
         _dailyTranslation.value = userInfo["dailyTranslation"]
+
         _dailyReward.value = userInfo["dailyReward"]
-        _haveRewarded.value = userInfo["rewarded"]
+        _haveRewarded.value = userInfo["haveReward"]
         _todayRewarded.value = userInfo["todayRewarded"]
 
-        Log.d(TAG, "first get \n identifier: ${identifier.value}\n dailyReward: ${_dailyReward.value}\n rewarded: ${_haveRewarded.value}\ndailyTranslation: ${_dailyTranslation.value}")
+        Log.d(TAG, "first get \n identifier: ${identifier.value}" +
+                "\n dailyReward: ${_dailyReward.value}" +
+                "\n haveRewarded: ${_haveRewarded.value}" +
+                "\n todayRewarded : ${todayRewarded.value}"+
+                "\ndailyTranslation: ${_dailyTranslation.value}")
 
     }
 
@@ -252,6 +256,7 @@ class MainActivityViewModel(private val application: Application) :  AndroidView
         mainActivityModel.requestAd(key, callbackAd!!)
     }
     fun setRewarded(sharedPreferences: SharedPreferences){
+        Log.d(TAG, "use haveRewarded: ${_haveRewarded.value}")
        mainActivityModel.setRewarded(sharedPreferences, _haveRewarded.value!!)
     }
 
@@ -290,7 +295,7 @@ class MainActivityViewModel(private val application: Application) :  AndroidView
         val rewarded = mainActivityModel.rewardedPlus(sharedPreferences)
         Log.d(TAG, "rewardedSuccess: $rewarded")
         _haveRewarded.value = rewarded.first
-        _todayRewarded.value = rewarded.first
+        _todayRewarded.value = 3 - rewarded.second
 
         _dailyReward.value = rewarded.second
     }
@@ -425,6 +430,7 @@ class MainActivityViewModel(private val application: Application) :  AndroidView
         }else{
             _isRewardExceeded.value = false
             var item = itemName(_rewardTranslationAmount, _rewardFoodAmount)
+
             var time = LocalDateTime.now().toString()
             savePaymentHistory(identifier
                 ,hashCode().toString()
@@ -567,7 +573,6 @@ class MainActivityViewModel(private val application: Application) :  AndroidView
         callback = {response ->
             //여기서 클라이언트 티켓 개수 수정
             if(response.result == "success"){
-                _changeTicket.value = true
                 Log.d(TAG, "savePaymentHistory: ${response.result}")
 
                 if(_paymentType.value == "regular"){
@@ -576,11 +581,13 @@ class MainActivityViewModel(private val application: Application) :  AndroidView
 
 
                 }else if(_paymentType.value == "reward"){
-                    _haveRewarded.value = _haveRewarded.value!! - 1
+                    _haveRewarded.value = _haveRewarded.value!! - (_rewardFoodAmount.value!! + _rewardTranslationAmount.value!!)
                     _userInformation.value!!.foodTicket = _userInformation.value!!.foodTicket + _rewardFoodAmount.value!!
                     _userInformation.value!!.translationTicket = _userInformation.value!!.translationTicket + _rewardTranslationAmount.value!!
 
                 }
+
+                _changeTicket.value = true
 
 
             }else{

@@ -96,12 +96,10 @@ class TicketPurchaseFragment : Fragment() {
     fun clickListener() {
 
         binding.foodTicketPurchaseButton.setOnClickListener {
-            //receivedReward가 0초과면 paymentTypeDialog
-            Log.d(TAG, "haveReworded: ${ticketPurchaseViewModel.haveRewarded.value}")
-            if(ticketPurchaseViewModel.haveRewarded.value != 0){
+            Log.d(TAG, "haveRewarded: ${ticketPurchaseViewModel.haveRewarded.value}")
+            if(ticketPurchaseViewModel.haveRewarded.value!! > 0){
                 paymentTypeDialog()
             }else{
-                //0이면 바로 카카오페이(paymentRegularDialog) 호출
                 paymentRegularDialog()
             }
 
@@ -110,8 +108,8 @@ class TicketPurchaseFragment : Fragment() {
         }
 
         binding.translationTicketPurchaseButton.setOnClickListener {
-
-            if(ticketPurchaseViewModel.haveRewarded.value != 0){
+            Log.d(TAG, "haveRewarded: ${ticketPurchaseViewModel.haveRewarded.value}")
+            if(ticketPurchaseViewModel.haveRewarded.value!! > 0){
                 paymentTypeDialog()
             }else{
                 paymentRegularDialog()
@@ -150,8 +148,8 @@ class TicketPurchaseFragment : Fragment() {
             paymentRegularDialog()
         }
 
-        dialogBinding.paymentTypeReword.setOnClickListener {
-            Log.d(TAG, "reword click")
+        dialogBinding.paymentTypeReward.setOnClickListener {
+            Log.d(TAG, "reward click")
             ticketPurchaseViewModel.updatePaymentType("reward")
             dialog.dismiss()
             paymentRewardDialog()
@@ -254,20 +252,22 @@ class TicketPurchaseFragment : Fragment() {
         }
 
         dataBindingReward.rewardTranslationTicketPurchasePlusButton.setOnClickListener{
+            Log.d(TAG, "reward translation plus: ${ticketPurchaseViewModel.rewardTranslationAmount.value}")
             ticketPurchaseViewModel.addTranslationTicketReward()
         }
 
         dataBindingReward.rewardTranslationTicketPurchaseMinusButton.setOnClickListener{
-            Log.d(TAG, "paymentRewardDialog: click")
+            Log.d(TAG, "reward translation minus: ${ticketPurchaseViewModel.rewardTranslationAmount.value}")
             ticketPurchaseViewModel.removeTranslationTicketReward()
         }
 
         dataBindingReward.rewardFoodTicketPurchasePlusButton.setOnClickListener{
-            Log.d(TAG, "paymentRewardDialog: click")
+            Log.d(TAG, "reward food plus: ${ticketPurchaseViewModel.rewardFoodAmount.value}")
             ticketPurchaseViewModel.addFoodTicketReward()
         }
 
         dataBindingReward.rewardFoodTicketPurchaseMinusButton.setOnClickListener{
+            Log.d(TAG, "reward food minus: ${ticketPurchaseViewModel.rewardFoodAmount.value}")
             ticketPurchaseViewModel.removeFoodTicketReward()
         }
 

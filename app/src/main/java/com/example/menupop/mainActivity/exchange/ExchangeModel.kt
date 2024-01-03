@@ -37,6 +37,7 @@ class ExchangeModel {
                 response: Response<ExchangeRateResponseDTO>
             ) {
                 if(response.isSuccessful && response.body() != null){
+                    Log.d(TAG, "exchange rate: ${response.body()}")
                     callback(response.body()!!)
                 }
             }

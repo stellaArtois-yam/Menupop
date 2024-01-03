@@ -1,5 +1,6 @@
 package com.example.menupop.mainActivity.translation
 
+import android.app.Application
 import android.content.SharedPreferences
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
@@ -11,29 +12,21 @@ import android.graphics.Typeface
 import android.graphics.drawable.BitmapDrawable
 import android.graphics.drawable.Drawable
 import android.util.Log
+import androidx.core.text.isDigitsOnly
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import com.airbnb.lottie.L
-import com.example.menupop.R
 import com.example.menupop.mainActivity.foodPreference.FoodPreference
-import com.example.menupop.mainActivity.foodPreference.FoodPreferenceDataClass
-import com.google.gson.JsonObject
-import com.google.gson.JsonPrimitive
 import com.google.mlkit.vision.common.InputImage
 import com.google.mlkit.vision.text.Text
 import com.zynksoftware.documentscanner.model.ScannerResults
 import org.json.JSONArray
-import org.json.JSONObject
-import java.net.URLDecoder
-import java.util.Collections.list
-import kotlin.math.log
 
-
-class CameraViewModel : ViewModel() {
+class CameraViewModel(application: Application) : ViewModel() {
 
     val TAG = "CameraViewModel"
     private val _scannerResult = MutableLiveData<ScannerResults>()
+    val application = application
     val scannerResult: LiveData<ScannerResults>
         get() = _scannerResult
     val cameraModel = CameraModel()
@@ -51,6 +44,7 @@ class CameraViewModel : ViewModel() {
         get() = _failed
 
     private val _textPosition = MutableLiveData<ArrayList<Rect>>()
+
     private val _image = MutableLiveData<Drawable>()
 
     lateinit var likesFoodList: ArrayList<String>
@@ -67,7 +61,7 @@ class CameraViewModel : ViewModel() {
             val (likesFoodList, unLikesFoodList) = splitFoodPreferenceList(foodPreference)
             this.likesFoodList = likesFoodList
             this.unLikesFoodList = unLikesFoodList
-//            Log.d(TAG, "setFoodPreference: ${likesFoodList}, ${unLikesFoodList}")
+            Log.d(TAG, "setFoodPreference: ${likesFoodList}, ${unLikesFoodList}")
         }
     }
 
@@ -78,11 +72,7 @@ class CameraViewModel : ViewModel() {
 
             if (visionText != null) {
 
-//                Log.d(TAG, "getRecognizedText: ${visionText.text}")
-
                 val resultText = getText(visionText)
-//                Log.d(TAG, "resultText: $resultText")
-//                Log.d(TAG, "textPosition: ${_textPosition.value}")
 
                 checkLanguage(resultText)
 
@@ -98,6 +88,7 @@ class CameraViewModel : ViewModel() {
         callbackString = { langCode ->
             if (langCode != "und" && langCode != "failed") {
                 requestTranslation(text, langCode)
+                Log.d(TAG, "checkLanguage: $langCode")
             } else {
                 Log.d(TAG, "checkLanguage else: $langCode")
                 _failed.value = true
@@ -113,10 +104,10 @@ class CameraViewModel : ViewModel() {
 
         for (foodPreference in foodPreferenceList) {
             if (foodPreference.classification == "호") {
-                Log.d(TAG, "호: ${foodPreference.foodName}")
+//                Log.d(TAG, "호: ${foodPreference.foodName}")
                 likes.add(foodPreference.foodName)
             } else if (foodPreference.classification == "불호") {
-                Log.d(TAG, "불호: ${foodPreference.foodName}")
+//                Log.d(TAG, "불호: ${foodPreference.foodName}")
                 dislikes.add(foodPreference.foodName)
             }
         }
@@ -128,12 +119,12 @@ class CameraViewModel : ViewModel() {
     fun requestTranslation(text: String, langCode: String) {
         callbackString = {
             if (it != "failed") {
-                val jsonArray = JSONArray(it)
-//                Log.d(TAG, "requestTranslation response: $jsonArray")
-                var decode = jsonArray.getString(0).replace("[", "")
-                decode = decode.replace("]", "")
-                val decodeList = decode.split(", ")
+                Log.d(TAG, "translated Text: $it")
 
+                val jsonArray = JSONArray(it)
+                var decode = jsonArray.getString(0)
+
+                val decodeList = decode.split("%")
 
                 Log.d(TAG, "requestTranslation: $decodeList")
                 if (decode != null) {
@@ -149,7 +140,7 @@ class CameraViewModel : ViewModel() {
 
     fun getText(text: Text): String {
         var positionList = ArrayList<Rect>()
-        var textList = ArrayList<String>()
+        var requestText  = ""
 
         for (block in text.textBlocks) {
 
@@ -157,7 +148,7 @@ class CameraViewModel : ViewModel() {
                 val lineText = line.text.lowercase()
                 val lineFrame = line.boundingBox
 
-                textList.add(lineText)
+                requestText = requestText.plus(lineText).plus("%")
                 positionList.add(lineFrame!!)
             }
 
@@ -165,15 +156,11 @@ class CameraViewModel : ViewModel() {
 
         }
 
-        if(textList.size != positionList.size){
-            _failed.value = true
-        }
 
-
-
-        Log.d(TAG, "getText text size: ${textList.size}")
+        requestText = requestText.substring(0, requestText.length-1)
+        Log.d(TAG, "text : ${requestText}")
         Log.d(TAG, "getText position size: ${positionList.size}")
-        return textList.toString()
+        return requestText
     }
 
 
@@ -185,77 +172,64 @@ class CameraViewModel : ViewModel() {
         val mutableBitmap = bitmap.copy(Bitmap.Config.ARGB_8888, true)
         val canvas = Canvas(mutableBitmap)
 
-        var paintText = Paint().apply {
-            color = Color.BLACK // 텍스트 색상
-            textSize = 20f
-            typeface = Typeface.DEFAULT_BOLD
-        }
-
 
         var paintRect = Paint().apply {
             color = Color.WHITE
             style = Paint.Style.FILL
         }
 
-//        if(textList.size != _textPosition.value!!.size){
-//            Log.d(TAG, "drawTranslatedText list size unMatch:")
-//            _failed.value = true
-//        }
-
 
         for (i: Int in textList.indices) {
+
+            if(textList[i].isDigitsOnly()){
+                Log.d(TAG, "drawTranslatedText 숫자로만 이루어져 있음: ${textList[i]}")
+            }
+
+            var (paintText, x,y) = getTextSize(_textPosition.value!![i], textList[i])
+
             val left = _textPosition.value!![i].left.toFloat()
             val top = _textPosition.value!![i].top.toFloat()
             val right = _textPosition.value!![i].right.toFloat()
             val bottom = _textPosition.value!![i].bottom.toFloat()
 
-//            val getTextSize = getTextSize(_textPosition.value!![i], textList[i])
-
 
             for (text in likesFoodList) {
                 if (textList[i].contains(text)) {
                     Log.d(TAG, "like: ${text}")
-                    paintText = Paint().apply {
-                        color = Color.rgb(255, 127, 9) // 텍스트 색상
-                        textSize = 30f
-                        typeface = Typeface.DEFAULT_BOLD
-                    }
+                    paintText.color = Color.rgb(255, 127, 9) // 텍스트 색상
+
                 }else {
-                    paintText = Paint().apply {
-                        color = Color.BLACK // 텍스트 색상
-                        textSize = 30f
-                        typeface = Typeface.DEFAULT_BOLD
-                    }
+                    paintText.color = Color.BLACK
                 }
             }
 
             for (text in unLikesFoodList) {
                 if (textList[i].contains(text)) {
                     Log.d(TAG, "dislike: ${text}")
-                    paintText = Paint().apply {
-                        color = Color.rgb(255, 173, 13) // 텍스트 색상
-                        textSize = 30f
-                        typeface = Typeface.DEFAULT_BOLD
-                    }
+                    paintText.color = Color.rgb(255, 173, 13) // 텍스트 색상
+                }else {
+                    paintText.color = Color.BLACK
                 }
             }
 
 
             canvas.drawRect(left, top, right, bottom, paintRect)
-            canvas.drawText(textList[i], left, bottom, paintText)
+            canvas.drawText(textList[i], x , y, paintText)
         }
 
-        _image.value = BitmapDrawable(mutableBitmap)
+        _image.value = BitmapDrawable(application.applicationContext.resources,mutableBitmap)
 
     }
 
 
 
-    fun getTextSize(rect: Rect, text: String) : Paint {
+    fun getTextSize(rect: Rect, text: String) : Triple<Paint, Float, Float> {
 
-        var textSize = 20f // 텍스트 크기 초기값 설정 (임의의 크기)
+        var textSize = 50f // 텍스트 크기 초기값 설정 (임의의 크기)
         var paint = Paint()
         paint.textSize = textSize
+        paint.typeface = Typeface.DEFAULT_BOLD
+        paint.color = Color.BLACK
 
         val bounds = Rect()
         paint.getTextBounds(text, 0, text.length, bounds)
@@ -271,12 +245,9 @@ class CameraViewModel : ViewModel() {
         val x = rect.left + (rect.width() - bounds.width()) / 2
         val y = rect.top + (rect.height() + bounds.height()) / 2
 
-        return paint
+        return Triple(paint,x.toFloat(),y.toFloat())
 
-//        canvas.drawText(text, x.toFloat(), y.toFloat(), paint)
     }
-
-
 
 }
 
