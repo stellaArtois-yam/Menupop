@@ -49,6 +49,7 @@ class MainActivity : AppCompatActivity(), MainActivityEvent{
     lateinit var foodPreferenceFragment: FoodPreferenceFragment
     lateinit var exchangeFragment: ExchangeFragment
     lateinit var profileFragment: ProfileFragment
+    lateinit var countrySelectionFragment : CountrySelectionFragment
 
     lateinit var ticketPurchaseFragment: TicketPurchaseFragment
     var checkingTranslation : Boolean = false
@@ -72,6 +73,7 @@ class MainActivity : AppCompatActivity(), MainActivityEvent{
         exchangeFragment = ExchangeFragment()
         profileFragment = ProfileFragment()
         ticketPurchaseFragment = TicketPurchaseFragment()
+        countrySelectionFragment = CountrySelectionFragment()
 
         binding = DataBindingUtil.setContentView(this, R.layout.activity_main)
         mainActivityViewModel = ViewModelProvider(this).get(MainActivityViewModel::class.java)
@@ -106,14 +108,15 @@ class MainActivity : AppCompatActivity(), MainActivityEvent{
         mainActivityViewModel.checkingTranslationTicket.observe(this){ result ->
             Log.d(TAG, "푸드 티켓 확인 값: ${result}")
             if (result){ // 티켓이 있을때
+                supportFragmentManager.beginTransaction()
+                    .replace(R.id.home_frame_layout, countrySelectionFragment)
+                    .commit()
+//                binding.appbarMenu.findViewById<TextView>(R.id.appbar_status).text = "ㅇ"
 
 
-
-
-
-                val intent = Intent(this,CameraActivity::class.java)
-                intent.putExtra("foodPreference",mainActivityViewModel.foodPreferenceList.value?.foodList)
-                startActivity(intent)
+//                val intent = Intent(this,CameraActivity::class.java)
+//                intent.putExtra("foodPreference",mainActivityViewModel.foodPreferenceList.value?.foodList)
+//                startActivity(intent)
 
             }else { // 티켓이 없을때
                 emptyTicketShowDialog()

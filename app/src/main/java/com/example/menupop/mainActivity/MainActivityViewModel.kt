@@ -7,6 +7,7 @@ import android.graphics.drawable.Drawable
 
 import android.os.Build
 import android.util.Log
+import android.view.View
 import androidx.annotation.RequiresApi
 import androidx.core.net.toUri
 import androidx.lifecycle.AndroidViewModel
@@ -75,6 +76,10 @@ class MainActivityViewModel(private val application: Application) :  AndroidView
 
     val todayRewarded : LiveData<Int>
         get() = _todayRewarded
+
+    private val _countrySelection = MutableLiveData<String>()
+
+    val countrySelection : LiveData<String> get() = _countrySelection
 
     fun getProfileList(resources : Resources) : ArrayList<ProfileSelectionDTO>{
         val imageNames = resources.getStringArray(R.array.profile)
@@ -648,6 +653,19 @@ class MainActivityViewModel(private val application: Application) :  AndroidView
         Log.d(TAG, "scheduleMidnightWork: ?")
 
 
+    }
+    fun selectionCountry(view : View){
+        Log.d(TAG, "selectionCountry: 실행")
+        when(view.id){
+            R.id.country_selection_america -> _countrySelection.value = "america"
+            R.id.country_selection_china -> _countrySelection.value = "china"
+            R.id.country_selection_hongkong -> _countrySelection.value = "hongkong"
+            R.id.country_selection_japan -> _countrySelection.value = "japan"
+            R.id.country_selection_taiwan -> _countrySelection.value = "taiwan"
+            R.id.country_selection_vietnam -> _countrySelection.value = "vietnam"
+        }
+//        Log.d(TAG, "selectionCountry: ${country}")
+//        _countrySelection.value = country
     }
 
 

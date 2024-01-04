@@ -66,7 +66,7 @@ class CameraViewModel(application: Application) : ViewModel() {
     }
 
 
-    fun getRecognizedText(image: InputImage) {
+    fun getRecognizedText(image: InputImage,country : String) {
 
         callbackText = { visionText ->
 
@@ -81,7 +81,7 @@ class CameraViewModel(application: Application) : ViewModel() {
             }
         }
 
-        cameraModel.recognizedText(image, callbackText!!)
+        cameraModel.recognizedText(image,country, callbackText!!)
     }
 
     fun checkLanguage(text: String) {
@@ -180,41 +180,33 @@ class CameraViewModel(application: Application) : ViewModel() {
 
 
         for (i: Int in textList.indices) {
-
-            if(textList[i].isDigitsOnly()){
-                Log.d(TAG, "drawTranslatedText 숫자로만 이루어져 있음: ${textList[i]}")
-            }
-
-            var (paintText, x,y) = getTextSize(_textPosition.value!![i], textList[i])
+            var (paintText, x, y) = getTextSize(_textPosition.value!![i], textList[i])
 
             val left = _textPosition.value!![i].left.toFloat()
             val top = _textPosition.value!![i].top.toFloat()
             val right = _textPosition.value!![i].right.toFloat()
             val bottom = _textPosition.value!![i].bottom.toFloat()
 
+            var color = Color.BLACK // 기본 색상
 
             for (text in likesFoodList) {
                 if (textList[i].contains(text)) {
-                    Log.d(TAG, "like: ${text}")
-                    paintText.color = Color.rgb(255, 127, 9) // 텍스트 색상
-
-                }else {
-                    paintText.color = Color.BLACK
+                    color = Color.rgb(255, 127, 9)
+                    break
                 }
             }
 
             for (text in unLikesFoodList) {
                 if (textList[i].contains(text)) {
-                    Log.d(TAG, "dislike: ${text}")
-                    paintText.color = Color.rgb(255, 173, 13) // 텍스트 색상
-                }else {
-                    paintText.color = Color.BLACK
+                    color = Color.rgb(255, 173, 13)
+                    break
                 }
             }
 
+            paintText.color = color // 마지막에 설정된 색상으로 텍스트 색상을 설정
 
             canvas.drawRect(left, top, right, bottom, paintRect)
-            canvas.drawText(textList[i], x , y, paintText)
+            canvas.drawText(textList[i], x, y, paintText)
         }
 
         _image.value = BitmapDrawable(application.applicationContext.resources,mutableBitmap)

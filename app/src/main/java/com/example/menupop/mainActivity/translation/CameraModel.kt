@@ -62,14 +62,18 @@ class CameraModel {
         })
     }
 
-    fun recognizedText(image : InputImage, callback: (Text) -> Unit) {
+    fun recognizedText(image : InputImage, country : String,callback: (Text) -> Unit) {
 
-        val recognizer = TextRecognition.getClient(TextRecognizerOptions.DEFAULT_OPTIONS)
+        var recognizer = TextRecognition.getClient(TextRecognizerOptions.DEFAULT_OPTIONS)
+
         /**
          * 카메라 들어가기 전에 중국어, 일본어인지 선택하게 하고 들어와야 텍스트 추출 할 수 있음
          */
-//        val chineseRecognizer = TextRecognition.getClient(ChineseTextRecognizerOptions.Builder().build())
-//        val japaneseRecognizer = TextRecognition.getClient(JapaneseTextRecognizerOptions.Builder().build())
+        if (country.equals("japan")){
+            recognizer = TextRecognition.getClient(JapaneseTextRecognizerOptions.Builder().build())
+        }else if(country.equals("china") || country.equals("hongkong") || country.equals("taiwan")){
+            recognizer = TextRecognition.getClient(ChineseTextRecognizerOptions.Builder().build())
+        }
 
         recognizer.process(image)
             .addOnSuccessListener { visionText ->

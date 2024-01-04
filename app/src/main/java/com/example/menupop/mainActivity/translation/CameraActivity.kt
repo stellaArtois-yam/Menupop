@@ -37,6 +37,7 @@ class CameraActivity : ScanActivity() {
     lateinit var sharedPreferences: SharedPreferences
     lateinit var foodPreferenceData : ArrayList<FoodPreference>
     var isImageSuccess = false
+    lateinit var country : String
 
     private val callback = object : OnBackPressedCallback(true) {
         override fun handleOnBackPressed() {
@@ -56,7 +57,12 @@ class CameraActivity : ScanActivity() {
     val TAG = "CameraActivityTAG"
     fun init(){
         val intent = intent
-        foodPreferenceData = intent.getSerializableExtra("foodPreference") as ArrayList<FoodPreference>
+        if (intent.getSerializableExtra("foodPreference")!=null){
+            foodPreferenceData = intent.getSerializableExtra("foodPreference") as ArrayList<FoodPreference>
+        }else{
+            foodPreferenceData = ArrayList<FoodPreference>()
+        }
+        country = intent.getStringExtra("country").toString()
 
         cameraViewModel.setFoodPreference(foodPreferenceData)
 
@@ -75,7 +81,7 @@ class CameraActivity : ScanActivity() {
                 //여기서 스위치 on/off checking
                 sharedPreferences = getSharedPreferences("util", MODE_PRIVATE)
                 image = InputImage.fromFilePath(applicationContext, uri)
-                cameraViewModel.getRecognizedText(image)
+                cameraViewModel.getRecognizedText(image,country)
                 showDialog()
             } catch (e: IOException) {
                 e.printStackTrace()
