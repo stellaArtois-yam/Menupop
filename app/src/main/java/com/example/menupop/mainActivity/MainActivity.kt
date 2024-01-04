@@ -106,6 +106,11 @@ class MainActivity : AppCompatActivity(), MainActivityEvent{
         mainActivityViewModel.checkingTranslationTicket.observe(this){ result ->
             Log.d(TAG, "푸드 티켓 확인 값: ${result}")
             if (result){ // 티켓이 있을때
+
+
+
+
+
                 val intent = Intent(this,CameraActivity::class.java)
                 intent.putExtra("foodPreference",mainActivityViewModel.foodPreferenceList.value?.foodList)
                 startActivity(intent)

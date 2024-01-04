@@ -40,6 +40,10 @@ class ExchangeViewModel : ViewModel() {
         _targetCurrencyUnit.value = unit
     }
 
+    fun checkedSetCurrency() : Boolean {
+        return _targetCurrency.value != null && _sourceCurrency.value != null
+    }
+
     fun init() {
         _targetCurrency.value = "0"
         _sourceCurrency.value = "1000"

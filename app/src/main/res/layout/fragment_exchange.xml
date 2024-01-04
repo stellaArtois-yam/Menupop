@@ -55,7 +55,7 @@
                     android:layout_gravity="start"
                     android:layout_marginTop="30dp"
                     android:layout_marginStart="30dp"
-                    android:text="보유 화폐"
+                    android:text="기준 화폐"
                     android:textColor="@color/light_gray"
 
                     android:textSize="20sp"
