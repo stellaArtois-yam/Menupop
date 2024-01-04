@@ -9,6 +9,8 @@ import com.google.mlkit.nl.languageid.LanguageIdentification
 import com.google.mlkit.vision.common.InputImage
 import com.google.mlkit.vision.text.Text
 import com.google.mlkit.vision.text.TextRecognition
+import com.google.mlkit.vision.text.chinese.ChineseTextRecognizerOptions
+import com.google.mlkit.vision.text.japanese.JapaneseTextRecognizerOptions
 import com.google.mlkit.vision.text.latin.TextRecognizerOptions
 import okhttp3.OkHttpClient
 import retrofit2.Call
@@ -63,16 +65,38 @@ class CameraModel {
     fun recognizedText(image : InputImage, callback: (Text) -> Unit) {
 
         val recognizer = TextRecognition.getClient(TextRecognizerOptions.DEFAULT_OPTIONS)
+        /**
+         * 카메라 들어가기 전에 중국어, 일본어인지 선택하게 하고 들어와야 텍스트 추출 할 수 있음
+         */
+//        val chineseRecognizer = TextRecognition.getClient(ChineseTextRecognizerOptions.Builder().build())
+//        val japaneseRecognizer = TextRecognition.getClient(JapaneseTextRecognizerOptions.Builder().build())
 
         recognizer.process(image)
-            .addOnSuccessListener {visionText ->
-//                Log.d(TAG, "recognizedText Success: ${visionText.text}")
+            .addOnSuccessListener { visionText ->
+                Log.d(TAG, "recognizedText Success: ${visionText.text}")
                 callback(visionText)
-
             }
             .addOnFailureListener { e ->
-                Log.d(TAG, "recognizedText: ${e.message}")
+                Log.d(TAG, "recognizedText e: ")
             }
+
+//        chineseRecognizer.process(image)
+//            .addOnSuccessListener {
+//                Log.d(TAG, "chinese Success: ${it.text}")
+//                callback(it)
+//
+//            }
+//            .addOnFailureListener {
+//                Log.d(TAG, "chinese e: ${it.message}")
+//            }
+//
+//        japaneseRecognizer.process(image)
+//            .addOnSuccessListener {
+//                Log.d(TAG, "japanese success: ${it.text}")
+//            }
+//            .addOnFailureListener {
+//                Log.d(TAG, "japanese e: ${it.message}")
+//            }
 
 
     }
