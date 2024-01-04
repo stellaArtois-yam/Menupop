@@ -7,6 +7,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.AdapterView
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.widget.addTextChangedListener
 import androidx.databinding.DataBindingUtil
@@ -19,7 +20,7 @@ import com.example.menupop.databinding.FragmentExchangeBinding
 
 
 class ExchangeFragment : Fragment() {
-    private var TAG = "ExchangeFragment"
+    private var TAG = "ExchangeFragmentTAG"
     lateinit var binding : FragmentExchangeBinding
     private lateinit var exchangeViewModel : ExchangeViewModel
     private lateinit var context : Context
@@ -91,9 +92,16 @@ class ExchangeFragment : Fragment() {
          * 메뉴판에 환율 적용 버튼
          */
         binding.exchangeRateApplicationStatus.setOnCheckedChangeListener {_, status ->
-            Log.d(TAG, "환율 적용 버튼: ${status}")
-            val sharedPreferences = context.getSharedPreferences("util", AppCompatActivity.MODE_PRIVATE)
-            exchangeViewModel.exchangeRateApplicationStatus(sharedPreferences,status)
+            if(exchangeViewModel.checkedSetCurrency()){
+                Log.d(TAG, "환율 적용 버튼: ${status}")
+
+                val sharedPreferences = context.getSharedPreferences("util", AppCompatActivity.MODE_PRIVATE)
+                exchangeViewModel.exchangeRateApplicationStatus(sharedPreferences,status)
+
+            }else{
+                Toast.makeText(requireContext(), "기준 화폐와 환전 화폐를 선택해주세요.", Toast.LENGTH_LONG).show()
+            }
+
         }
 
 
