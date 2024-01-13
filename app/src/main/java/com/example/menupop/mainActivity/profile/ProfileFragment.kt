@@ -120,6 +120,7 @@ class ProfileFragment : Fragment() {
         // 광고보러 가기 누르면 광고 프래그먼트로 이동
         binding.profileAdButton.setOnClickListener{
             event?.moveToAdvertisement()
+            Log.d(TAG, "setClick move to Ad ")
         }
 
         // 로그아웃하면 다이얼로그 뜨고

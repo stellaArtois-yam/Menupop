@@ -34,8 +34,6 @@ class TicketPurchaseFragment : Fragment() {
     private lateinit var context: Context
     var identifier : Int ?= null
 
-    private lateinit var sharedPreferences : SharedPreferences
-
     override fun onAttach(context: Context) {
         super.onAttach(context)
         this.context = context
@@ -94,10 +92,9 @@ class TicketPurchaseFragment : Fragment() {
 
     @RequiresApi(Build.VERSION_CODES.O)
     fun clickListener() {
-
         binding.foodTicketPurchaseButton.setOnClickListener {
-            Log.d(TAG, "haveRewarded: ${ticketPurchaseViewModel.haveRewarded.value}")
-            if(ticketPurchaseViewModel.haveRewarded.value!! > 0){
+            Log.d(TAG, "haveRewarded: ${ticketPurchaseViewModel.userInformation.value!!.haveRewarded}")
+            if(ticketPurchaseViewModel.userInformation.value!!.haveRewarded > 0){
                 paymentTypeDialog()
             }else{
                 paymentRegularDialog()
@@ -108,8 +105,8 @@ class TicketPurchaseFragment : Fragment() {
         }
 
         binding.translationTicketPurchaseButton.setOnClickListener {
-            Log.d(TAG, "haveRewarded: ${ticketPurchaseViewModel.haveRewarded.value}")
-            if(ticketPurchaseViewModel.haveRewarded.value!! > 0){
+            Log.d(TAG, "haveRewarded: ${ticketPurchaseViewModel.userInformation.value!!.haveRewarded}")
+            if(ticketPurchaseViewModel.userInformation.value!!.haveRewarded > 0){
                 paymentTypeDialog()
             }else{
                 paymentRegularDialog()
@@ -152,6 +149,7 @@ class TicketPurchaseFragment : Fragment() {
             Log.d(TAG, "reward click")
             ticketPurchaseViewModel.updatePaymentType("reward")
             dialog.dismiss()
+            Log.d(TAG, "reward click?")
             paymentRewardDialog()
         }
 
@@ -209,6 +207,7 @@ class TicketPurchaseFragment : Fragment() {
 
     @RequiresApi(Build.VERSION_CODES.O)
     fun paymentRewardDialog() {
+        Log.d(TAG, "paymentRewardDialog start");
         val dialogReward = Dialog(context)
 
         val dataBindingReward: DialogPaymentRewardBinding = DataBindingUtil.inflate(
@@ -238,9 +237,6 @@ class TicketPurchaseFragment : Fragment() {
 
         ticketPurchaseViewModel.changeTicket.observe(viewLifecycleOwner, Observer {
             if(it){
-                sharedPreferences = context.getSharedPreferences("userInfo", AppCompatActivity.MODE_PRIVATE)
-                ticketPurchaseViewModel.setRewarded(sharedPreferences)
-
                 dialogReward.dismiss()
                 event?.completePayment()
             }

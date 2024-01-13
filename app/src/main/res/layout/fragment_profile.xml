@@ -82,7 +82,7 @@
                         android:layout_marginTop="10dp"
                         android:layout_marginBottom="10dp"
 
-                        android:text='@{Integer.toString(mainActivityViewModel.dailyTranslation) + "/3"}'
+                        android:text='@{Integer.toString(mainActivityViewModel.userInformation.freeTranslationTicket) + "/3"}'
                         android:textColor="@color/black"
                         android:textSize="17sp" />
 

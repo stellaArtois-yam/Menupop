@@ -5,8 +5,8 @@ import android.content.SharedPreferences
 import android.os.Build
 import android.util.Log
 import androidx.annotation.RequiresApi
+import androidx.work.ExistingWorkPolicy
 import androidx.work.OneTimeWorkRequestBuilder
-import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkInfo
 import androidx.work.WorkManager
 import com.example.menupop.BuildConfig
@@ -52,23 +52,6 @@ class MainActivityModel(val application :Application) {
     private val service = retrofit.create(RetrofitService::class.java)
 
 
-    fun getUserInfo(sharedPreferences: SharedPreferences) : HashMap<String, Int>{
-        val hashmap = HashMap<String, Int>()
-
-        val identifier = sharedPreferences.getInt("identifier", 0)
-        val dailyTranslation = sharedPreferences.getInt("dailyTranslation", 0)
-        val dailyReward = sharedPreferences.getInt("dailyReward", 0)
-        val haveReward = sharedPreferences.getInt("haveReward", 0)
-        val todayRewarded = sharedPreferences.getInt("todayRewarded", 0)
-
-        hashmap.put("identifier", identifier)
-        hashmap.put("dailyTranslation", dailyTranslation)
-        hashmap.put("dailyReward", dailyReward)
-        hashmap.put("haveReward", haveReward)
-        hashmap.put("todayRewarded", todayRewarded)
-
-        return hashmap
-    }
 
     fun getProfileImage(sharedPreferences: SharedPreferences) : String?{
         val image = sharedPreferences.getString("profileImage", "")
@@ -80,59 +63,50 @@ class MainActivityModel(val application :Application) {
         return null
     }
 
-    fun minusTranslationTicket(identifier: Int,callback: (String) -> Unit){
-        service.minusTranslationTicket(identifier).enqueue(object : Callback<String>{
-            override fun onResponse(call: Call<String>, response: Response<String>) {
-                Log.d(TAG, "onResponse:  minusTicket $response")
-                if(response.isSuccessful){
+    fun updateTicketQuantity(identifier: Int,
+                             ticketType : String,
+                             operator : String,
+                             quantity : Int,
+                             callback: (String) ->Unit){
+        service.updateTicketQuantity(identifier, ticketType, operator, quantity)
+            .enqueue(object : Callback<String>{
+                override fun onResponse(call: Call<String>, response: Response<String>) {
+                    Log.d(TAG, "update ticket quantity onResponse: ${response.body()}")
+                    if(response.isSuccessful){
+                        callback(response.body()!!)
+                    }else{
+                        Log.d(TAG, "update ticket is not successful")
+                        //여기도 예외 처리 필요
+                    }
+                }
 
+                override fun onFailure(call: Call<String>, t: Throwable) {
+                    Log.d(TAG, "update ticket quantity onFailure: ${t.message}")
+                    //ticket 사용이 안된 것이므로 다시 결제하라는 toast나 뭐가 떠야함
+                }
+            })
+    }
+
+    fun updateRewardQuantity(identifier: Int, callback: (String) ->Unit){
+        service.updateRewardQuantity(identifier).enqueue(object : Callback<String>{
+            override fun onResponse(call: Call<String>, response: Response<String>) {
+                Log.d(TAG, "update Reward onResponse: ${response.body()}")
+                if(response.isSuccessful){
                     callback(response.body()!!)
+                }else{
+                    Log.d(TAG, "update Reward is not successful")
                 }
             }
 
             override fun onFailure(call: Call<String>, t: Throwable) {
-                Log.d(TAG, "onFailure: ${t}")
-                callback("failed")
+                Log.d(TAG, "update reward onFailure: ${t.message}")
             }
-
         })
     }
 
-    fun minusFreeFoodTicket(identifier: Int,callback: (String) -> Unit){
-        service.minusFreeFoodTicket(identifier).enqueue(object : Callback<String>{
-            override fun onResponse(call: Call<String>, response: Response<String>) {
-                Log.d(TAG, "onResponse:  minusTicket $response")
-                if(response.isSuccessful){
 
-                    callback(response.body()!!)
-                }
-            }
 
-            override fun onFailure(call: Call<String>, t: Throwable) {
-                Log.d(TAG, "onFailure: ${t}")
-                callback("failed")
-            }
 
-        })
-    }
-
-    fun minusFoodTicket(identifier: Int,callback: (String) -> Unit){
-        service.minusFoodTicket(identifier).enqueue(object : Callback<String>{
-            override fun onResponse(call: Call<String>, response: Response<String>) {
-                Log.d(TAG, "onResponse:  minusTicket $response")
-                if(response.isSuccessful){
-
-                    callback(response.body()!!)
-                }
-            }
-
-            override fun onFailure(call: Call<String>, t: Throwable) {
-                Log.d(TAG, "onFailure: ${t}")
-                callback("failed")
-            }
-
-        })
-    }
 
     fun getFoodPreference(identifier: Int,callback : (FoodPreferenceDataClass)->Unit){
         Log.d(TAG, "getFoodPreference: 호출")
@@ -148,26 +122,13 @@ class MainActivityModel(val application :Application) {
             }
 
             override fun onFailure(call: Call<FoodPreferenceDataClass>, t: Throwable) {
-                Log.d(TAG, "onFailure: ${t}")
+                Log.d(TAG, "get food preference onFailure: ${t}")
             }
 
         })
 
     }
-    fun checkTranslationTicket(sharedPreferences: SharedPreferences) : Int{
-        return sharedPreferences.getInt("dailyTranslation",0)
-    }
-    fun freeTranslationTicketMinus(sharedPreferences: SharedPreferences): Boolean{
 
-        val edit = sharedPreferences.edit()
-
-        val freeTranslationTicket = sharedPreferences.getInt("dailyTranslation",0)
-        var result = if(freeTranslationTicket != 0) freeTranslationTicket -1 else freeTranslationTicket
-        Log.d(TAG, "freeTranslationTicketMinus result: $result")
-        edit.putInt("dailyTranslation",result)
-
-        return edit.commit()
-    }
 
     fun savePaymentHistory(ticketSaveModel: TicketSaveDTO, callback: (SimpleResultDTO) -> Unit){
 
@@ -187,7 +148,7 @@ class MainActivityModel(val application :Application) {
 
             }
             override fun onFailure(call: Call<SimpleResultDTO>, t: Throwable) {
-                Log.d(TAG, "onFailure: ${t.message}")
+                Log.d(TAG, "save payment history onFailure: ${t.message}")
             }
         })
     }
@@ -207,7 +168,7 @@ class MainActivityModel(val application :Application) {
             }
 
             override fun onFailure(call: Call<UserInformationDTO>, t: Throwable) {
-                Log.d(TAG, "onFailure: ${t.message}")
+                Log.d(TAG, "request user info onFailure: ${t.message}")
             }
         })
     }
@@ -260,7 +221,7 @@ class MainActivityModel(val application :Application) {
             }
 
             override fun onFailure(call: Call<KakaoPayReadyResponseDTO>, t: Throwable) {
-                Log.d(TAG, "onFailure: ${t.message}")
+                Log.d(TAG, "create payment request onFailure: ${t.message}")
             }
         })
     }
@@ -276,7 +237,7 @@ class MainActivityModel(val application :Application) {
             }
 
             override fun onFailure(call: Call<String>, t: Throwable) {
-                Log.d(TAG, "onFailure: ${t}")
+                Log.d(TAG, "food register onFailure: ${t}")
             }
 
         })
@@ -295,7 +256,7 @@ class MainActivityModel(val application :Application) {
             }
 
             override fun onFailure(call: Call<FoodPreferenceSearchDTO>, t: Throwable) {
-                Log.d(TAG, "onFailure: ${t}")
+                Log.d(TAG, "search food onFailure: ${t}")
             }
 
         })
@@ -313,6 +274,7 @@ class MainActivityModel(val application :Application) {
             }
 
             override fun onFailure(call: Call<String>, t: Throwable) {
+                Log.d(TAG, "delete food preference onFailure: ${t.message}")
                 callback("failed")
             }
 
@@ -345,64 +307,79 @@ class MainActivityModel(val application :Application) {
             }
 
             override fun onFailure(call: Call<KakaoPayApproveResponseDTO>, t: Throwable) {
-                Log.d(TAG, "onFailure: ${t.message}")
+                Log.d(TAG, "request approve payment onFailure: ${t.message}")
             }
         })
     }
 
-
-    fun scheduleMidnightWork(application: Application, callback: (Boolean) -> Unit) {
+    fun setDelayTime() : Long {
 
         val midnight = Calendar.getInstance().apply {
-            set(Calendar.HOUR_OF_DAY, 22) // 자정
-            set(Calendar.MINUTE, 10)
+            set(Calendar.HOUR_OF_DAY, 16) // 자정
+            set(Calendar.MINUTE, 4)
             set(Calendar.SECOND, 0)
         }
 
-
         val currentTime = Calendar.getInstance()
 
+        if(midnight.before(currentTime)){
+            midnight.add(Calendar.HOUR_OF_DAY, 24)
+        }
+
         val delay = midnight.timeInMillis - currentTime.timeInMillis
+        Log.d(TAG, "delay : $delay")
+
 
         Log.d(TAG, "WorkManager dueDate: ${midnight.timeInMillis}")
         Log.d(TAG, "WorkManager currentTime: ${currentTime.timeInMillis}")
 
+        return delay
+    }
+
+
+    fun scheduleMidnightWork(application: Application, callback: (Boolean) -> Unit) {
+        val delay = setDelayTime()
 
         val midnightWorkRequest = OneTimeWorkRequestBuilder<MidnightResetWorker>()
             .setInitialDelay(delay, TimeUnit.MILLISECONDS)
             .build()
 
-        Log.d(TAG, "scheduleMidnightWork: ${midnightWorkRequest.id.toString()}")
-
-
-        WorkManager.getInstance(application.applicationContext).enqueue(midnightWorkRequest)
+        WorkManager.getInstance(application.applicationContext)
+            .enqueueUniqueWork("midnightWork",
+                ExistingWorkPolicy.KEEP ,
+                midnightWorkRequest)
 
         Log.d(TAG, "workManager first: ${midnightWorkRequest.id}")
 
         WorkManager.getInstance(application.applicationContext)
-            .getWorkInfoByIdLiveData(midnightWorkRequest.id)
-            .observeForever {
-                if (it != null && it.state == WorkInfo.State.SUCCEEDED) {
-                    Log.d(TAG, "WorkManager success? : ${it.state}")
+            .getWorkInfosForUniqueWorkLiveData("midnightWork")
+            .observeForever{
+                Log.d(TAG, "workInfo Size: ${it.size}")
+                Log.d(TAG, "workInfo info: ${it[0]}")
+
+                if (it != null && it[0].state == WorkInfo.State.SUCCEEDED) {
+                    Log.d(TAG, "WorkManager success? : ${it[0].state}")
                     callback(true)
 
-                    /**
-                     * 처음 1번이 성공하면 다른 Request를 작업에 넣는 형식 이게 되는건지는 모르겠다
-                     */
+                    val delay = setDelayTime()
 
                     var againWorkRequest = OneTimeWorkRequestBuilder<MidnightResetWorker>()
                         .setInitialDelay(delay, TimeUnit.MILLISECONDS)
                         .build()
 
-                    WorkManager.getInstance(application.applicationContext).enqueue(againWorkRequest)
+                    WorkManager.getInstance(application.applicationContext)
+                        .enqueueUniqueWork("midnightWork",
+                            ExistingWorkPolicy.KEEP,
+                            againWorkRequest)
+
                     Log.d(TAG, "WorkManager enqueue again: ${againWorkRequest.id}")
 
+                }else if(it == null){
+                    Log.d(TAG, "WorkManager null")
                 }else{
-                    Log.d(TAG, "WorkManager: ${it.state}")
+                    Log.d(TAG, "${it[0].id}: ${it[0].state}")
                 }
             }
-
-
     }
 
 
@@ -415,35 +392,14 @@ class MainActivityModel(val application :Application) {
             }
 
             override fun onFailure(call: Call<String>, t: Throwable) {
-                Log.d(TAG, "onFailure: ${t}")
+                Log.d(TAG, "withdrawal onFailure: ${t}")
                 callback("failed")
             }
 
         })
     }
-    fun rewardedPlus(sharedPreferences: SharedPreferences) : Pair<Int,Int>{
-        var haveReward = sharedPreferences.getInt("haveReward",0)
-        var todayRewarded = sharedPreferences.getInt("todayRewarded", 0)
-        var dailyReward = sharedPreferences.getInt("dailyReward", 0)
 
-        haveReward += 1
-        dailyReward -= 1
-        todayRewarded = 3 - dailyReward
 
-        Log.d(TAG, "rewardedPlus: haveReward_$haveReward dailyReward_$dailyReward")
-
-        val edit = sharedPreferences.edit()
-        edit.putInt("haveReward",haveReward)
-        edit.putInt("dailyReward", dailyReward)
-        edit.putInt("todayRewarded", todayRewarded)
-        edit.commit()
-
-        return Pair<Int,Int>(todayRewarded,dailyReward)
-    }
-    fun setRewarded(sharedPreferences: SharedPreferences, haveReward : Int) {
-        Log.d(TAG, "setRewarded: $haveReward")
-        sharedPreferences.edit().putInt("haveReward",haveReward).commit()
-    }
 
     fun saveSelectedProfile(drawable : String, sharedPreferences: SharedPreferences, callback: (String) -> Unit){
         if(sharedPreferences.edit().putString("profileImage", drawable).commit()){

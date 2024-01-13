@@ -43,7 +43,7 @@ class CameraModel {
 
     private val service = retrofit.create(RetrofitService::class.java)
 
-    fun  requestTranslation(text : String, language : String, callback: (String) -> Unit){
+    fun requestTranslation(text : String, language : String, callback: (String) -> Unit){
         service.requestTranslation(text, language).enqueue(object : Callback<String> {
             override fun onResponse(call: Call<String>, response: Response<String>) {
                 if(response.isSuccessful){
@@ -71,8 +71,12 @@ class CameraModel {
          */
         if (country.equals("japan")){
             recognizer = TextRecognition.getClient(JapaneseTextRecognizerOptions.Builder().build())
+            Log.d(TAG, "recognizer: japan")
+
         }else if(country.equals("china") || country.equals("hongkong") || country.equals("taiwan")){
             recognizer = TextRecognition.getClient(ChineseTextRecognizerOptions.Builder().build())
+            Log.d(TAG, "recognizer: china")
+
         }
 
         recognizer.process(image)
@@ -83,26 +87,6 @@ class CameraModel {
             .addOnFailureListener { e ->
                 Log.d(TAG, "recognizedText e: ")
             }
-
-//        chineseRecognizer.process(image)
-//            .addOnSuccessListener {
-//                Log.d(TAG, "chinese Success: ${it.text}")
-//                callback(it)
-//
-//            }
-//            .addOnFailureListener {
-//                Log.d(TAG, "chinese e: ${it.message}")
-//            }
-//
-//        japaneseRecognizer.process(image)
-//            .addOnSuccessListener {
-//                Log.d(TAG, "japanese success: ${it.text}")
-//            }
-//            .addOnFailureListener {
-//                Log.d(TAG, "japanese e: ${it.message}")
-//            }
-
-
     }
 
     fun checkTranslationTicket(){

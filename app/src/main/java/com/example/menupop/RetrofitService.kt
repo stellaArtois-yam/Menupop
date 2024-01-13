@@ -125,21 +125,31 @@ interface RetrofitService {
     @POST("DeleteFoodPreference.php")
     @FormUrlEncoded
     fun deleteFoodPreference(@Field("identifier") identifier: Int,@Field("foodName") foodName: String) : Call<String>
-    @POST("MinusFoodTicket.php")
-    @FormUrlEncoded
-    fun minusFoodTicket(@Field("identifier") identifier: Int) : Call<String>
-    @POST("MinusFreeFoodTicket.php")
-    @FormUrlEncoded
-    fun minusFreeFoodTicket(@Field("identifier") identifier: Int) : Call<String>
-    @FormUrlEncoded
-    @POST("MinusTranslationTicket.php")
-    fun minusTranslationTicket(@Field("identifier") identifier: Int) : Call<String>
+
+
     @POST("Withdrawal.php")
     @FormUrlEncoded
     fun withdrawal(@Field("identifier") identifier: Int,
                    @Field("email") email: String,
                    @Field("id") id : String,
                    @Field("date") date:String) : Call<String>
+
+
+    @POST("UpdateTicketQuantity.php")
+    @FormUrlEncoded
+    fun updateTicketQuantity(@Field("identifier") identifier: Int,
+                             @Field("ticketType") ticketType : String,
+                             @Field("operator") operator : String,
+                             @Field("quantity") quantity : Int) : Call<String>
+
+    @POST("UpdateRewardQuantity.php")
+    @FormUrlEncoded
+    fun updateRewardQuantity(@Field("identifier") identifier: Int) : Call<String>
+
+    @POST("MidnightWork.php")
+    @FormUrlEncoded
+    fun midnightWork(@Field("identifier") identifier: Int) : Call<String>
+
 
     @POST("/")
     @FormUrlEncoded

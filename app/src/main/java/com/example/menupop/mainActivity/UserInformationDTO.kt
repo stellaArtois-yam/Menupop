@@ -9,5 +9,8 @@ data class UserInformationDTO(
     var unFavoriteFood : String,
     var foodTicket : Int,
     var translationTicket : Int,
-    var freeFoodTicket : Int
+    var freeTranslationTicket : Int,
+    var freeFoodTicket : Int,
+    var dailyReward : Int,
+    var haveRewarded : Int
 )

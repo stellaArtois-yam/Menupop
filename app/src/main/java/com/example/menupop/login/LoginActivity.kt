@@ -39,7 +39,7 @@ import kotlinx.coroutines.launch
 
 class LoginActivity : AppCompatActivity() {
     private lateinit var loginViewModel: LoginViewModel
-    private  val TAG = "LoginActivity"
+    private  val TAG = "LoginActivityTAG"
     private lateinit var binding : ActivityLoginBinding
     lateinit var kakaoCallback: (OAuthToken?, Throwable?) -> Unit
     private val googleSignInClient: GoogleSignInClient by lazy { getGoogleClient() }
@@ -75,7 +75,7 @@ class LoginActivity : AppCompatActivity() {
             if(result.result == "success"){
                 var sharedPreferences = getSharedPreferences("userInfo", MODE_PRIVATE)
                 loginViewModel.saveIdentifier(sharedPreferences,result.identifier)
-                isNewUserCheck(result.isNewUser)
+                isNewUserCheck(result.isNewUser, result.identifier)
             }
         }
 
@@ -87,7 +87,7 @@ class LoginActivity : AppCompatActivity() {
             } else {
                 var sharedPreferences = getSharedPreferences("userInfo", MODE_PRIVATE)
                 loginViewModel.saveIdentifier(sharedPreferences,it.identifier)
-                isNewUserCheck(it.isNewUser)
+                isNewUserCheck(it.isNewUser, it.identifier)
             }
         })
         loginViewModel.socialLoginResult.observe(this){ result ->
@@ -99,7 +99,7 @@ class LoginActivity : AppCompatActivity() {
             } else {
                 var sharedPreferences = getSharedPreferences("userInfo", MODE_PRIVATE)
                 loginViewModel.saveIdentifier(sharedPreferences,result.identifier)
-                isNewUserCheck(result.isNewUser)
+                isNewUserCheck(result.isNewUser, result.identifier)
             }
         }
     }
@@ -110,21 +110,24 @@ class LoginActivity : AppCompatActivity() {
         binding.loginViewModel = loginViewModel
         binding.lifecycleOwner = this
     }
-    private fun isNewUserCheck(isNewUser:Int){
+    private fun isNewUserCheck(isNewUser:Int, identifier:Int){
         if (isNewUser == 1){
             var intent = Intent(this, SignupActivity :: class.java)
             startActivity(intent)
             return
         }
         var intent = Intent(this, MainActivity :: class.java)
+        intent.putExtra("identifier", identifier)
         startActivity(intent)
         finish()
     }
     private fun IdentitySaveCheck(){
         var sharedPreferences = getSharedPreferences("userInfo", MODE_PRIVATE)
+
         val identifier = sharedPreferences.getInt("identifier",0)
         if(identifier != 0){
             var intent = Intent(this, MainActivity :: class.java)
+            intent.putExtra("identifier", identifier)
             startActivity(intent)
             finish()
         }

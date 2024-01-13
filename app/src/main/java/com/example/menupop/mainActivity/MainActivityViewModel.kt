@@ -22,6 +22,7 @@ import com.example.menupop.mainActivity.foodPreference.FoodPreferenceSearchDTO
 import com.example.menupop.SimpleResultDTO
 import com.example.menupop.mainActivity.profile.ProfileSelectionDTO
 import com.google.android.gms.ads.rewarded.RewardedAd
+import org.intellij.lang.annotations.Identifier
 import java.text.DecimalFormat
 import java.time.LocalDate
 import java.time.LocalDateTime
@@ -64,12 +65,6 @@ class MainActivityViewModel(private val application: Application) :  AndroidView
     val accountWithdrawal : LiveData<String>
         get() = _accountWithdrawal
 
-
-    // 가지고 있는 리워드
-    private val _haveRewarded = MutableLiveData<Int>()
-
-    val haveRewarded : LiveData<Int>
-        get() = _haveRewarded
 
     // 받은 리워드
     private val _todayRewarded = MutableLiveData<Int>()
@@ -120,52 +115,44 @@ class MainActivityViewModel(private val application: Application) :  AndroidView
     val checkingTranslationTicket : LiveData<Boolean>
         get() =_checkingTranslationTicket
 
-    fun freeFoodTicketMinus(){
-        Log.d(TAG, "free food ticket Minus: ${_userInformation.value!!.foodTicket}")
 
-        callbackResult = {result ->
-            Log.d(TAG, "free food ticket Minus: $result")
-            if(result.trim() == "success"){
-                _userInformation.value?.freeFoodTicket = _userInformation.value?.freeFoodTicket?.minus(1)!!
+
+
+
+    fun updateTicketQuantity(ticketType : String, operator : String, quantity : Int){
+        callbackResult = {
+            Log.d(TAG, "updateTicketQuantity ticketType : $ticketType")
+            //여기서 update를 하자, switch문 같은거 쓰면 될듯
+            if(it == "success"){
+                when(ticketType){
+                    "free_translation_ticket"-> _userInformation.value!!.freeTranslationTicket -= 1
+                    "free_food_ticket" -> _userInformation.value!!.freeFoodTicket -= 1
+                    "translation_ticket" -> _userInformation.value!!.translationTicket -= 1
+                    "food_ticket" -> _userInformation.value!!.foodTicket -= 1
+                    "have_rewarded" -> buyTicketUsingReward()
+                    else -> Log.d(TAG, "updateTicketQuantity not match")
+
+                }
+                _changeTicket.value = true
+                Log.d(TAG, "updateTicketQuantity after user: ${_userInformation.value}")
+
+            }else{
+                Log.d(TAG, "updateTicketQuantity result failed: ")
             }
         }
-        mainActivityModel.minusFreeFoodTicket(_identifier.value!!,callbackResult!!)
-        Log.d(TAG, "free food ticket Minus: ${_userInformation.value!!.foodTicket}")
+        mainActivityModel.updateTicketQuantity(_identifier.value!!, ticketType, operator, quantity,callbackResult!!)
+
     }
 
-    fun foodTicketMinus(){
-        Log.d(TAG, "food ticket minus: ${_userInformation.value!!.foodTicket}")
+    fun buyTicketUsingReward(){
+        Log.d(TAG, "buyTicketUsingReward")
+        _userInformation.value!!.haveRewarded = _userInformation.value!!.haveRewarded - (_rewardFoodAmount.value!! + _rewardTranslationAmount.value!!)
+        _userInformation.value!!.foodTicket = _userInformation.value!!.foodTicket + _rewardFoodAmount.value!!
+        _userInformation.value!!.translationTicket = _userInformation.value!!.translationTicket + _rewardTranslationAmount.value!!
 
-        callbackResult = {result ->
-            Log.d(TAG, "food ticket minus: $result")
-            if(result.trim() == "success"){
-                _userInformation.value?.foodTicket = _userInformation.value?.foodTicket?.minus(1)!!
-            }
-        }
-        mainActivityModel.minusFoodTicket(_identifier.value!!,callbackResult!!)
-        Log.d(TAG, "food ticket minus: ${_userInformation.value!!.foodTicket}")
-    }
-    fun translationTicketMinus(){
-        Log.d(TAG, "translation ticket minus : ${_userInformation.value!!.translationTicket}")
-
-        callbackResult = {result ->
-            Log.d(TAG, "translation ticket minus result: $result")
-            if(result.trim() == "success"){
-                _userInformation.value?.translationTicket = _userInformation.value?.translationTicket?.minus(1)!!
-            }
-        }
-        mainActivityModel.minusTranslationTicket(_identifier.value!!,callbackResult!!)
-        Log.d(TAG, "translation ticket minus: ${_userInformation.value!!.translationTicket}")
-    }
-    fun freeTranslationTicketMinus(sharedPreferences: SharedPreferences){
-        if(mainActivityModel.freeTranslationTicketMinus(sharedPreferences)){
-            _dailyTranslation.value = _dailyTranslation.value!! - 1
-
-            Log.d(TAG, "free Translation Ticket Minus: ${_dailyTranslation.value}")
-        }
     }
 
-    fun foodPreferenceRegister(foodName:String,classification:String){
+    fun foodPreferenceRegister(foodName:String, classification:String){
         Log.d(TAG, "foodPreferenceRegister: 호출됨")
 
         callbackResult = { result ->
@@ -176,12 +163,10 @@ class MainActivityViewModel(private val application: Application) :  AndroidView
     }
 
     fun checkingTranslationTicket(){
-        _checkingTranslationTicket.value = userInformation.value?.translationTicket!! > 0  || _dailyTranslation.value!! > 0
+        _checkingTranslationTicket.value = userInformation.value?.translationTicket!! > 0  || _userInformation.value!!.dailyReward > 0
 
     }
-    fun checkTranslationTicket(sharedPreferences: SharedPreferences) : Int{
-        return mainActivityModel.checkTranslationTicket(sharedPreferences)
-    }
+
 
     fun deleteFoodPreference(foodName: String){
         callbackResult = {result ->
@@ -221,26 +206,12 @@ class MainActivityViewModel(private val application: Application) :  AndroidView
     val identifier : LiveData<Int>
         get() = _identifier
 
-
-
-
-    fun getUserInfo(sharedPreferences: SharedPreferences){
-        val userInfo = mainActivityModel.getUserInfo(sharedPreferences)
-        _identifier.value = userInfo["identifier"]
-
-        _dailyTranslation.value = userInfo["dailyTranslation"]
-
-        _dailyReward.value = userInfo["dailyReward"]
-        _haveRewarded.value = userInfo["haveReward"]
-        _todayRewarded.value = userInfo["todayRewarded"]
-
-        Log.d(TAG, "first get \n identifier: ${identifier.value}" +
-                "\n dailyReward: ${_dailyReward.value}" +
-                "\n haveRewarded: ${_haveRewarded.value}" +
-                "\n todayRewarded : ${todayRewarded.value}"+
-                "\ndailyTranslation: ${_dailyTranslation.value}")
-
+    fun setIdentifier(identifier: Int){
+        _identifier.value = identifier
     }
+
+
+
 
 
     fun requestUserInformation(identifier : Int){
@@ -248,6 +219,7 @@ class MainActivityViewModel(private val application: Application) :  AndroidView
         callbackUserInfo = {response ->
             _userInformation.value = response
             Log.d(TAG, "requestUserInformation: ${response.id}, ${response.email} ${_userInformation.value!!.freeFoodTicket} ${response}")
+            _todayRewarded.value = 3 - _userInformation.value!!.dailyReward
             _isLoading.value = response.id != null && response.email!=null
         }
         mainActivityModel.requestUserInformation(identifier, callbackUserInfo!!)
@@ -259,10 +231,6 @@ class MainActivityViewModel(private val application: Application) :  AndroidView
             _rewardedAd.value = ad
         }
         mainActivityModel.requestAd(key, callbackAd!!)
-    }
-    fun setRewarded(sharedPreferences: SharedPreferences){
-        Log.d(TAG, "use haveRewarded: ${_haveRewarded.value}")
-       mainActivityModel.setRewarded(sharedPreferences, _haveRewarded.value!!)
     }
 
     private val _isChangedProfile = MutableLiveData<Boolean>()
@@ -296,13 +264,20 @@ class MainActivityViewModel(private val application: Application) :  AndroidView
         }
 
     }
-    fun rewardedSuccess(sharedPreferences: SharedPreferences){
-        val rewarded = mainActivityModel.rewardedPlus(sharedPreferences)
-        Log.d(TAG, "rewardedSuccess: $rewarded")
-        _haveRewarded.value = rewarded.first
-        _todayRewarded.value = 3 - rewarded.second
+    fun rewardedSuccess(){
 
-        _dailyReward.value = rewarded.second
+        callbackResult ={
+            if(it == "success"){
+                _userInformation.value!!.haveRewarded +=1
+                _userInformation.value!!.dailyReward -= 1
+                _todayRewarded.value = 3 - _userInformation.value!!.dailyReward
+            }else{
+                Log.d(TAG, "rewardedSuccess failed: ")
+            }
+        }
+
+        mainActivityModel.updateRewardQuantity(_identifier.value!!, callbackResult!!)
+
     }
 
 
@@ -429,7 +404,7 @@ class MainActivityViewModel(private val application: Application) :  AndroidView
     @RequiresApi(Build.VERSION_CODES.O)
     fun rewardPayment(identifier: Int){
 
-        if(_haveRewarded.value!! < (_rewardFoodAmount.value!! + _rewardTranslationAmount.value!!)){
+        if(_userInformation.value!!.haveRewarded < (_rewardFoodAmount.value!! + _rewardTranslationAmount.value!!)){
             _isRewardExceeded.value = true
 
         }else{
@@ -437,8 +412,9 @@ class MainActivityViewModel(private val application: Application) :  AndroidView
             var item = itemName(_rewardTranslationAmount, _rewardFoodAmount)
 
             var time = LocalDateTime.now().toString()
+
             savePaymentHistory(identifier
-                ,hashCode().toString()
+                ,Calendar.getInstance().hashCode().toString()
                 ,_paymentType.value!!
                 ,item
                 , 0
@@ -571,6 +547,11 @@ class MainActivityViewModel(private val application: Application) :  AndroidView
     val changeTicket : LiveData<Boolean>
         get() =_changeTicket
 
+    fun setChangeTicket(){
+        _changeTicket.value = false
+        Log.d(TAG, "setChangeTicket status: ${_changeTicket.value}")
+    }
+
     fun savePaymentHistory(identifier: Int, tid : String, paymentType : String, item : String,
                            price : Int, approveAt : String){
         var ticketSaveModel : TicketSaveDTO?= null
@@ -584,15 +565,12 @@ class MainActivityViewModel(private val application: Application) :  AndroidView
                     _userInformation.value!!.foodTicket = _userInformation.value!!.foodTicket + _regularFoodAmount.value!!
                     _userInformation.value!!.translationTicket = _userInformation.value!!.translationTicket + _regularTranslationAmount.value!!
 
+                    _changeTicket.value = true
 
                 }else if(_paymentType.value == "reward"){
-                    _haveRewarded.value = _haveRewarded.value!! - (_rewardFoodAmount.value!! + _rewardTranslationAmount.value!!)
-                    _userInformation.value!!.foodTicket = _userInformation.value!!.foodTicket + _rewardFoodAmount.value!!
-                    _userInformation.value!!.translationTicket = _userInformation.value!!.translationTicket + _rewardTranslationAmount.value!!
-
+                    Log.d(TAG, "savePaymentHistory reward ")
+                    updateTicketQuantity("have_rewarded", "-", _rewardFoodAmount.value!! + _rewardTranslationAmount.value!!)
                 }
-
-                _changeTicket.value = true
 
 
             }else{
@@ -617,8 +595,8 @@ class MainActivityViewModel(private val application: Application) :  AndroidView
 
         mainActivityModel.savePaymentHistory(ticketSaveModel!!, callback!!)
 
-
     }
+
 
     fun logout(sharedPreferences: SharedPreferences){
         mainActivityModel.logout(sharedPreferences)
@@ -627,22 +605,15 @@ class MainActivityViewModel(private val application: Application) :  AndroidView
         _registerResult.value = false
     }
 
-    private val _dailyTranslation = MutableLiveData<Int>()
-    val dailyTranslation : LiveData<Int>
-        get() = _dailyTranslation
 
-    //reward 받을 수 있는 개수
-    private val _dailyReward = MutableLiveData<Int>()
-    val dailyReward : LiveData<Int>
-        get() = _dailyReward
 
     fun scheduleMidnightWork(application: Application){
         val callback : ((Boolean) -> Unit) ={
             if(it){
                 Log.d(TAG, "scheduleMidnightWork: true")
-                _dailyTranslation.value = 3
-                _dailyReward.value = 3
-                _haveRewarded.value = 0
+                _userInformation.value!!.freeTranslationTicket = 3
+                _userInformation.value!!.dailyReward = 3
+                _userInformation.value!!.haveRewarded = 0
                 _todayRewarded.value = 0
             }else{
                 Log.d(TAG, "scheduleMidnightWork: false")
@@ -650,10 +621,8 @@ class MainActivityViewModel(private val application: Application) :  AndroidView
 
         }
         mainActivityModel.scheduleMidnightWork(application, callback)
-        Log.d(TAG, "scheduleMidnightWork: ?")
-
-
     }
+
     fun selectionCountry(view : View){
         Log.d(TAG, "selectionCountry: 실행")
         when(view.id){
