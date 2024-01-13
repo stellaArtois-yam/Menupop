@@ -54,10 +54,15 @@ class MainActivity : AppCompatActivity(), MainActivityEvent{
     lateinit var ticketPurchaseFragment: TicketPurchaseFragment
     var checkingTranslation : Boolean = false
 
+    var identifierByIntent : Int = 0
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+
+        identifierByIntent = intent.getIntExtra("identifier", 0)
+        Log.d(TAG, "onCreate identifierByIntent: $identifierByIntent")
 
         init()
 
@@ -88,8 +93,15 @@ class MainActivity : AppCompatActivity(), MainActivityEvent{
         /**
          * 초기 유저 정보 세팅
          */
-        var sharedPreferences = getSharedPreferences("userInfo", MODE_PRIVATE)
-        mainActivityViewModel.getUserInfo(sharedPreferences)
+//        var sharedPreferences = getSharedPreferences("userInfo", MODE_PRIVATE)
+//
+//        mainActivityViewModel.getUserInfo(sharedPreferences)
+
+
+        if(identifierByIntent != 0){
+            mainActivityViewModel.setIdentifier(identifierByIntent)
+            Log.d(TAG, "init: ")
+        }
 
         mainActivityViewModel.identifier.observe(this, Observer{
             if(it != null){
@@ -111,12 +123,7 @@ class MainActivity : AppCompatActivity(), MainActivityEvent{
                 supportFragmentManager.beginTransaction()
                     .replace(R.id.home_frame_layout, countrySelectionFragment)
                     .commit()
-//                binding.appbarMenu.findViewById<TextView>(R.id.appbar_status).text = "ㅇ"
-
-
-//                val intent = Intent(this,CameraActivity::class.java)
-//                intent.putExtra("foodPreference",mainActivityViewModel.foodPreferenceList.value?.foodList)
-//                startActivity(intent)
+                binding.appbarMenu.findViewById<TextView>(R.id.appbar_status).text = "번역"
 
             }else { // 티켓이 없을때
                 emptyTicketShowDialog()
@@ -128,18 +135,18 @@ class MainActivity : AppCompatActivity(), MainActivityEvent{
         /**
          * 초기화
          */
-//        mainActivityViewModel.scheduleMidnightWork(application)
+        mainActivityViewModel.scheduleMidnightWork(application)
 
 
         mainActivityViewModel.isLoading.observe(this, Observer {
             if(it){
                 if(checkingTranslation){
-                    if(mainActivityViewModel.checkTranslationTicket(sharedPreferences) > 0){
-                        Log.d(TAG, "freeTicketMinus")
-                        mainActivityViewModel.freeTranslationTicketMinus(sharedPreferences)
-                    }else {
-                        mainActivityViewModel.translationTicketMinus()
-                        Log.d(TAG, "ticket minus")
+//
+                    if(mainActivityViewModel.userInformation.value!!.freeTranslationTicket > 0){
+                        mainActivityViewModel.updateTicketQuantity("free_translation_ticket", "-", 1)
+                        Log.d(TAG, "Free Translation Ticket Use")
+                    }else{
+                        mainActivityViewModel.updateTicketQuantity("translation_ticket", "-", 1)
                     }
                     Log.d(TAG, "init Translation Ticket: ${mainActivityViewModel.userInformation.value!!.translationTicket} ")
 
@@ -177,8 +184,7 @@ class MainActivity : AppCompatActivity(), MainActivityEvent{
                 val rewardAmount = rewardItem.amount
                 val rewardType = rewardItem.type
                 Log.d(TAG, "User earned the reward. ${rewardAmount} ${rewardType}")
-                val sharedPreferences = getSharedPreferences("userInfo", MODE_PRIVATE)
-                mainActivityViewModel.rewardedSuccess(sharedPreferences)
+                mainActivityViewModel.rewardedSuccess()
             })
 
         }
@@ -235,7 +241,7 @@ class MainActivity : AppCompatActivity(), MainActivityEvent{
                 R.id.tab_camera -> {
                     Log.d(TAG, "onNavigationItemSelected: 카메라 탭 선택")
                     mainActivityViewModel.checkingTranslationTicket()
-                    return false
+                    return true
                 }
                 R.id.tab_exchange -> {
                     supportFragmentManager.beginTransaction()
@@ -305,6 +311,8 @@ class MainActivity : AppCompatActivity(), MainActivityEvent{
     }
 
     override fun completePayment() {
+        mainActivityViewModel.setChangeTicket()
+
         supportFragmentManager.beginTransaction().apply {
             replace(R.id.home_frame_layout, profileFragment)
             commit()
@@ -312,11 +320,13 @@ class MainActivity : AppCompatActivity(), MainActivityEvent{
     }
 
     override fun moveToAdvertisement() {
-        if(mainActivityViewModel.dailyReward.value!! == 0){
+        if(mainActivityViewModel.userInformation.value!!.dailyReward == 0){
             Toast.makeText(this,"하루에 받을 수 있는 리워드를 초과했습니다.", Toast.LENGTH_SHORT).show()
         }else{
+
             loadingDialog()
             val key = BuildConfig.GOOGLE_AD_ID
+            Log.d(TAG, "key: $key")
             mainActivityViewModel.loadAd(key)
 
         }

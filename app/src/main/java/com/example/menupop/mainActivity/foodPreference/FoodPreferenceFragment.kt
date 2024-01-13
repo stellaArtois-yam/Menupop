@@ -170,7 +170,6 @@ class FoodPreferenceFragment : Fragment() {
             mainViewModel.deletedResult.observe(viewLifecycleOwner){ result ->
                 if(result){
                     dialog.dismiss()
-
                     mainViewModel.getFoodPreference()
                 }else{
                     Toast.makeText(context,"잠시 후 다시 시도해주세요.",Toast.LENGTH_SHORT).show()
@@ -273,10 +272,10 @@ class FoodPreferenceFragment : Fragment() {
             if(result) {
                 existBottomSheetDialog.dismiss()
                 if (mainViewModel.userInformation.value?.freeFoodTicket!! > 0) {
-                    mainViewModel.freeFoodTicketMinus()
+                    mainViewModel.updateTicketQuantity("free_food_ticket", "-", 1)
 
                 }else {
-                    mainViewModel.foodTicketMinus()
+                    mainViewModel.updateTicketQuantity("food_ticket", "-", 1)
                 }
 
                 val imm = context.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager

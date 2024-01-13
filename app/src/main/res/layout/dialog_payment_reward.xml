@@ -26,7 +26,7 @@
 
         <LinearLayout
             android:id="@+id/reward_translation_ticket_purchase_box"
-            android:layout_width="350dp"
+            android:layout_width="300dp"
             android:layout_height="150dp"
 
             android:layout_marginStart="30dp"
@@ -92,7 +92,7 @@
 
         <LinearLayout
             android:id="@+id/reward_food_ticket_purchase_box"
-            android:layout_width="350dp"
+            android:layout_width="300dp"
             android:layout_height="150dp"
             android:layout_marginTop="30dp"
             android:layout_marginBottom="30dp"
@@ -158,7 +158,7 @@
             android:id="@+id/reward_ticket_purchase_available_rewards"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text='@{"사용 가능 리워드: " + Integer.toString(ticketPurchaseViewModel.haveRewarded) + "/3"}'
+            android:text='@{"사용 가능 리워드: " + Integer.toString(ticketPurchaseViewModel.userInformation.haveRewarded) + "/3"}'
             android:textColor="@color/black"
             android:textSize="20sp"
             android:textStyle="bold" />
@@ -176,7 +176,7 @@
 
         <androidx.appcompat.widget.AppCompatButton
             android:id="@+id/reward_ticket_purchase_button"
-            android:layout_width="350dp"
+            android:layout_width="300dp"
             android:layout_height="wrap_content"
             android:layout_marginTop="30dp"
             android:layout_marginBottom="30dp"

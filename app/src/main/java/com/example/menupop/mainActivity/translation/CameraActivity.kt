@@ -12,6 +12,7 @@ import android.util.Log
 import android.view.Window
 import android.widget.ImageView
 import android.widget.Toast
+import android.window.OnBackInvokedDispatcher
 import androidx.activity.OnBackPressedCallback
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.Observer
@@ -38,6 +39,8 @@ class CameraActivity : ScanActivity() {
     lateinit var foodPreferenceData : ArrayList<FoodPreference>
     var isImageSuccess = false
     lateinit var country : String
+
+
 
     private val callback = object : OnBackPressedCallback(true) {
         override fun handleOnBackPressed() {
