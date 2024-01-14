@@ -124,17 +124,28 @@ class MainActivityViewModel(private val application: Application) :  AndroidView
             Log.d(TAG, "updateTicketQuantity ticketType : $ticketType")
             //여기서 update를 하자, switch문 같은거 쓰면 될듯
             if(it == "success"){
-                when(ticketType){
-                    "free_translation_ticket"-> _userInformation.value!!.freeTranslationTicket -= 1
-                    "free_food_ticket" -> _userInformation.value!!.freeFoodTicket -= 1
-                    "translation_ticket" -> _userInformation.value!!.translationTicket -= 1
-                    "food_ticket" -> _userInformation.value!!.foodTicket -= 1
-                    "have_rewarded" -> buyTicketUsingReward()
-                    else -> Log.d(TAG, "updateTicketQuantity not match")
+                if(operator == "-"){
+                    when(ticketType) {
+                        "free_translation_ticket" -> _userInformation.value!!.freeTranslationTicket -= 1
+                        "free_food_ticket" -> _userInformation.value!!.freeFoodTicket -= 1
+                        "translation_ticket" -> _userInformation.value!!.translationTicket -= 1
+                        "food_ticket" -> _userInformation.value!!.foodTicket -= 1
+                        "have_rewarded" -> buyTicketUsingReward()
+                        else -> Log.d(TAG, "updateTicketQuantity not match")
 
+                    }
+                }else{
+                    //구매의 경우
+                    when(ticketType) {
+                        "translation_ticket" -> _userInformation.value!!.translationTicket += quantity
+                        "food_ticket" -> _userInformation.value!!.foodTicket += quantity
+                        else -> Log.d(TAG, "updateTicketQuantity not match")
+                    }
                 }
+
                 _changeTicket.value = true
-                Log.d(TAG, "updateTicketQuantity after user: ${_userInformation.value}")
+                Log.d(TAG, "updateTicketQuantity after use: ${_userInformation.value}")
+
 
             }else{
                 Log.d(TAG, "updateTicketQuantity result failed: ")
@@ -254,7 +265,7 @@ class MainActivityViewModel(private val application: Application) :  AndroidView
 
     fun getProfileImage(sharedPreferences: SharedPreferences, resources: Resources){
         val getResult = mainActivityModel.getProfileImage(sharedPreferences)
-        Log.d(TAG, "getProfileImage: $getResult")
+//        Log.d(TAG, "getProfileImage: $getResult")
 
         if(getResult != null){
             val image = resources.getIdentifier(getResult, "drawable", application.packageName)
@@ -298,7 +309,7 @@ class MainActivityViewModel(private val application: Application) :  AndroidView
 
     fun getFoodPreference(){
         callbackFoodPreference = { foodPreferenceDataClass ->
-            Log.d(TAG, "getFoodPreference: ${foodPreferenceDataClass}")
+//            Log.d(TAG, "getFoodPreference: ${foodPreferenceDataClass}")
             _foodPreferenceList.value = foodPreferenceDataClass
         }
         mainActivityModel.getFoodPreference(_identifier.value!!,callbackFoodPreference!!)
@@ -410,12 +421,13 @@ class MainActivityViewModel(private val application: Application) :  AndroidView
         }else{
             _isRewardExceeded.value = false
             var item = itemName(_rewardTranslationAmount, _rewardFoodAmount)
+            Log.d(TAG, "rewardPayment itemName: $item")
 
             var time = LocalDateTime.now().toString()
 
             savePaymentHistory(identifier
                 ,Calendar.getInstance().hashCode().toString()
-                ,_paymentType.value!!
+                ,_paymentType.value!!.uppercase()
                 ,item
                 , 0
                 ,time)

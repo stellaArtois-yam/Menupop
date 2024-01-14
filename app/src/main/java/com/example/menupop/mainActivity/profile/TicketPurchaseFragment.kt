@@ -173,6 +173,8 @@ class TicketPurchaseFragment : Fragment() {
         dialogRegular.setContentView(dataBindingRegular.root)
         dialogRegular.show()
 
+        ticketPurchaseViewModel.updatePaymentType("regular")
+
         dataBindingRegular.paymentRegularCancel.setOnClickListener{
             dialogRegular.dismiss()
         }

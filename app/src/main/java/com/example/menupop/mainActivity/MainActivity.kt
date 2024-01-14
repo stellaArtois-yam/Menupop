@@ -61,8 +61,6 @@ class MainActivity : AppCompatActivity(), MainActivityEvent{
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        identifierByIntent = intent.getIntExtra("identifier", 0)
-        Log.d(TAG, "onCreate identifierByIntent: $identifierByIntent")
 
         init()
 
@@ -93,19 +91,24 @@ class MainActivity : AppCompatActivity(), MainActivityEvent{
         /**
          * 초기 유저 정보 세팅
          */
-//        var sharedPreferences = getSharedPreferences("userInfo", MODE_PRIVATE)
-//
-//        mainActivityViewModel.getUserInfo(sharedPreferences)
+
+        identifierByIntent = intent.getIntExtra("identifier", 0)
+        Log.d(TAG, "onCreate identifierByIntent: $identifierByIntent")
 
 
         if(identifierByIntent != 0){
             mainActivityViewModel.setIdentifier(identifierByIntent)
             Log.d(TAG, "init: ")
+        }else{
+            Log.d(TAG, "identifier: ${mainActivityViewModel.identifier.value}")
         }
 
         mainActivityViewModel.identifier.observe(this, Observer{
             if(it != null){
+                Log.d(TAG, "init identifier: $it")
                 mainActivityViewModel.requestUserInformation(it)
+            }else{
+                Log.d(TAG, "identifier: ${mainActivityViewModel.identifier.value}")
             }
         })
 
