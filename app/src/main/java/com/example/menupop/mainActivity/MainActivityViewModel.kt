@@ -130,7 +130,7 @@ class MainActivityViewModel(private val application: Application) :  AndroidView
                         "free_food_ticket" -> _userInformation.value!!.freeFoodTicket -= 1
                         "translation_ticket" -> _userInformation.value!!.translationTicket -= 1
                         "food_ticket" -> _userInformation.value!!.foodTicket -= 1
-                        "have_rewarded" -> buyTicketUsingReward()
+                        "have_rewarded" -> buyTicketUsingReward(quantity)
                         else -> Log.d(TAG, "updateTicketQuantity not match")
 
                     }
@@ -146,9 +146,9 @@ class MainActivityViewModel(private val application: Application) :  AndroidView
 
     }
 
-    fun buyTicketUsingReward(){
+    fun buyTicketUsingReward(quantity: Int){
         Log.d(TAG, "buyTicketUsingReward")
-        _userInformation.value!!.haveRewarded = _userInformation.value!!.haveRewarded - (_rewardFoodAmount.value!! + _rewardTranslationAmount.value!!)
+        _userInformation.value!!.haveRewarded = _userInformation.value!!.haveRewarded - quantity
         _userInformation.value!!.foodTicket = _userInformation.value!!.foodTicket + _rewardFoodAmount.value!!
         _userInformation.value!!.translationTicket = _userInformation.value!!.translationTicket + _rewardTranslationAmount.value!!
 
@@ -353,26 +353,44 @@ class MainActivityViewModel(private val application: Application) :  AndroidView
         _paymentType.value = type
     }
 
-    fun addTranslationTicket() {
-        changeTicketAmount(_regularTranslationAmount, _regularTranslationPrice, _regularFoodAmount)
-    }
+    fun adjustRegularTicketQuantity(ticketType : String, operator: String){
+        when{
+            ticketType == "translation" && operator == "+"
+            -> changeTicketAmount(_regularTranslationAmount,_regularTranslationPrice, _regularFoodAmount)
+            
+            ticketType == "food" && operator == "+" 
+            -> changeTicketAmount(_regularFoodAmount, _regularFoodPrice, _regularTranslationAmount)
+            
+            ticketType == "translation" && operator == "-" && _regularTranslationAmount.value!! > 0 
+            -> changeTicketAmount(_regularTranslationAmount, _regularTranslationPrice, _regularFoodAmount, -1)
 
-    fun removeTranslationTicket() {
-        if (_regularTranslationAmount.value!!.toInt() > 0) {
-            changeTicketAmount(_regularTranslationAmount, _regularTranslationPrice, _regularFoodAmount, -1)
+            ticketType == "food" && operator == "-" && _regularFoodAmount.value!! > 0
+            -> changeTicketAmount(_regularFoodAmount, _regularFoodPrice, _regularTranslationAmount, -1)
+            
+            else -> Log.d(TAG, "adjustRegularTicketQuantity: not match case")
         }
     }
+    
+    fun adjustRewardTicketQuantity(ticketType: String, operator: String){
+        when{
+            ticketType == "translation" && operator == "+"
+            -> incrementRewardAmount(_rewardTranslationAmount)
 
-    fun addFoodTicket() {
-        changeTicketAmount(_regularFoodAmount, _regularFoodPrice, _regularTranslationAmount)
-    }
-
-    fun removeFoodTicket() {
-        if (_regularFoodAmount.value!!.toInt() > 0) {
-            changeTicketAmount(_regularFoodAmount, _regularFoodPrice, _regularTranslationAmount, -1)
+            ticketType == "food" && operator == "+"
+            -> incrementRewardAmount(_rewardFoodAmount)
+            
+            ticketType == "translation" && operator == "-"
+            -> decrementRewardAmount(_rewardTranslationAmount)
+            
+            ticketType == "food" && operator == "-"
+            -> decrementRewardAmount(_rewardFoodAmount)
+            
+            else -> Log.d(TAG, "adjustRewardTicketQuantity: not match case")
+                
         }
     }
-
+    
+    
 
     private fun incrementRewardAmount(amount: MutableLiveData<Int>) {
         amount.value = amount.value!! + 1
@@ -384,21 +402,7 @@ class MainActivityViewModel(private val application: Application) :  AndroidView
         }
     }
 
-    fun addTranslationTicketReward() {
-        incrementRewardAmount(_rewardTranslationAmount)
-    }
-
-    fun addFoodTicketReward() {
-        incrementRewardAmount(_rewardFoodAmount)
-    }
-
-    fun removeTranslationTicketReward() {
-        decrementRewardAmount(_rewardTranslationAmount)
-    }
-
-    fun removeFoodTicketReward() {
-        decrementRewardAmount(_rewardFoodAmount)
-    }
+ 
 
     private val _isRewardExceeded = MutableLiveData<Boolean>()
     val isRewardExceeded : LiveData<Boolean>
@@ -418,7 +422,7 @@ class MainActivityViewModel(private val application: Application) :  AndroidView
 
             savePaymentHistory(identifier
                 ,Calendar.getInstance().hashCode().toString()
-                ,_paymentType.value!!.uppercase()
+                ,"REWARD"
                 ,item
                 , 0
                 ,time)
@@ -483,7 +487,6 @@ class MainActivityViewModel(private val application: Application) :  AndroidView
 
     private val _pgToken = MutableLiveData<String>()
 
-    private val _userId = MutableLiveData<String>()
 
 
     @RequiresApi(Build.VERSION_CODES.O)
@@ -494,7 +497,7 @@ class MainActivityViewModel(private val application: Application) :  AndroidView
 
         if(_pgToken.value !=null){
             Log.d(TAG, "updatePgToken: not null")
-            completePayment(_paymentResponse.value!!.tid, _userId.value!!, _pgToken.value!!)
+            completePayment(_paymentResponse.value!!.tid, _identifier.value.toString(), _pgToken.value!!)
         }
     }
 
@@ -502,22 +505,23 @@ class MainActivityViewModel(private val application: Application) :  AndroidView
 
 
     @RequiresApi(Build.VERSION_CODES.O)
-    fun createPaymentRequest(userId : String){
+    fun createPaymentRequest(){
         Log.d(TAG, "createPaymentRequest: !!!")
         callbackKakaoReady = {response ->
 
             //여기서 웹뷰로 보내 줘야 함
             if(response!=null){
                 _paymentResponse.value = response
+            }else{
+                //결제 실패 toast 처리
             }
 
         }
         val item = itemName(_regularTranslationAmount, _regularFoodAmount)
         val quantity = countTicket(_regularTranslationAmount, _regularFoodAmount)
 
-        _userId.value = userId
 
-        mainActivityModel.createPaymentRequest(userId, item, quantity.toString(),
+        mainActivityModel.createPaymentRequest(_identifier.value.toString(), item, quantity.toString(),
             _totalPriceForPay.value!!, callbackKakaoReady!!)
 
     }
@@ -572,12 +576,14 @@ class MainActivityViewModel(private val application: Application) :  AndroidView
 
                 }else if(_paymentType.value == "reward"){
                     Log.d(TAG, "savePaymentHistory reward ")
-                    updateTicketQuantity("have_rewarded", "-", _rewardFoodAmount.value!! + _rewardTranslationAmount.value!!)
+                    val quantity = countTicket(_rewardTranslationAmount, _rewardFoodAmount)
+                    updateTicketQuantity("have_rewarded", "-", quantity)
                 }
 
 
             }else{
                 Log.d(TAG, "savePaymentHistory: failed")
+                //재실행..?
             }
 
         } //callback

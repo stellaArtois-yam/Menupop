@@ -180,25 +180,25 @@ class TicketPurchaseFragment : Fragment() {
         }
 
         dataBindingRegular.regularTranslationTicketPurchasePlusButton.setOnClickListener{
-            ticketPurchaseViewModel.addTranslationTicket()
+            ticketPurchaseViewModel.adjustRegularTicketQuantity("translation", "+")
         }
 
         dataBindingRegular.regularTranslationTicketPurchaseMinusButton.setOnClickListener{
-            ticketPurchaseViewModel.removeTranslationTicket()
+            ticketPurchaseViewModel.adjustRegularTicketQuantity("translation", "-")
         }
 
         dataBindingRegular.regularFoodTicketPurchasePlusButton.setOnClickListener{
-            ticketPurchaseViewModel.addFoodTicket()
+            ticketPurchaseViewModel.adjustRegularTicketQuantity("food", "+")
         }
 
         dataBindingRegular.regularFoodTicketPurchaseMinusButton.setOnClickListener{
-            ticketPurchaseViewModel.removeFoodTicket()
+            ticketPurchaseViewModel.adjustRegularTicketQuantity("food", "-")
         }
 
         dataBindingRegular.regularTicketPurchaseButton.setOnClickListener {
             //카카오페이 결제 요청
             dialogRegular.dismiss()
-            ticketPurchaseViewModel.createPaymentRequest(identifier.toString())
+            ticketPurchaseViewModel.createPaymentRequest()
             Log.d(TAG, "paymentRegularDialog: ?!?!??")
 
         }
@@ -251,22 +251,22 @@ class TicketPurchaseFragment : Fragment() {
 
         dataBindingReward.rewardTranslationTicketPurchasePlusButton.setOnClickListener{
             Log.d(TAG, "reward translation plus: ${ticketPurchaseViewModel.rewardTranslationAmount.value}")
-            ticketPurchaseViewModel.addTranslationTicketReward()
+            ticketPurchaseViewModel.adjustRewardTicketQuantity("translation", "+")
         }
 
         dataBindingReward.rewardTranslationTicketPurchaseMinusButton.setOnClickListener{
             Log.d(TAG, "reward translation minus: ${ticketPurchaseViewModel.rewardTranslationAmount.value}")
-            ticketPurchaseViewModel.removeTranslationTicketReward()
+            ticketPurchaseViewModel.adjustRewardTicketQuantity("translation", "-")
         }
 
         dataBindingReward.rewardFoodTicketPurchasePlusButton.setOnClickListener{
             Log.d(TAG, "reward food plus: ${ticketPurchaseViewModel.rewardFoodAmount.value}")
-            ticketPurchaseViewModel.addFoodTicketReward()
+            ticketPurchaseViewModel.adjustRewardTicketQuantity("food", "+")
         }
 
         dataBindingReward.rewardFoodTicketPurchaseMinusButton.setOnClickListener{
             Log.d(TAG, "reward food minus: ${ticketPurchaseViewModel.rewardFoodAmount.value}")
-            ticketPurchaseViewModel.removeFoodTicketReward()
+            ticketPurchaseViewModel.adjustRewardTicketQuantity("food", "-")
         }
 
         dataBindingReward.rewardTicketPurchaseButton.setOnClickListener {
