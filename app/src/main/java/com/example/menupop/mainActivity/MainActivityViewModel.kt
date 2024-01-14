@@ -134,18 +134,9 @@ class MainActivityViewModel(private val application: Application) :  AndroidView
                         else -> Log.d(TAG, "updateTicketQuantity not match")
 
                     }
-                }else{
-                    //구매의 경우
-                    when(ticketType) {
-                        "translation_ticket" -> _userInformation.value!!.translationTicket += quantity
-                        "food_ticket" -> _userInformation.value!!.foodTicket += quantity
-                        else -> Log.d(TAG, "updateTicketQuantity not match")
-                    }
                 }
-
                 _changeTicket.value = true
                 Log.d(TAG, "updateTicketQuantity after use: ${_userInformation.value}")
-
 
             }else{
                 Log.d(TAG, "updateTicketQuantity result failed: ")
