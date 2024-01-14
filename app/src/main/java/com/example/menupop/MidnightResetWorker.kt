@@ -39,7 +39,6 @@ class MidnightResetWorker(
         val identifier = sharedPreferences.getInt("identifier", 0)
         Log.d(TAG, "doWork identifier: $identifier")
 
-//        val response =
             withContext(Dispatchers.IO){
                 requestInitialize(identifier)
             }

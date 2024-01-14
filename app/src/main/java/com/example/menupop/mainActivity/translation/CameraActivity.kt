@@ -50,9 +50,16 @@ class CameraActivity : ScanActivity() {
     }
 
     fun backPressed(){
+
+        val sharedPreferences = getSharedPreferences("userInfo", MODE_PRIVATE)
+        val identifier = sharedPreferences.getInt("identifier", 0)
+        Log.d(TAG, "backPressed identifier: $identifier")
+
+
         val intent = Intent(this,MainActivity::class.java)
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
         intent.putExtra("checkedTranslation", isImageSuccess)
+        intent.putExtra("identifier", identifier)
         startActivity(intent)
         finish()
     }
