@@ -13,6 +13,7 @@ import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
+import com.example.menupop.BuildConfig
 import com.example.menupop.mainActivity.MainActivity
 import com.example.menupop.R
 import com.example.menupop.databinding.ActivityLoginBinding
@@ -46,7 +47,7 @@ class LoginActivity : AppCompatActivity() {
     private var mGoogleSignInClient: GoogleSignInClient? = null
     private var mAuth: FirebaseAuth? = null
 
-    val googleApiKey = com.example.menupop.BuildConfig.GOOGLE_API_KEY
+    val googleApiKey = "449200691212-qh37imbkld085r2d0aks63ci7nq63g28.apps.googleusercontent.com"
 
     private val googleAuthLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
         val task: Task<GoogleSignInAccount> = GoogleSignIn.getSignedInAccountFromIntent(result.data)
@@ -207,11 +208,6 @@ class LoginActivity : AppCompatActivity() {
         }
     }
 
-    private fun requestGoogleLogin() {
-        googleSignInClient.signOut()
-        val signInIntent = googleSignInClient.signInIntent
-        googleAuthLauncher.launch(signInIntent)
-    }
 
     private fun getGoogleClient(): GoogleSignInClient {
         val googleSignInOption = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
@@ -223,6 +219,8 @@ class LoginActivity : AppCompatActivity() {
         return GoogleSignIn.getClient(applicationContext, googleSignInOption)
     }
     private fun signIn() {
+        googleSignInClient.signOut()
+        Log.d(TAG, "signIn: ${googleApiKey}")
 
         val gso = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
             .requestIdToken(googleApiKey)
