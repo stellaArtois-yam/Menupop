@@ -7,6 +7,10 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import com.google.android.gms.auth.api.signin.GoogleSignIn
+import com.google.android.gms.auth.api.signin.GoogleSignInClient
+import com.google.android.gms.auth.api.signin.GoogleSignInOptions
+import com.google.android.gms.common.api.Scope
 import com.kakao.sdk.auth.model.OAuthToken
 import com.kakao.sdk.user.UserApiClient
 import com.navercorp.nid.NaverIdLoginSDK
@@ -23,6 +27,9 @@ class LoginViewModel(private var application: Application) :  AndroidViewModel(a
     lateinit var kakaoCallback : (OAuthToken?, Throwable?) -> Unit
     lateinit var naverProfileCallback : NidProfileCallback<NidProfileResponse>
     lateinit var naverOauthLoginCallback : OAuthLoginCallback
+
+    val googleApiKey = "449200691212-qh37imbkld085r2d0aks63ci7nq63g28.apps.googleusercontent.com"
+
 
     val TAG = "LoginViewModel"
     val loginResult: LiveData<LoginResponseModel>
@@ -107,5 +114,4 @@ class LoginViewModel(private var application: Application) :  AndroidViewModel(a
         }
         loginModel.requestKakaoSocialLogin(kakaoCallback)
     }
-
 }

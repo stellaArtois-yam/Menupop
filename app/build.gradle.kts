@@ -6,6 +6,7 @@ plugins {
     id("org.jetbrains.kotlin.android")
     id("com.google.gms.google-services")
     kotlin("plugin.serialization") version "1.9.21"
+
 }
 
 //선언 및 키 값 가져오기
@@ -81,7 +82,7 @@ dependencies {
 
     implementation ("com.google.gms:google-services:4.3.15")
     implementation ("com.google.firebase:firebase-auth:22.0.0")
-    implementation ("com.google.firebase:firebase-bom:32.0.0")
+    implementation(platform("com.google.firebase:firebase-bom:32.7.0"))
     implementation ("com.google.android.gms:play-services-auth:20.5.0")
 
     implementation ("com.navercorp.nid:oauth-jdk8:5.1.0") // jdk 8
