@@ -248,6 +248,7 @@ class LoginActivity : AppCompatActivity() {
                 Log.d(TAG, "signInWithCredential:success")
                 val user = mAuth!!.currentUser
                 Log.d(TAG, "onComplete: " + user!!.email)
+                loginViewModel.socialLoginRequest(user!!.email.toString())
             }
         }
             }
