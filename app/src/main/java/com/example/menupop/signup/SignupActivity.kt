@@ -7,6 +7,7 @@ import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
 import android.util.Log
+import android.view.LayoutInflater
 import android.view.View
 import android.view.Window
 import android.widget.AdapterView
@@ -21,7 +22,10 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import com.example.menupop.R
 import com.example.menupop.databinding.ActivitySignupBinding
+import com.example.menupop.databinding.DialogTicketBottomBinding
+import com.example.menupop.databinding.DialogWarningBinding
 import com.example.menupop.login.LoginActivity
+import com.google.android.material.bottomsheet.BottomSheetDialog
 import kotlinx.coroutines.launch
 
 class SignupActivity : AppCompatActivity() {
@@ -67,6 +71,12 @@ class SignupActivity : AppCompatActivity() {
             }
         })
 
+        binding.signupPersonalCheckbox.setOnCheckedChangeListener { compoundButton, isCheck ->
+            signupViewModel.personalCheckBoxChecked(isCheck)
+        }
+        binding.signupMarketingCheckbox.setOnCheckedChangeListener { compoundButton, isCheck ->
+            signupViewModel.marketingCheckBoxChecked(isCheck)
+        }
 
         /**
          * 3. 아이디 중복검사 버튼을 누르면
@@ -206,6 +216,13 @@ class SignupActivity : AppCompatActivity() {
             }
         })
 
+        binding.signupCheckProvideInformation.setOnClickListener {
+            showInformationDialog("personal")
+        }
+        binding.signupCheckMarketingInformation.setOnClickListener {
+            showInformationDialog("marketing")
+        }
+
 
         /**
          * 이메일을 명확히 입력하면 인증번호 버튼이 활성화
@@ -285,8 +302,12 @@ class SignupActivity : AppCompatActivity() {
                 Log.d(TAG, "password: $password")
                 val email = "${binding.signupEmailIdEdittext.text.toString().trim()}@${binding.signupEmailSelection.selectedItem}"
                 val identifier = id.hashCode()
+                if(signupViewModel.checkBoxChecked()){
+                    signupViewModel.sendUserInformation(id, password, email, identifier)
+                }else{
+                    Toast.makeText(this, "약관에 동의 해주세요.",Toast.LENGTH_LONG).show()
+                }
 
-                signupViewModel.sendUserInformation(id, password, email, identifier)
             }else{
                 Log.d(TAG, "checkUserInfo false")
 
@@ -321,7 +342,21 @@ class SignupActivity : AppCompatActivity() {
 
         dialog.show()
     }
+    fun showInformationDialog(type : String){
+        val bindingDialog : DialogWarningBinding = DataBindingUtil.inflate(LayoutInflater.from(this), R.layout.dialog_warning, null, false);
+        val dialog = Dialog(this)
+        dialog.setContentView(bindingDialog.root)
+        if(type == "personal"){
+            bindingDialog.dialogTitle.text = "개인 정보 이용 약관"
+            bindingDialog.dialogContent.text =  "개인 정보 이용약관이 들어갈 예정"
+        }else{
+            bindingDialog.dialogTitle.text = "마케팅 수신 이용 약관"
+            bindingDialog.dialogContent.text = "마케팅 수신 이용 약관이 들어갈 예정"
 
+        }
+        dialog.show()
+
+    }
     fun dialogDismiss(dialog: Dialog, close : Boolean){
         if(close){
             val handler = Handler(Looper.getMainLooper())
