@@ -28,6 +28,8 @@ class SignupViewModel : ViewModel() {
     private val _isValidId = MutableLiveData<Boolean>()
     val isValidId : LiveData<Boolean>
         get() = _isValidId
+    private var provideChecking : Boolean = false
+    private var marketingChecking : Boolean = false
 
     fun validateId(inputId: String) : Boolean {
 
@@ -297,6 +299,17 @@ class SignupViewModel : ViewModel() {
 
         }
         signupModel.sendUserInformation(id, password, email, identifier, callbackList!!)
+    }
+    fun personalCheckBoxChecked(isCheck : Boolean){
+        provideChecking = isCheck
+    }
+    fun marketingCheckBoxChecked(isCheck : Boolean){
+        marketingChecking = isCheck
+    }
+
+    fun checkBoxChecked():Boolean{
+        Log.d(TAG, "checkBoxChecked: ${provideChecking && marketingChecking}")
+        return provideChecking && marketingChecking
     }
 
 

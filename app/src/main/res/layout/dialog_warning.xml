@@ -5,6 +5,9 @@
         <variable
             name="binding"
             type="com.example.menupop.mainActivity.MainActivityViewModel" />
+        <variable
+            name="signupViewModel"
+            type="com.example.menupop.signup.SignupViewModel" />
     </data>
     <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
         android:layout_width="300dp"
