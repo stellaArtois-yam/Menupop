@@ -81,7 +81,7 @@ class TicketPurchaseFragment : Fragment() {
         binding.ticketPurchaseViewModel = ticketPurchaseViewModel
         binding.lifecycleOwner = this
 
-        ticketPurchaseViewModel.paymentResponse.observe(viewLifecycleOwner, Observer {
+        ticketPurchaseViewModel.paymentReady.observe(viewLifecycleOwner, Observer {
             if(it!=null){
                 event?.moveToWebView()
             }

@@ -19,6 +19,7 @@ import com.example.menupop.mainActivity.profile.TicketSaveDTO
 import com.example.menupop.mainActivity.foodPreference.FoodPreferenceDataClass
 import com.example.menupop.mainActivity.foodPreference.FoodPreferenceSearchDTO
 import com.example.menupop.SimpleResultDTO
+import com.example.menupop.mainActivity.profile.KakaoPayCancelResponseDTO
 import com.google.android.gms.ads.AdRequest
 import com.google.android.gms.ads.LoadAdError
 import com.google.android.gms.ads.rewarded.RewardedAd
@@ -153,6 +154,8 @@ class MainActivityModel(val application :Application) {
         })
     }
 
+
+
     fun requestUserInformation(identifier : Int, callback: (UserInformationDTO) -> Unit){
         val call : Call<UserInformationDTO> = service.requestUserInformation(identifier)
 
@@ -190,6 +193,27 @@ class MainActivityModel(val application :Application) {
     @RequiresApi(Build.VERSION_CODES.O)
     val orderId = LocalDate.now().toString().replace("-", "") + hashCode().toString() //주문번호
 
+    fun requestCancelPayment(tid : String, cancelAmount : String, callback : (KakaoPayCancelResponseDTO) -> Unit){
+        val call : Call<KakaoPayCancelResponseDTO> = service.requestCancelPayment(API_KEY,
+            cid, tid, cancelAmount, "0")
+
+        call.enqueue(object : Callback<KakaoPayCancelResponseDTO>{
+            override fun onResponse(
+                call: Call<KakaoPayCancelResponseDTO>,
+                response: Response<KakaoPayCancelResponseDTO>
+            ) {
+                if(response.isSuccessful){
+                    callback(response.body()!!)
+                }else{
+                    Log.d(TAG, "kakaopay cancel is not successful")
+                }
+            }
+
+            override fun onFailure(call: Call<KakaoPayCancelResponseDTO>, t: Throwable) {
+                Log.d(TAG, "kakaopay cancel onFailure: ${t.message}")
+            }
+        })
+    }
 
     @RequiresApi(Build.VERSION_CODES.O)
     fun createPaymentRequest(userId: String, item: String, quantity: String,

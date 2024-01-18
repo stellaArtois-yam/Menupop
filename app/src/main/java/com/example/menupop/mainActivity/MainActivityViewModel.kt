@@ -20,6 +20,7 @@ import com.example.menupop.mainActivity.profile.TicketSaveDTO
 import com.example.menupop.mainActivity.foodPreference.FoodPreferenceDataClass
 import com.example.menupop.mainActivity.foodPreference.FoodPreferenceSearchDTO
 import com.example.menupop.SimpleResultDTO
+import com.example.menupop.mainActivity.profile.KakaoPayCancelResponseDTO
 import com.example.menupop.mainActivity.profile.ProfileSelectionDTO
 import com.google.android.gms.ads.rewarded.RewardedAd
 import org.intellij.lang.annotations.Identifier
@@ -36,7 +37,8 @@ class MainActivityViewModel(private val application: Application) :  AndroidView
     private var callback : ((SimpleResultDTO) -> Unit) ?= null
     private var callbackUserInfo :((UserInformationDTO) ->Unit) ?= null
     private var callbackKakaoReady : ((KakaoPayReadyResponseDTO) -> Unit) ? = null
-    private var callbackApprove : ((KakaoPayApproveResponseDTO) -> Unit) ? = null
+    private var callbackKakaoApprove : ((KakaoPayApproveResponseDTO) -> Unit) ? = null
+    private var callbackKakaoCancel : ((KakaoPayCancelResponseDTO) -> Unit) ? = null
     private var callbackSearchData : ((FoodPreferenceSearchDTO) -> Unit) ?= null
     private var callbackResult : ((String) -> Unit) ?= null
     private var callbackFoodPreference : ((FoodPreferenceDataClass) -> Unit) ?= null
@@ -481,9 +483,9 @@ class MainActivityViewModel(private val application: Application) :  AndroidView
     }
 
 
-    private val _paymentResponse = MutableLiveData<KakaoPayReadyResponseDTO>()
-    val paymentResponse : LiveData<KakaoPayReadyResponseDTO>
-        get() = _paymentResponse
+    private val _paymentReady = MutableLiveData<KakaoPayReadyResponseDTO>()
+    val paymentReady : LiveData<KakaoPayReadyResponseDTO>
+        get() = _paymentReady
 
     private val _pgToken = MutableLiveData<String>()
 
@@ -497,7 +499,7 @@ class MainActivityViewModel(private val application: Application) :  AndroidView
 
         if(_pgToken.value !=null){
             Log.d(TAG, "updatePgToken: not null")
-            completePayment(_paymentResponse.value!!.tid, _identifier.value.toString(), _pgToken.value!!)
+            completePayment(_paymentReady.value!!.tid, _identifier.value.toString(), _pgToken.value!!)
         }
     }
 
@@ -511,7 +513,7 @@ class MainActivityViewModel(private val application: Application) :  AndroidView
 
             //여기서 웹뷰로 보내 줘야 함
             if(response!=null){
-                _paymentResponse.value = response
+                _paymentReady.value = response
             }else{
                 //결제 실패 toast 처리
             }
@@ -527,14 +529,14 @@ class MainActivityViewModel(private val application: Application) :  AndroidView
     }
 
     fun setPaymentResponse(){
-        _paymentResponse.value = null
+        _paymentReady.value = null
     }
 
     @RequiresApi(Build.VERSION_CODES.O)
     fun completePayment(tid : String, userId: String, pgToken : String){
-        callbackApprove = {response ->
+        callbackKakaoApprove = {response ->
             Log.d(TAG, "completePayment: $response")
-            _paymentResponse.value = null
+            _paymentReady.value = null
 
             // db에 티켓 개수도 수정
             // 구매 이력 저장
@@ -546,7 +548,7 @@ class MainActivityViewModel(private val application: Application) :  AndroidView
             }
 
         }
-        mainActivityModel.requestApprovePayment(tid, userId, pgToken, callbackApprove!!)
+        mainActivityModel.requestApprovePayment(tid, userId, pgToken, callbackKakaoApprove!!)
     }
 
     private val _changeTicket = MutableLiveData<Boolean>()
@@ -554,9 +556,23 @@ class MainActivityViewModel(private val application: Application) :  AndroidView
     val changeTicket : LiveData<Boolean>
         get() =_changeTicket
 
+    private val _failedBuyTicket = MutableLiveData<Boolean>()
+    val failedBuyTicket: LiveData<Boolean>
+        get() = _failedBuyTicket
+
     fun setChangeTicket(){
         _changeTicket.value = false
         Log.d(TAG, "setChangeTicket status: ${_changeTicket.value}")
+    }
+
+    fun requestCancelPayment(tid : String, cancelAmount : String){
+        callbackKakaoCancel = {response ->
+            when(response.status){
+                "CANCEL_PAYMENT" -> _failedBuyTicket.value = true
+            }
+        }
+
+        mainActivityModel.requestCancelPayment(tid, cancelAmount, callbackKakaoCancel!!)
     }
 
     fun savePaymentHistory(identifier: Int, tid : String, paymentType : String, item : String,
@@ -565,6 +581,8 @@ class MainActivityViewModel(private val application: Application) :  AndroidView
 
         callback = {response ->
             //여기서 클라이언트 티켓 개수 수정
+
+
             if(response.result == "success"){
                 Log.d(TAG, "savePaymentHistory: ${response.result}")
 
@@ -583,22 +601,21 @@ class MainActivityViewModel(private val application: Application) :  AndroidView
 
             }else{
                 Log.d(TAG, "savePaymentHistory: failed")
-                //재실행..?
+                //결제 취소
+                requestCancelPayment(tid, price.toString())
+
             }
 
         } //callback
 
-        if(_paymentType.value == "regular"){
-            ticketSaveModel = TicketSaveDTO(identifier,
+        when(_paymentType.value){
+            "regular" -> ticketSaveModel = TicketSaveDTO(identifier,
                 tid, paymentType, item, price,approveAt,
                 _regularTranslationAmount.value!!, _regularFoodAmount.value!!)
-            Log.d(TAG, "ticketSaveModel Regular: $ticketSaveModel")
 
-
-        }else{
-            ticketSaveModel = TicketSaveDTO(identifier, tid, paymentType, item, price, approveAt,
+            "reward" -> ticketSaveModel = TicketSaveDTO(identifier,
+                tid, paymentType, item, price, approveAt,
                 _rewardTranslationAmount.value!!, _rewardFoodAmount.value!!)
-            Log.d(TAG, "ticketSaveModel Reward: $ticketSaveModel")
         }
 
 
