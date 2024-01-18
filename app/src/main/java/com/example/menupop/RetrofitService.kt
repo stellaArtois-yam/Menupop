@@ -8,6 +8,7 @@ import com.example.menupop.mainActivity.foodPreference.FoodPreferenceSearchDTO
 import com.example.menupop.mainActivity.profile.KakaoPayApproveResponseDTO
 import com.example.menupop.mainActivity.profile.KakaoPayReadyResponseDTO
 import com.example.menupop.mainActivity.UserInformationDTO
+import com.example.menupop.mainActivity.profile.KakaoPayCancelResponseDTO
 import retrofit2.Call
 import retrofit2.http.Field
 import retrofit2.http.FieldMap
@@ -112,6 +113,17 @@ interface RetrofitService {
     fun requestApprovePayment(@Header("Authorization") apiKey : String,
                               @FieldMap map : HashMap<String, String>)
                                 :Call<KakaoPayApproveResponseDTO>
+
+    @POST("v1/payment/cancel")
+    @FormUrlEncoded
+    fun requestCancelPayment(@Header("Authorization") apiKey : String,
+                             @Field("cid") cid : String,
+                             @Field("tid") tid : String,
+                             @Field("cancel_amount") cancelAmount : String,
+                             @Field("cancel_tax_free_amount") cancelTaxFreeAmount : String)
+                            :Call<KakaoPayCancelResponseDTO>
+
+
     @GET("searchFood.php")
     fun searchFood(@Query("query") searchText :String) : Call<FoodPreferenceSearchDTO>
 
