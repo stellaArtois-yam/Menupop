@@ -39,6 +39,7 @@ class FoodPreferenceFragment : Fragment() {
     var event: MainActivityEvent? = null
     lateinit var existBottomSheetDialog : BottomSheetDialog
 
+
     override fun onAttach(context: Context) {
         super.onAttach(context)
         this.context = context
@@ -194,7 +195,10 @@ class FoodPreferenceFragment : Fragment() {
                 Log.d(TAG, "favoriteItemClick: 좋아하는 음식 ${foodName} 클릭됨 ")
                 if(checkTicketEmpty()){
                     emptyTicketShowDialog()
-                } else{
+                }else if(mainViewModel.userInformation.value?.freeFoodTicket!! > 0){
+                    existFreeTicketShowDialog(foodName,"호")
+                }
+                else{
                     if(mainViewModel.userInformation.value?.freeFoodTicket!! > 0){
                         existFreeTicketShowDialog(foodName,"호")
                     }else {
@@ -209,7 +213,9 @@ class FoodPreferenceFragment : Fragment() {
                 Log.d(TAG, "unFavoriteItemClick: 싫어하는 음식 ${foodName} 클릭됨 ")
                 if(checkTicketEmpty()){
                     emptyTicketShowDialog()
-                } else{
+                } else if(mainViewModel.userInformation.value?.freeFoodTicket!! > 0){
+                    existFreeTicketShowDialog(foodName,"호")
+                }else{
                     if(mainViewModel.userInformation.value?.freeFoodTicket!! > 0){
                         existFreeTicketShowDialog(foodName,"불호")
                     }else {
@@ -324,6 +330,12 @@ class FoodPreferenceFragment : Fragment() {
             }
 
         })
+    }
+
+    override fun onResume() {
+        super.onResume()
+        binding.foodPreferenceSearchRecyclerview.visibility = View.GONE
+        binding.foodPreferenceRecyclerview.visibility = View.VISIBLE
     }
 
 

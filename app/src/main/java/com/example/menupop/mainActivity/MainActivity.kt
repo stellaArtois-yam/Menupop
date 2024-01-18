@@ -239,11 +239,13 @@ class MainActivity : AppCompatActivity(), MainActivityEvent{
                         .replace(R.id.home_frame_layout, FoodPreferenceFragment())
                         .commit()
                     binding.appbarMenu.findViewById<TextView>(R.id.appbar_status).text = "음식 등록"
+                    backButtonGone()
                     return true
                 }
                 R.id.tab_camera -> {
                     Log.d(TAG, "onNavigationItemSelected: 카메라 탭 선택")
                     mainActivityViewModel.checkingTranslationTicket()
+                    backButtonGone()
                     return true
                 }
                 R.id.tab_exchange -> {
@@ -251,6 +253,7 @@ class MainActivity : AppCompatActivity(), MainActivityEvent{
                         .replace(R.id.home_frame_layout, ExchangeFragment())
                         .commit()
                     binding.appbarMenu.findViewById<TextView>(R.id.appbar_status).text = "환율"
+                    backButtonGone()
                     return true
                 }
                 R.id.tab_profile -> {
@@ -259,6 +262,7 @@ class MainActivity : AppCompatActivity(), MainActivityEvent{
                         .replace(R.id.home_frame_layout, profileFragment)
                         .commit()
                     binding.appbarMenu.findViewById<TextView>(R.id.appbar_status).text = "프로필 확인"
+                    backButtonGone()
                     return true
                 }
             }
@@ -321,6 +325,10 @@ class MainActivity : AppCompatActivity(), MainActivityEvent{
             commit()
         }
     }
+    fun backButtonGone(){
+        binding.appbarMenu.findViewById<ImageView>(R.id.appbar_back).visibility = View.GONE
+    }
+
 
     override fun moveToAdvertisement() {
         if(mainActivityViewModel.userInformation.value!!.dailyReward == 0){

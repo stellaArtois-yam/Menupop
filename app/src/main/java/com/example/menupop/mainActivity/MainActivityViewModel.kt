@@ -162,6 +162,8 @@ class MainActivityViewModel(private val application: Application) :  AndroidView
         callbackResult = { result ->
             Log.d(TAG, "foodPreferenceRegister: ${result}")
             _registerResult.value = result == "success"
+            searchFood.value?.clear()
+            Log.d(TAG, "foodPreferenceRegister: ${searchFood.value}")
         }
         mainActivityModel.foodPreferenceRegister(_identifier.value!!,foodName,classification,callbackResult!!)
     }
