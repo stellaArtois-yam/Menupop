@@ -75,10 +75,12 @@ class FoodPreferenceFragment : Fragment() {
         return binding.root
     }
     fun checkTicketEmpty() : Boolean{
-        if(mainViewModel.userInformation.value?.foodTicket!! <= 0){
-            return true
+        if(mainViewModel.userInformation.value?.foodTicket!! > 0){
+            return false
+        } else if(mainViewModel.userInformation.value?.freeFoodTicket!! > 0){
+            return false
         }
-        return false
+        return true
     }
     fun emptyTicketShowDialog(){
         val bindingDialog : DialogTicketBottomBinding = DataBindingUtil.inflate(LayoutInflater.from(context), R.layout.dialog_ticket_bottom, null, false)
@@ -118,6 +120,7 @@ class FoodPreferenceFragment : Fragment() {
     fun existFreeTicketShowDialog(foodName:String,classfication : String){
         val bindingDialog : DialogTicketBottomBinding = DataBindingUtil.inflate(LayoutInflater.from(context), R.layout.dialog_ticket_bottom, null, false);
         val foodTicket = mainViewModel.userInformation.value?.freeFoodTicket.toString()
+        Log.d(TAG, "existFreeTicketShowDialog: 호출")
         existBottomSheetDialog.setContentView(bindingDialog.root)
         bindingDialog.dialogTicketBottomFoodTicket.text = "무료 음식 티켓 ${foodTicket} 개"
         bindingDialog.dialogTicketBottomTranslationTicket.visibility = View.GONE
@@ -195,14 +198,11 @@ class FoodPreferenceFragment : Fragment() {
                 Log.d(TAG, "favoriteItemClick: 좋아하는 음식 ${foodName} 클릭됨 ")
                 if(checkTicketEmpty()){
                     emptyTicketShowDialog()
-                }else if(mainViewModel.userInformation.value?.freeFoodTicket!! > 0){
-                    existFreeTicketShowDialog(foodName,"호")
                 }
                 else{
                     if(mainViewModel.userInformation.value?.freeFoodTicket!! > 0){
                         existFreeTicketShowDialog(foodName,"호")
                     }else {
-
                         existTicketShowDialog(foodName,"호")
                     }
                 }

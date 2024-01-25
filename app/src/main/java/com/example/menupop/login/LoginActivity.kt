@@ -113,7 +113,7 @@ class LoginActivity : AppCompatActivity() {
     }
     private fun isNewUserCheck(isNewUser:Int, identifier:Int){
         if (isNewUser == 1){
-            var intent = Intent(this, SignupActivity :: class.java)
+            var intent = Intent(this, MainActivity :: class.java)
             startActivity(intent)
             return
         }
