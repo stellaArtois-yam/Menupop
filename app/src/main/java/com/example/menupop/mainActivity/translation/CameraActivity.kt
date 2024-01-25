@@ -40,6 +40,8 @@ class CameraActivity : ScanActivity() {
     var isImageSuccess = false
     lateinit var country : String
 
+    var identifier = 0
+
 
 
     private val callback = object : OnBackPressedCallback(true) {
@@ -52,7 +54,7 @@ class CameraActivity : ScanActivity() {
     fun backPressed(){
 
         val sharedPreferences = getSharedPreferences("userInfo", MODE_PRIVATE)
-        val identifier = sharedPreferences.getInt("identifier", 0)
+        identifier = sharedPreferences.getInt("identifier", 0)
         Log.d(TAG, "backPressed identifier: $identifier")
 
 
@@ -91,8 +93,8 @@ class CameraActivity : ScanActivity() {
                 //여기서 스위치 on/off checking
                 sharedPreferences = getSharedPreferences("util", MODE_PRIVATE)
                 image = InputImage.fromFilePath(applicationContext, uri)
-                cameraViewModel.getRecognizedText(image,country)
                 showDialog()
+                cameraViewModel.getRecognizedText(image,country)
             } catch (e: IOException) {
                 e.printStackTrace()
             }
@@ -102,9 +104,13 @@ class CameraActivity : ScanActivity() {
         cameraViewModel.failed.observe(this){
             if(it){
                 Toast.makeText(applicationContext, "서버에 문제가 발생하였습니다.\n잠시 후 다시 시도해주세요.", Toast.LENGTH_LONG).show()
-                val intent = Intent(this,MainActivity::class.java)
-                startActivity(intent)
-                finish()
+//                val intent = Intent(this,MainActivity::class.java)
+//                Log.d(TAG, "failed imageSuccess: ${isImageSuccess}, identifier : ${identifier}")
+//                intent.putExtra("checkedTranslation", isImageSuccess)
+//                intent.putExtra("identifier", identifier)
+//                startActivity(intent)
+//                finish()
+                backPressed()
             }
         }
 
@@ -160,9 +166,17 @@ class CameraActivity : ScanActivity() {
 
         cameraViewModel.image.observe(this, Observer {
             if(it != null){
+                Log.d(TAG, "showDialog: image is not null")
                 dialog.dismiss()
                 binding.cropImage.setImageDrawable(it)
                 isImageSuccess = true
+            }
+        })
+
+        cameraViewModel.failed.observe(this, Observer {
+            if(it){
+                Log.d(TAG, "showDialog failed")
+                dialog.dismiss()
             }
         })
 

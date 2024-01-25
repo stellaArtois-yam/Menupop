@@ -52,9 +52,6 @@ class CameraViewModel(application: Application) : ViewModel() {
     val image: LiveData<Drawable>
         get() = _image
 
-    fun checkTranslationTicket(sharedPreferences: SharedPreferences) {
-
-    }
 
     fun setFoodPreference(foodPreference: ArrayList<FoodPreference>) {
         if (foodPreference != null) {
@@ -126,7 +123,7 @@ class CameraViewModel(application: Application) : ViewModel() {
 
                 val decodeList = decode.split("%")
 
-                Log.d(TAG, "requestTranslation: $decodeList")
+                Log.d(TAG, "requestTranslation: ${decodeList}\nsize : ${decodeList.size}")
                 if (decode != null) {
 
                     drawTranslatedText(decodeList)
@@ -192,6 +189,7 @@ class CameraViewModel(application: Application) : ViewModel() {
             for (text in likesFoodList) {
                 if (textList[i].contains(text)) {
                     color = Color.rgb(255, 127, 9)
+//                    color = Color.BLUE
                     break
                 }
             }
@@ -199,6 +197,7 @@ class CameraViewModel(application: Application) : ViewModel() {
             for (text in unLikesFoodList) {
                 if (textList[i].contains(text)) {
                     color = Color.rgb(255, 173, 13)
+//                    color = Color.RED
                     break
                 }
             }

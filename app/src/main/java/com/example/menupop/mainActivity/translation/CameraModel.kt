@@ -79,6 +79,7 @@ class CameraModel {
 
         }
 
+
         recognizer.process(image)
             .addOnSuccessListener { visionText ->
                 Log.d(TAG, "recognizedText Success: ${visionText.text}")
@@ -87,11 +88,11 @@ class CameraModel {
             .addOnFailureListener { e ->
                 Log.d(TAG, "recognizedText e: ")
             }
-    }
 
-    fun checkTranslationTicket(){
 
     }
+
+
 
     fun checkLanguage(text: String, callback: (String) -> Unit) {
 
@@ -104,7 +105,7 @@ class CameraModel {
                     callback(languageCode)
 
                 } else {
-                    Log.d(TAG, "checkLanguage: und")
+                    Log.d(TAG, "checkLanguage und")
                     callback("und")
 
                 }

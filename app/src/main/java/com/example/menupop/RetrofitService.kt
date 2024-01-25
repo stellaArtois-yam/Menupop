@@ -117,10 +117,7 @@ interface RetrofitService {
     @POST("v1/payment/cancel")
     @FormUrlEncoded
     fun requestCancelPayment(@Header("Authorization") apiKey : String,
-                             @Field("cid") cid : String,
-                             @Field("tid") tid : String,
-                             @Field("cancel_amount") cancelAmount : String,
-                             @Field("cancel_tax_free_amount") cancelTaxFreeAmount : String)
+                             @FieldMap map : HashMap<String, String>)
                             :Call<KakaoPayCancelResponseDTO>
 
 

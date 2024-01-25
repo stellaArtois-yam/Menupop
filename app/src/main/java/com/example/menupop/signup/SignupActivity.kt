@@ -11,6 +11,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.Window
 import android.widget.AdapterView
+import android.widget.Button
 import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
@@ -343,18 +344,24 @@ class SignupActivity : AppCompatActivity() {
         dialog.show()
     }
     fun showInformationDialog(type : String){
-        val bindingDialog : DialogWarningBinding = DataBindingUtil.inflate(LayoutInflater.from(this), R.layout.dialog_warning, null, false);
+//        val bindingDialog : DialogWarningBinding = DataBindingUtil.inflate(LayoutInflater.from(this), R.layout.dialog_terms_of_service, null, false);
         val dialog = Dialog(this)
-        dialog.setContentView(bindingDialog.root)
+        dialog.setContentView(R.layout.dialog_terms_of_service)
+
+        var button = dialog.findViewById<Button>(R.id.dialog_service_button)
         if(type == "personal"){
-            bindingDialog.dialogTitle.text = "개인 정보 이용 약관"
-            bindingDialog.dialogContent.text =  "개인 정보 이용약관이 들어갈 예정"
+//            bindingDialog.dialogTitle.text = "개인 정보 이용 약관"
+//            bindingDialog.dialogContent.text =  "개인 정보 이용약관이 들어갈 예정"
         }else{
-            bindingDialog.dialogTitle.text = "마케팅 수신 이용 약관"
-            bindingDialog.dialogContent.text = "마케팅 수신 이용 약관이 들어갈 예정"
+//            bindingDialog.dialogTitle.text = "마케팅 수신 이용 약관"
+//            bindingDialog.dialogContent.text = "마케팅 수신 이용 약관이 들어갈 예정"
 
         }
         dialog.show()
+
+        button.setOnClickListener{
+            dialog.dismiss()
+        }
 
     }
     fun dialogDismiss(dialog: Dialog, close : Boolean){
