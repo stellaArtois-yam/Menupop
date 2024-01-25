@@ -100,7 +100,7 @@ class MainActivity : AppCompatActivity(), MainActivityEvent{
             mainActivityViewModel.setIdentifier(identifierByIntent)
             Log.d(TAG, "init: ")
         }else{
-            Log.d(TAG, "identifier: ${mainActivityViewModel.identifier.value}")
+            Log.d(TAG, "identifier intent: ${mainActivityViewModel.identifier.value}")
         }
 
         mainActivityViewModel.identifier.observe(this, Observer{
@@ -108,7 +108,7 @@ class MainActivity : AppCompatActivity(), MainActivityEvent{
                 Log.d(TAG, "init identifier: $it")
                 mainActivityViewModel.requestUserInformation(it)
             }else{
-                Log.d(TAG, "identifier: ${mainActivityViewModel.identifier.value}")
+                Log.d(TAG, "identifier observe: ${mainActivityViewModel.identifier.value}")
             }
         })
 
@@ -142,9 +142,8 @@ class MainActivity : AppCompatActivity(), MainActivityEvent{
 
 
         mainActivityViewModel.isLoading.observe(this, Observer {
-            if(it){
+            if(it.equals("success")){
                 if(checkingTranslation){
-//
                     if(mainActivityViewModel.userInformation.value!!.freeTranslationTicket > 0){
                         mainActivityViewModel.updateTicketQuantity("free_translation_ticket", "-", 1)
                         Log.d(TAG, "Free Translation Ticket Use")
@@ -163,22 +162,12 @@ class MainActivity : AppCompatActivity(), MainActivityEvent{
                     commit()
                 }
 
-            }else{
+            }else if(it.equals("yet")){
                 loadingDialog()
             }
         })
 
-    }
 
-    fun loadingDialog(){
-
-        val dialog = Dialog(this)
-        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
-        dialog.setContentView(R.layout.progressbar)
-        dialog.window!!.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
-        dialog.findViewById<TextView>(R.id.progress_text).visibility = View.GONE
-
-        dialog.show()
 
         mainActivityViewModel.rewardedAd.observe(this){
 
@@ -192,11 +181,36 @@ class MainActivity : AppCompatActivity(), MainActivityEvent{
 
         }
 
+
+
+    }
+
+    fun loadingDialog() : Dialog{
+
+        val dialog = Dialog(this)
+        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
+        dialog.setContentView(R.layout.progressbar)
+        dialog.setCancelable(false)
+        dialog.window!!.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+        dialog.findViewById<TextView>(R.id.progress_text).visibility = View.GONE
+        dialog.findViewById<ImageView>(R.id.progress_image).visibility = View.GONE
+
+        dialog.show()
+
+        Log.d(TAG, "loadingDialog: 실행")
+
+
         mainActivityViewModel.isLoading.observe(this){
-            if(it){
+            if(it.equals("success")){
+                dialog.dismiss()
+            }
+            else if (it.equals("isNotSuccessful") || it.equals("timeout")){
+                Toast.makeText(this, "서버 오류로 로딩이 불가합니다 :(", Toast.LENGTH_LONG).show();
                 dialog.dismiss()
             }
         }
+
+        return dialog
 
 
 

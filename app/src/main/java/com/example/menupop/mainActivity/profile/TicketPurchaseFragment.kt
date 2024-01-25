@@ -12,6 +12,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.Window
 import android.view.WindowManager
+import android.widget.Toast
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 
@@ -238,9 +239,13 @@ class TicketPurchaseFragment : Fragment() {
         })
 
         ticketPurchaseViewModel.changeTicket.observe(viewLifecycleOwner, Observer {
-            if(it){
+            if(it == "success"){
                 dialogReward.dismiss()
                 event?.completePayment()
+            }else if(it == "failed"){
+                dialogReward.dismiss()
+                event?.completePayment()
+                Toast.makeText(requireContext(), "결제가 실패하였습니다. 다시 시도해주세요 :(", Toast.LENGTH_LONG).show()
             }
         })
 

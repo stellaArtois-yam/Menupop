@@ -11,6 +11,7 @@ import android.view.ViewGroup
 import android.webkit.WebResourceRequest
 import android.webkit.WebView
 import android.webkit.WebViewClient
+import android.widget.Toast
 import androidx.annotation.RequiresApi
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
@@ -22,10 +23,10 @@ import java.net.URISyntaxException
 
 class KakaoPayWebView : Fragment() {
     val TAG = "WebViewFragment"
-    var webView: WebView ?= null
-    private lateinit var ticketPurchaseViewModel : MainActivityViewModel
-    var event : MainActivityEvent? = null
-    private lateinit var context : Context
+    var webView: WebView? = null
+    private lateinit var ticketPurchaseViewModel: MainActivityViewModel
+    var event: MainActivityEvent? = null
+    private lateinit var context: Context
 
 
     override fun onAttach(context: Context) {
@@ -58,7 +59,7 @@ class KakaoPayWebView : Fragment() {
         Log.d(TAG, "onCreateView: ")
         val view = inflater.inflate(R.layout.webview, container, false)
 
-        webView  = view.findViewById(R.id.webview)
+        webView = view.findViewById(R.id.webview)
 
         return view
     }
@@ -68,14 +69,15 @@ class KakaoPayWebView : Fragment() {
 
         Log.d(TAG, "onViewCreated: ")
 
-        ticketPurchaseViewModel = ViewModelProvider(requireActivity()).get(MainActivityViewModel::class.java)
+        ticketPurchaseViewModel =
+            ViewModelProvider(requireActivity()).get(MainActivityViewModel::class.java)
 
         val myWebViewClient = MyWebViewClient(ticketPurchaseViewModel)
         webView?.settings?.javaScriptEnabled = true
         webView?.webViewClient = myWebViewClient
 
         ticketPurchaseViewModel.paymentReady.observe(viewLifecycleOwner, Observer {
-            if(it!=null){
+            if (it != null) {
                 val url = it.next_redirect_mobile_url
                 Log.d(TAG, "mobile url: $url")
                 webView?.loadUrl(url)
@@ -86,14 +88,17 @@ class KakaoPayWebView : Fragment() {
 
     }
 
-    inner class MyWebViewClient (val viewModel : MainActivityViewModel):WebViewClient(){
+    inner class MyWebViewClient(val viewModel: MainActivityViewModel) : WebViewClient() {
 
         val TAG = "MyWebViewClient"
 
-        var pgToken : String ?= null
+        var pgToken: String? = null
 
         @RequiresApi(Build.VERSION_CODES.O)
-        override fun shouldOverrideUrlLoading(view: WebView?, request: WebResourceRequest?): Boolean {
+        override fun shouldOverrideUrlLoading(
+            view: WebView?,
+            request: WebResourceRequest?
+        ): Boolean {
 
 
             val url = request!!.url.toString()
@@ -127,26 +132,28 @@ class KakaoPayWebView : Fragment() {
             if (url.contains("KakaoPayApprove")) {
                 //여기서 결제 완료 observe해서 update 되면 이동
                 viewModel.changeTicket.observe(viewLifecycleOwner, Observer {
-                    if(it){
+                    Log.d(TAG, "changeTicket: $it")
+                    if (it == "success") {
+                        event?.completePayment()
+                    } else if (it == "failed") {
+                        Toast.makeText(requireContext(), "결제 실패로 결제가 취소되었습니다 :(", Toast.LENGTH_LONG).show()
                         event?.completePayment()
                     }
                 })
 
                 Log.d(TAG, "webView Clear")
 
-            }else if(url.contains("KakaoPayCancel")){
+            } else if (url.contains("KakaoPayCancel")) {
 
                 viewModel.setPaymentResponse()
                 event?.completePayment()
 
-            }else if(url.contains("KakaoPayFail")){
-
+            } else if (url.contains("KakaoPayFail")) {
                 viewModel.setPaymentResponse()
                 event?.completePayment()
             }
 
             view!!.loadUrl(url)
-            Log.d(TAG, "what")
 
 
             return false

@@ -20,6 +20,7 @@ import com.example.menupop.mainActivity.foodPreference.FoodPreferenceDataClass
 import com.example.menupop.mainActivity.foodPreference.FoodPreferenceSearchDTO
 import com.example.menupop.SimpleResultDTO
 import com.example.menupop.mainActivity.profile.KakaoPayCancelResponseDTO
+import com.example.menupop.mainActivity.profile.KakaoPayPriceDTO
 import com.google.android.gms.ads.AdRequest
 import com.google.android.gms.ads.LoadAdError
 import com.google.android.gms.ads.rewarded.RewardedAd
@@ -32,6 +33,7 @@ import retrofit2.Response
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import retrofit2.converter.scalars.ScalarsConverterFactory
+import retrofit2.http.Field
 import java.time.LocalDate
 import java.util.Calendar
 import java.util.concurrent.TimeUnit
@@ -144,12 +146,14 @@ class MainActivityModel(val application :Application) {
                     Log.d(TAG, "onResponse: ${response.body()}")
                     callback(response.body()!!)
                 }else{
-                    Log.d(TAG, "is not successful: $response")
+                    Log.d(TAG, "is not successful: ${response}")
+                    callback(SimpleResultDTO("failed"))
                 }
 
             }
             override fun onFailure(call: Call<SimpleResultDTO>, t: Throwable) {
                 Log.d(TAG, "save payment history onFailure: ${t.message}")
+                callback(SimpleResultDTO("failed"))
             }
         })
     }
@@ -166,12 +170,22 @@ class MainActivityModel(val application :Application) {
                     callback(response.body()!!)
                 }else{
                     Log.d(TAG, "isNotSuccessful: ${response.body()}")
+                    callback(
+                        UserInformationDTO("isNotSuccessful",
+                        null, null, null, null,
+                        0, 0, 0, 0,
+                        0, 0)
+                    )
 
                 }
             }
 
             override fun onFailure(call: Call<UserInformationDTO>, t: Throwable) {
                 Log.d(TAG, "request user info onFailure: ${t.message}")
+                callback(UserInformationDTO(t.message,
+                    null, null, null, null,
+                    0, 0, 0, 0,
+                        0, 0))
             }
         })
     }
@@ -194,23 +208,39 @@ class MainActivityModel(val application :Application) {
     val orderId = LocalDate.now().toString().replace("-", "") + hashCode().toString() //주문번호
 
     fun requestCancelPayment(tid : String, cancelAmount : String, callback : (KakaoPayCancelResponseDTO) -> Unit){
-        val call : Call<KakaoPayCancelResponseDTO> = service.requestCancelPayment(API_KEY,
-            cid, tid, cancelAmount, "0")
+
+        var map  = HashMap<String, String>()
+        map.put("cid", cid)
+        map.put("tid", tid)
+        map.put("cancel_amount", cancelAmount)
+        map.put("cancel_tax_free_amount", "0")
+
+
+        val call : Call<KakaoPayCancelResponseDTO> = kakaoPayService.requestCancelPayment(API_KEY, map)
 
         call.enqueue(object : Callback<KakaoPayCancelResponseDTO>{
             override fun onResponse(
                 call: Call<KakaoPayCancelResponseDTO>,
                 response: Response<KakaoPayCancelResponseDTO>
             ) {
+                Log.d(TAG, "cancel onResponse: ${response}")
                 if(response.isSuccessful){
                     callback(response.body()!!)
                 }else{
                     Log.d(TAG, "kakaopay cancel is not successful")
+                    callback(
+                        KakaoPayCancelResponseDTO("null", "null", "null",
+                        "FAILED", "null", "null",
+                            "null", KakaoPayPriceDTO("0"), "null")
+                    )
                 }
             }
 
             override fun onFailure(call: Call<KakaoPayCancelResponseDTO>, t: Throwable) {
                 Log.d(TAG, "kakaopay cancel onFailure: ${t.message}")
+                callback(  KakaoPayCancelResponseDTO("null", "null", "null",
+                    "FAILED", "null", "null",
+                    "null", KakaoPayPriceDTO("0"), "null"))
             }
         })
     }
@@ -339,8 +369,8 @@ class MainActivityModel(val application :Application) {
     fun setDelayTime() : Long {
 
         val midnight = Calendar.getInstance().apply {
-            set(Calendar.HOUR_OF_DAY, 16) // 자정
-            set(Calendar.MINUTE, 4)
+            set(Calendar.HOUR_OF_DAY, 24) // 자정
+            set(Calendar.MINUTE, 0)
             set(Calendar.SECOND, 0)
         }
 
