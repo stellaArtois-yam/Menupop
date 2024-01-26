@@ -24,6 +24,8 @@ import com.example.menupop.R
 import com.example.menupop.databinding.FragmentProfileBinding
 import com.example.menupop.mainActivity.MainActivityEvent
 import com.example.menupop.mainActivity.MainActivityViewModel
+import com.google.android.gms.ads.OnUserEarnedRewardListener
+
 @SuppressLint("ResourceAsColor")
 class ProfileFragment : Fragment() {
     val TAG = "ProfileFragment"
@@ -92,6 +94,9 @@ class ProfileFragment : Fragment() {
             }
 
         }
+        profileViewModel.rewardedAd.observe(viewLifecycleOwner){
+            binding.profileAdButton.isClickable = true
+        }
 
 
         profileViewModel.profileImage.observe(viewLifecycleOwner, Observer {
@@ -120,7 +125,8 @@ class ProfileFragment : Fragment() {
         // 광고보러 가기 누르면 광고 프래그먼트로 이동
         binding.profileAdButton.setOnClickListener{
             event?.moveToAdvertisement()
-            Log.d(TAG, "setClick move to Ad ")
+            binding.profileAdButton.isClickable = false
+            Log.d(TAG, "setClick: 광고 보러가기 클릭됨")
         }
 
         // 로그아웃하면 다이얼로그 뜨고
