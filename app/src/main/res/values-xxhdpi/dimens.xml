@@ -21,7 +21,7 @@
     <dimen name="email_width">170dp</dimen>
     <dimen name="email_at_width">20dp</dimen>
 
-    <dimen name="signup_checkbox">48dp</dimen>
+    <dimen name="signup_checkbox">20dp</dimen>
     <dimen name="signup_information">200dp</dimen>
     <dimen name="signup_information_check">100dp</dimen>
 
