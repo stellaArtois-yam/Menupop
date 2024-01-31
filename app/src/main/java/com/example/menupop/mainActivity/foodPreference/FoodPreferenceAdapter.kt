@@ -34,11 +34,11 @@ class FoodPreferenceAdapter(private val listener: FoodPreferenceClickListener) :
 
         holder.binding.foodPreferenceItemFavorite.background = backgroundDrawable
         holder.binding.foodPreferenceItemDeleteButton.setOnClickListener {
-            listener.deleteBtnClick(foodList[position])
-            foodList.remove(foodList[position])
+            listener.deleteBtnClick(foodList[position],position)
 //            listener.favoriteItemClick(foodList[position])
         }
     }
+
 
     fun setFoodList(foodList: ArrayList<FoodPreference>) {
         this.foodList = foodList

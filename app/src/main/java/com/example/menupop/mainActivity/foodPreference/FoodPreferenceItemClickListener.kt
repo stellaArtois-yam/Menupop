@@ -5,5 +5,5 @@ interface FoodPreferenceItemClickListener {
     fun unFavoriteItemClick(foodName:  String)
 }
 interface FoodPreferenceClickListener {
-    fun deleteBtnClick(foodPreference: FoodPreference)
+    fun deleteBtnClick(foodPreference: FoodPreference,idx:Int)
 }
