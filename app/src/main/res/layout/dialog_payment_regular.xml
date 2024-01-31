@@ -59,12 +59,14 @@
                     android:textStyle="bold" />
 
                 <ImageView
-                    android:id="@+id/regular_translation_ticket_purchase_plus_button"
+                    android:id="@+id/regular_translation_ticket_purchase_minus_button"
                     android:layout_width="30dp"
                     android:layout_height="30dp"
                     android:layout_marginStart="50dp"
                     android:layout_marginEnd="20dp"
-                    android:src="@drawable/add_circle_24" />
+                    android:src="@drawable/remove_circle_24" />
+
+
 
                 <TextView
                     android:id="@+id/regular_translation_ticket_purchase_amount"
@@ -76,13 +78,15 @@
                     android:textSize="20sp"
                     android:textStyle="bold" />
 
+
+
                 <ImageView
-                    android:id="@+id/regular_translation_ticket_purchase_minus_button"
+                    android:id="@+id/regular_translation_ticket_purchase_plus_button"
                     android:layout_width="30dp"
                     android:layout_height="30dp"
                     android:layout_marginStart="20dp"
                     android:layout_marginEnd="20dp"
-                    android:src="@drawable/remove_circle_24" />
+                    android:src="@drawable/add_circle_24" />
 
             </LinearLayout>
 
@@ -136,12 +140,14 @@
                     android:textStyle="bold" />
 
                 <ImageView
-                    android:id="@+id/regular_food_ticket_purchase_plus_button"
+                    android:id="@+id/regular_food_ticket_purchase_minus_button"
                     android:layout_width="30dp"
                     android:layout_height="30dp"
                     android:layout_marginStart="50dp"
                     android:layout_marginEnd="20dp"
-                    android:src="@drawable/add_circle_24" />
+                    android:src="@drawable/remove_circle_24" />
+
+
 
                 <TextView
                     android:id="@+id/regular_food_ticket_purchase_amount"
@@ -152,13 +158,15 @@
                     android:textSize="20sp"
                     android:textStyle="bold" />
 
+
+
                 <ImageView
-                    android:id="@+id/regular_food_ticket_purchase_minus_button"
+                    android:id="@+id/regular_food_ticket_purchase_plus_button"
                     android:layout_width="30dp"
                     android:layout_height="30dp"
                     android:layout_marginStart="20dp"
                     android:layout_marginEnd="20dp"
-                    android:src="@drawable/remove_circle_24" />
+                    android:src="@drawable/add_circle_24" />
 
             </LinearLayout>
 

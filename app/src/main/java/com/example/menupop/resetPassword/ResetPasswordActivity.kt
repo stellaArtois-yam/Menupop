@@ -13,7 +13,7 @@ class ResetPasswordActivity : AppCompatActivity(),ResetPasswordFragmentEvent {
     private var TAG = "ResetPasswordActivity"
     private lateinit var binding : ActivityResetPasswordBinding
     private lateinit var checkIdFragment : ResetPasswordCheckIdFragment
-    private lateinit var verifyEamilFragment: ResetPasswordEamilFragment
+    private lateinit var verifyEamilFragment: ResetPasswordEmailFragment
     private lateinit var conformFragment: ResetPasswordConfirmFragment
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -25,7 +25,7 @@ class ResetPasswordActivity : AppCompatActivity(),ResetPasswordFragmentEvent {
         Log.d(TAG, "init: 호출")
 
         checkIdFragment = ResetPasswordCheckIdFragment()
-        verifyEamilFragment = ResetPasswordEamilFragment()
+        verifyEamilFragment = ResetPasswordEmailFragment()
         conformFragment = ResetPasswordConfirmFragment()
 
         binding = DataBindingUtil.setContentView(this, R.layout.activity_reset_password)

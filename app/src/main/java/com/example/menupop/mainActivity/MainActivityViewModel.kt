@@ -268,6 +268,8 @@ class MainActivityViewModel(private val application: Application) : AndroidViewM
                 val image = resources.getIdentifier(imageName, "drawable", application.packageName)
                 _profileImage.value = resources.getDrawable(image)
                 _isChangedProfile.value = true
+            }else{
+                Log.d(TAG, "saveSelectedProfile not success")
             }
         }
         mainActivityModel.saveSelectedProfile(imageName, sharedPreferences, callbackResult!!)
@@ -277,13 +279,15 @@ class MainActivityViewModel(private val application: Application) : AndroidViewM
 
     fun getProfileImage(sharedPreferences: SharedPreferences, resources: Resources) {
         val getResult = mainActivityModel.getProfileImage(sharedPreferences)
-//        Log.d(TAG, "getProfileImage: $getResult")
 
         if (getResult != null) {
             val image = resources.getIdentifier(getResult, "drawable", application.packageName)
             _profileImage.value = resources.getDrawable(image)
+            _isChangedProfile.value = false
+            Log.d(TAG, "getProfileImage not null")
         } else {
             _profileImage.value = null
+            Log.d(TAG, "getProfileImage is null")
         }
 
     }

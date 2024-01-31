@@ -44,14 +44,16 @@
                     android:textSize="20sp" />
 
                 <View
-                    android:layout_width="@dimen/login_width"
+                    android:layout_width="match_parent"
                     android:layout_height="2dp"
-                    android:background="@color/light_gray" />
+                    android:background="@color/light_gray"
+                    android:layout_marginStart="@dimen/basic_margin"
+                    android:layout_marginEnd="@dimen/basic_margin"/>
 
                 <LinearLayout
-                    android:layout_width="@dimen/login_width"
+                    android:layout_width="match_parent"
                     android:layout_height="200dp"
-                    android:layout_marginTop="30dp"
+                    android:layout_margin="@dimen/basic_margin"
                     android:background="@drawable/profile_box"
                     android:gravity="center"
                     android:orientation="vertical">
@@ -110,9 +112,9 @@
                 </LinearLayout>
 
                 <LinearLayout
-                    android:layout_width="@dimen/login_width"
+                    android:layout_width="match_parent"
                     android:layout_height="200dp"
-                    android:layout_marginTop="30dp"
+                    android:layout_margin="@dimen/basic_margin"
                     android:background="@drawable/profile_box"
                     android:gravity="center"
                     android:orientation="vertical">
@@ -193,9 +195,9 @@
 
 
                 <LinearLayout
-                    android:layout_width="@dimen/login_width"
+                    android:layout_width="match_parent"
                     android:layout_height="200dp"
-                    android:layout_marginTop="30dp"
+                    android:layout_margin="@dimen/basic_margin"
                     android:background="@drawable/profile_box"
                     android:gravity="center"
                     android:orientation="vertical">
@@ -245,9 +247,9 @@
 
                 <androidx.appcompat.widget.AppCompatButton
                     android:id="@+id/profile_logout_button"
-                    android:layout_width="@dimen/login_width"
+                    android:layout_width="match_parent"
                     android:layout_height="@dimen/standard_height"
-                    android:layout_marginTop="50dp"
+                    android:layout_margin="@dimen/basic_margin"
 
                     android:background="@drawable/radius_30_stroke_light_gray"
                     android:text="로그아웃"
@@ -257,10 +259,9 @@
 
                 <androidx.appcompat.widget.AppCompatButton
                     android:id="@+id/profile_withdrawal_button"
-                    android:layout_width="@dimen/login_width"
+                    android:layout_width="match_parent"
                     android:layout_height="@dimen/standard_height"
-                    android:layout_marginTop="30dp"
-                    android:layout_marginBottom="50dp"
+                    android:layout_margin="@dimen/basic_margin"
 
                     android:background="@drawable/profile_button"
                     android:backgroundTint="@color/pale_gray"

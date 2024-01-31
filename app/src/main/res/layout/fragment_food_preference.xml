@@ -24,16 +24,15 @@
 
             <androidx.appcompat.widget.SearchView
                 android:id="@+id/food_preference_searchview"
-                android:layout_width="350dp"
+                android:layout_width="match_parent"
                 android:layout_height="@dimen/standard_height"
-                android:layout_marginTop="30dp"
-                android:layout_marginBottom="30dp"
-                android:background="@drawable/profile_button"
-                android:backgroundTint="@color/pale_gray" />
+                android:layout_margin="@dimen/basic_margin"
+                android:background="@drawable/radius_30_stroke_light_gray"/>
 
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/food_preference_search_recyclerview"
-                android:layout_width="350dp"
+                android:layout_width="match_parent"
+                android:layout_margin="@dimen/basic_margin"
                 android:visibility="gone"
                 android:layout_height="match_parent"
                 tools:listitem="@layout/food_preference_search_item"/>
@@ -49,8 +48,9 @@
 
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/food_preference_recyclerview"
-                android:layout_width="350dp"
+                android:layout_width="match_parent"
                 android:layout_height="match_parent"
+                android:layout_margin="@dimen/basic_margin"
                 tools:listitem="@layout/food_preference_item"/>
 
 

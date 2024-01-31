@@ -77,15 +77,9 @@ class ProfileFragment : Fragment() {
 
         sharedPreferences = context.getSharedPreferences("userInfo", MODE_PRIVATE)
 
+        //프로필 이미지를 먼저 얻음
         profileViewModel.getProfileImage(sharedPreferences, resources)
 
-//        profileViewModel.userInformation.observe(viewLifecycleOwner, Observer{
-//            if(it.id != null){
-//
-//            }else{
-//                Log.d(TAG, "init: null")
-//            }
-//        })
 
         profileViewModel.userInformation.observe(viewLifecycleOwner){
             if(it.freeFoodTicket == 0){
@@ -100,11 +94,11 @@ class ProfileFragment : Fragment() {
 
 
         profileViewModel.profileImage.observe(viewLifecycleOwner, Observer {
-            if(it != null){
-                Log.d(TAG, "profileImage Observe: not null ")
+            if(it == null){
+                binding.profileImage.setImageResource(R.drawable.profile_unselected)
 
             }else{
-                binding.profileImage.setImageResource(R.drawable.profile_unselected)
+                Log.d(TAG, "init profile is not null")
             }
         })
 

@@ -52,7 +52,7 @@ class ExchangeFragment : Fragment() {
 
         currencyUnits = resources.getStringArray(R.array.currencies)
 
-        binding.exchangeRateApplicationStatus.isChecked = getStatus()
+//        binding.exchangeRateApplicationStatus.isChecked = getStatus()
 
         exchangeViewModel.isPossible.observe(viewLifecycleOwner, Observer { result ->
             Log.d(TAG, "init: ${result}")
@@ -91,18 +91,18 @@ class ExchangeFragment : Fragment() {
         /**
          * 메뉴판에 환율 적용 버튼
          */
-        binding.exchangeRateApplicationStatus.setOnCheckedChangeListener {_, status ->
-            if(exchangeViewModel.checkedSetCurrency()){
-                Log.d(TAG, "환율 적용 버튼: ${status}")
-
-                val sharedPreferences = context.getSharedPreferences("util", AppCompatActivity.MODE_PRIVATE)
-                exchangeViewModel.exchangeRateApplicationStatus(sharedPreferences,status)
-
-            }else{
-                Toast.makeText(requireContext(), "기준 화폐와 환전 화폐를 선택해주세요.", Toast.LENGTH_LONG).show()
-            }
-
-        }
+//        binding.exchangeRateApplicationStatus.setOnCheckedChangeListener {_, status ->
+//            if(exchangeViewModel.checkedSetCurrency()){
+//                Log.d(TAG, "환율 적용 버튼: ${status}")
+//
+//                val sharedPreferences = context.getSharedPreferences("util", AppCompatActivity.MODE_PRIVATE)
+//                exchangeViewModel.exchangeRateApplicationStatus(sharedPreferences,status)
+//
+//            }else{
+//                Toast.makeText(requireContext(), "기준 화폐와 환전 화폐를 선택해주세요.", Toast.LENGTH_LONG).show()
+//            }
+//
+//        }
 
 
         /**
