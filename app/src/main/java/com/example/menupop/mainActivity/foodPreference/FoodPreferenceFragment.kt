@@ -1,5 +1,6 @@
 package com.example.menupop.mainActivity.foodPreference
 
+import android.annotation.SuppressLint
 import android.app.Dialog
 import android.content.Context
 import android.graphics.Typeface
@@ -163,7 +164,8 @@ class FoodPreferenceFragment : Fragment() {
 
         existBottomSheetDialog.show()
     }
-    fun deleteFoodPreferenceItem(foodName: String,classification: String){
+    @SuppressLint("NotifyDataSetChanged")
+    fun deleteFoodPreferenceItem(foodName: String, classification: String, idx : Int){
         val dialog = Dialog(context)
         val binding : DialogDeletePreferenceBinding = DataBindingUtil.inflate(LayoutInflater.from(context), R.layout.dialog_delete_preference, null, false);
         dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
@@ -174,7 +176,8 @@ class FoodPreferenceFragment : Fragment() {
             mainViewModel.deletedResult.observe(viewLifecycleOwner){ result ->
                 if(result){
                     dialog.dismiss()
-                    mainViewModel.getFoodPreference()
+                    mainViewModel.foodPreferenceList.value?.foodList?.removeAt(idx)
+                    foodPreferenceAdapter.notifyDataSetChanged()
                 }else{
                     Toast.makeText(context,"잠시 후 다시 시도해주세요.",Toast.LENGTH_SHORT).show()
                 }
@@ -232,16 +235,17 @@ class FoodPreferenceFragment : Fragment() {
 
 
         foodPreferenceAdapter = FoodPreferenceAdapter(object : FoodPreferenceClickListener {
-            override fun deleteBtnClick(foodPreference: FoodPreference) {
-                deleteFoodPreferenceItem(foodPreference.foodName,foodPreference.classification)
+            override fun deleteBtnClick(foodPreference: FoodPreference,idx:Int) {
+                deleteFoodPreferenceItem(foodPreference.foodName,foodPreference.classification,idx)
             }
 
         })
         binding.foodPreferenceRecyclerview.adapter = foodPreferenceAdapter
         binding.foodPreferenceRecyclerview.layoutManager = LinearLayoutManager(context)
 
-
-        mainViewModel.getFoodPreference()
+        if(mainViewModel.foodPreferenceList.value == null) {
+            mainViewModel.getFoodPreference()
+        }
 
         mainViewModel.foodPreferenceList.observe(viewLifecycleOwner){ it->
             Log.d(TAG, "init: ${it.result}")
@@ -325,6 +329,7 @@ class FoodPreferenceFragment : Fragment() {
                 if(newText?.isEmpty() == true){
                     binding.foodPreferenceSearchRecyclerview.visibility = View.GONE
                     binding.foodPreferenceRecyclerview.visibility = View.VISIBLE
+                    mainViewModel.searchFood.value?.clear()
                 }
                 return true
             }
