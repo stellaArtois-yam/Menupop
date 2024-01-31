@@ -88,6 +88,8 @@ class ProfileSelectionFragment : Fragment() {
             if(it){
                 Log.d(TAG, "move To Profile:")
                 event?.moveToProfile()
+            }else{
+                Log.d(TAG, "move To Profile _isChangedProfile false")
             }
         })
 

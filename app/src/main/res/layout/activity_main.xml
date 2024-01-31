@@ -40,7 +40,8 @@
             android:layout_height="wrap_content"
             android:layout_gravity="bottom"
             android:background="@color/pale_gray"
-            app:menu="@menu/bottom_navi_menu"/>
+            app:menu="@menu/bottom_navi_menu"
+            style="@style/Widget.BottomNavigationView"/>
 
 
     </LinearLayout>

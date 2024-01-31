@@ -66,14 +66,16 @@
 
     <androidx.appcompat.widget.AppCompatButton
         android:id="@+id/find_id_result_button"
-        android:layout_width="@dimen/signup_password_and_warning_width"
+        android:layout_width="match_parent"
         android:layout_height="@dimen/standard_height"
         android:background="@drawable/button_round"
         android:backgroundTint="@color/orange"
 
         android:layout_gravity="center"
         android:gravity="center"
-        android:layout_marginTop="@dimen/standard_height"
+        android:layout_marginTop="@dimen/button_bottom_margin"
+        android:layout_marginStart="@dimen/basic_margin"
+        android:layout_marginEnd="@dimen/basic_margin"
 
         android:text="돌아가기"
         android:textColor="@color/white"

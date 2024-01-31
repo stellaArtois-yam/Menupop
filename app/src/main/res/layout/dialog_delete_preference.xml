@@ -6,20 +6,21 @@
             type="com.example.menupop.mainActivity.MainActivityViewModel" />
     </data>
     <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-        android:orientation="vertical"
-        android:layout_width="match_parent"
-        android:layout_height="300dp"
+
+        android:layout_width="400dp"
+        android:layout_height="wrap_content"
         android:background="@drawable/dialog_background"
-        android:gravity="center">
+        android:orientation="vertical">
 
         <TextView
             android:id="@+id/dialog_delete_preference_warning"
-            android:layout_width="match_parent"
+            android:layout_width="400dp"
             android:layout_height="wrap_content"
             android:text="[시금치]를 [불호]음식에서\n\n삭제 하시겠습니까?"
             android:textSize="20sp"
             android:textColor="@color/black"
-            android:gravity="center"/>
+            android:gravity="center"
+            android:padding="20dp"/>
 
         <TextView
             android:layout_width="match_parent"
@@ -35,7 +36,8 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
-            android:gravity="center">
+            android:gravity="center"
+            android:padding="20dp">
 
             <androidx.appcompat.widget.AppCompatButton
                 android:id="@+id/dialog_delete_preference_delete_button"

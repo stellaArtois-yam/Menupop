@@ -140,6 +140,8 @@ class MainActivity : AppCompatActivity(), MainActivityEvent{
          */
         mainActivityViewModel.scheduleMidnightWork(application)
 
+        val loadingDialog = loadingDialog()
+
 
         mainActivityViewModel.isLoading.observe(this, Observer {
             if(it.equals("success")){
@@ -162,8 +164,15 @@ class MainActivity : AppCompatActivity(), MainActivityEvent{
                     commit()
                 }
 
+                loadingDialog.dismiss()
+
             }else if(it.equals("yet")){
-                loadingDialog()
+                loadingDialog
+
+            }else if(it.equals("isNotSuccessful") || it.equals("timeout")){
+                Toast.makeText(this, "서버 오류로 로딩이 불가합니다 :(", Toast.LENGTH_LONG).show()
+                loadingDialog.dismiss()
+
             }
         })
 
@@ -200,15 +209,7 @@ class MainActivity : AppCompatActivity(), MainActivityEvent{
         Log.d(TAG, "loadingDialog: 실행")
 
 
-        mainActivityViewModel.isLoading.observe(this){
-            if(it.equals("success")){
-                dialog.dismiss()
-            }
-            else if (it.equals("isNotSuccessful") || it.equals("timeout")){
-                Toast.makeText(this, "서버 오류로 로딩이 불가합니다 :(", Toast.LENGTH_LONG).show();
-                dialog.dismiss()
-            }
-        }
+
 
         return dialog
 
@@ -256,7 +257,7 @@ class MainActivity : AppCompatActivity(), MainActivityEvent{
                     backButtonGone()
                     return true
                 }
-                R.id.tab_camera -> {
+                R.id.tab_translation -> {
                     Log.d(TAG, "onNavigationItemSelected: 카메라 탭 선택")
                     mainActivityViewModel.checkingTranslationTicket()
                     backButtonGone()

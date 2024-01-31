@@ -24,63 +24,70 @@
             android:id="@+id/find_id_info_text"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:padding="30dp"
+
+
             android:text="@string/find_id"
-
-
             android:textColor="@color/black"
             android:textSize="20dp"
+
+            android:layout_margin="@dimen/basic_margin"
+            android:paddingTop="30dp"
+            android:paddingBottom="30dp"
+
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/appbar_menu" />
 
-        <EditText
-            android:id="@+id/find_id_email"
-            android:layout_width="@dimen/email_width"
-            android:layout_height="@dimen/standard_height"
-            android:background="@drawable/stroke"
+        <LinearLayout
+            android:id="@+id/find_id_linear"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:orientation="horizontal"
+            android:layout_margin="@dimen/basic_margin"
 
-            android:hint="이메일"
-            android:paddingStart="10dp"
-            android:textColorHint="@color/light_gray"
-            android:textSize="16sp"
-
-
-            app:layout_constraintEnd_toStartOf="@id/find_id_at"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/find_id_info_text" />
-
-        <TextView
-            android:id="@+id/find_id_at"
-            android:layout_width="@dimen/email_at_width"
-            android:layout_height="@dimen/standard_height"
-
-            android:gravity="center"
-            android:text="@"
-            android:textColor="@color/light_gray"
-            android:textSize="16sp"
-
-
-            app:layout_constraintEnd_toStartOf="@id/find_id_email_selection"
-            app:layout_constraintStart_toEndOf="@id/find_id_email"
-            app:layout_constraintTop_toBottomOf="@id/find_id_info_text" />
-
-        <Spinner
-            android:id="@+id/find_id_email_selection"
-            android:layout_width="@dimen/email_width"
-            android:layout_height="@dimen/standard_height"
-            android:background="@drawable/stroke"
-
-            android:entries="@array/spinner_items"
-
-
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toEndOf="@id/find_id_at"
-            app:layout_constraintTop_toBottomOf="@id/find_id_info_text" />
+            app:layout_constraintTop_toBottomOf="@id/find_id_info_text">
+
+            <EditText
+                android:id="@+id/find_id_email"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="@dimen/standard_height"
+                android:background="@drawable/stroke"
+
+                android:hint="이메일"
+                android:paddingStart="10dp"
+                android:textColorHint="@color/light_gray"
+                android:textSize="16sp"/>
+
+            <TextView
+                android:id="@+id/find_id_at"
+                android:layout_width="@dimen/email_at_width"
+                android:layout_height="@dimen/standard_height"
+
+                android:gravity="center"
+                android:text="@"
+                android:textColor="@color/light_gray"
+                android:textSize="16sp"/>
+
+            <Spinner
+                android:id="@+id/find_id_email_selection"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="@dimen/standard_height"
+                android:background="@drawable/stroke"
+
+                android:entries="@array/spinner_items"/>
+
+        </LinearLayout>
+
+
+
 
         <TextView
             android:id="@+id/find_id_email_warning"
-            android:layout_width="@dimen/signup_password_and_warning_width"
+            android:layout_width="match_parent"
             android:layout_height="@dimen/signup_warning_height"
 
             android:gravity="center_vertical"
@@ -90,24 +97,27 @@
             android:textSize="15.5sp"
             android:visibility="gone"
 
+            android:layout_margin="@dimen/basic_margin"
 
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/find_id_at" />
+            app:layout_constraintTop_toBottomOf="@id/find_id_linear" />
 
         <androidx.appcompat.widget.AppCompatButton
             android:id="@+id/find_id_comfirm_button"
-            android:layout_width="@dimen/signup_password_and_warning_width"
+            android:layout_width="match_parent"
             android:layout_height="@dimen/standard_height"
-            android:layout_marginTop="@dimen/standard_height"
             android:background="@drawable/button_round"
-
             android:backgroundTint="@color/orange"
+
             android:text="확인하기"
             android:textColor="@color/white"
             android:textSize="18sp"
-
             android:textStyle="bold"
+
+            android:layout_marginTop="@dimen/button_bottom_margin"
+            android:layout_marginStart="@dimen/basic_margin"
+            android:layout_marginEnd="@dimen/basic_margin"
 
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"

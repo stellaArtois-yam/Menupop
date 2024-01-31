@@ -219,9 +219,11 @@ class SignupActivity : AppCompatActivity() {
 
         binding.signupCheckProvideInformation.setOnClickListener {
             showInformationDialog("personal")
+            Log.d(TAG, "personal")
         }
         binding.signupCheckMarketingInformation.setOnClickListener {
             showInformationDialog("marketing")
+            Log.d(TAG, "click marketing")
         }
 
 
@@ -347,14 +349,14 @@ class SignupActivity : AppCompatActivity() {
 //        val bindingDialog : DialogWarningBinding = DataBindingUtil.inflate(LayoutInflater.from(this), R.layout.dialog_terms_of_service, null, false);
         val dialog = Dialog(this)
         dialog.setContentView(R.layout.dialog_terms_of_service)
+        var imageview = dialog.findViewById<ImageView>(R.id.dialog_service_image)
 
         var button = dialog.findViewById<Button>(R.id.dialog_service_button)
+
         if(type == "personal"){
-//            bindingDialog.dialogTitle.text = "개인 정보 이용 약관"
-//            bindingDialog.dialogContent.text =  "개인 정보 이용약관이 들어갈 예정"
+
         }else{
-//            bindingDialog.dialogTitle.text = "마케팅 수신 이용 약관"
-//            bindingDialog.dialogContent.text = "마케팅 수신 이용 약관이 들어갈 예정"
+            imageview.setImageResource(R.drawable.marketing)
 
         }
         dialog.show()

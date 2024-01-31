@@ -4,24 +4,23 @@
 <!--    unchecked-->
     <item android:state_checked="false">
         <shape>
-            <stroke android:color="@color/light_gray" android:width="1dp"/>
+            <stroke android:color="@color/light_gray"
+                    android:width="1dp"/>
             <solid android:color="#fff"/>
         </shape>
     </item>
 
-<!--    checked-->
+<!--  checked-->
     <item android:state_checked="true">
         <layer-list>
             <item>
                 <shape>
-                    <stroke android:color="@color/light_gray" android:width="1dp"/>
+                    <stroke android:color="@color/light_gray"
+                            android:width="1dp"/>
+                    <solid android:color="@color/orange"/>
                 </shape>
             </item>
-            <item  android:drawable="@drawable/check_24"
-                android:top="4dp"
-                android:right="4dp"
-                android:bottom="4dp"
-                android:left="4dp" />
+            <item  android:drawable="@drawable/check_24"/>
         </layer-list>
     </item>
 
