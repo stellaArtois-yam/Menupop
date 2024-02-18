@@ -1,11 +1,16 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
     <!-- Base application theme. -->
-    <style name="Base.Theme.Menupop" parent="Theme.Material3.DayNight.NoActionBar">
+    <style name="Base.Theme.Menupop" parent="Theme.Material3.Light.NoActionBar">
         <!-- Customize your light theme here. -->
          <item name="colorPrimary">@color/white</item>
          <item name="windowActionBar">false</item>
         <item name="android:windowFullscreen">true</item>
     </style>
+
+    <style name="Widget.BottomNavigationView" parent="Widget.Material3.BottomNavigationView">
+        <item name="colorControlHighlight">@android:color/transparent</item>
+    </style>
+
 
     <style name="Theme.Menupop" parent="Base.Theme.Menupop" />
 </resources>

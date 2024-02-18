@@ -1,15 +1,20 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <dimen name="login_image_width">571dp</dimen>
-    <dimen name="login_image_height">457.2dp</dimen>
+    <dimen name="login_image_width">427dp</dimen>
+
 
     <dimen name="login_width">445dp</dimen>
-    <dimen name="login_height">77.7dp</dimen>
+    <dimen name="login_height">60dp</dimen>
     <dimen name="login_margin_top">30.5dp</dimen>
-    <dimen name="login_margin_side">76.2dp</dimen>
+
 
     <dimen name="login_find_text">30.5dp</dimen>
+
+    <dimen name="basic_margin">20dp</dimen>
+    <dimen name="button_bottom_margin">75dp</dimen>
+    <dimen name="login_margin_side">22dp</dimen>
+    <dimen name="login_margin">43dp</dimen>
 
 
 </resources>

@@ -1,6 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
+    <dimen name="basic_margin">13dp</dimen>
+    <dimen name="button_bottom_margin">37dp</dimen>
+
 
 
 </resources>
