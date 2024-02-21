@@ -48,5 +48,6 @@
 
 ### 시퀀스 다이어그램
 ##### [시퀀스 다이어그램 보러가기](https://thorn-preface-8d6.notion.site/MenuPop-Sequence-Diagram-95ab1c8b0dcf449db7d1ca36c1331158?pvs=4)
+#### 시퀀스 다이어그램 일부 사진
 ![image](https://github.com/stellaArtois-yam/Menupop/assets/102309691/76f5bc1c-77fa-43a1-b8a1-37ee07fdd3fa)
 
