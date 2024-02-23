@@ -70,7 +70,7 @@
     <td><img width="360" alt="스크린샷 2024-02-23 오후 6 29 25" src="https://github.com/stellaArtois-yam/Menupop/assets/102309691/a360744c-2c10-4164-91c6-63ec426bde9c"></td>
     <td><img width="360" alt="회원가입" src="https://github.com/stellaArtois-yam/Menupop/assets/102309691/50bc24a7-ba0b-4a55-b424-c564d8c6f875"></td>
     <td><img width="360" alt="스크린샷 2024-02-23 오후 6 29 33" src="https://github.com/stellaArtois-yam/Menupop/assets/102309691/914a3f9e-9028-4442-bf73-246ab50b59e4"></td>
-    <td><img width="360" alt="바밀번호 찾기" src="https://github.com/stellaArtois-yam/Menupop/assets/102309691/9f90a736-36ff-4b9d-8c98-ec46b7b625f9"></td>
+    <td><img width="360" alt="스크린샷 2024-02-23 오후 6 49 23" src="https://github.com/stellaArtois-yam/Menupop/assets/102309691/6f02ae7f-ed67-4596-9bd8-c81847b30c04"></td>
   </tr>
   <tr>
     <th>음식 등록 화면</th>
