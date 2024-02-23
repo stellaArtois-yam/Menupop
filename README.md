@@ -60,15 +60,29 @@
 
 ## 💡DEMO
 <table>
+    <tr>
+    <th>로그인</th>
+    <th>회원가입</th>
+    <th>아이디 찾기</th>
+    <th>비밀번호 찾기</th>
+  </tr>
   <tr>
-    <th>음식 등록</th>
-    <th>음식판 번역</th>
-    <th>환율 정보 확인</th>
+    <td><img width="360" alt="스크린샷 2024-02-23 오후 6 29 25" src="https://github.com/stellaArtois-yam/Menupop/assets/102309691/a360744c-2c10-4164-91c6-63ec426bde9c"></td>
+    <td><img width="360" alt="회원가입" src="https://github.com/stellaArtois-yam/Menupop/assets/102309691/50bc24a7-ba0b-4a55-b424-c564d8c6f875"></td>
+    <td><img width="360" alt="스크린샷 2024-02-23 오후 6 29 33" src="https://github.com/stellaArtois-yam/Menupop/assets/102309691/914a3f9e-9028-4442-bf73-246ab50b59e4"></td>
+    <td><img width="360" alt="바밀번호 찾기" src="https://github.com/stellaArtois-yam/Menupop/assets/102309691/9f90a736-36ff-4b9d-8c98-ec46b7b625f9"></td>
+  </tr>
+  <tr>
+    <th>음식 등록 화면</th>
+    <th>음식판 번역 화면</th>
+    <th>환율 정보 확인 화면</th>
+    <th>프로필 화면 </th>
   </tr>
   <tr>
     <td><img width="300" alt="스크린샷 2024-02-23 오후 6 10 42" src="https://github.com/stellaArtois-yam/Menupop/assets/102309691/e6646cd6-4dfd-4399-98d0-28ccc9438e43"></td>
     <td><img width="300" alt="스크린샷 2024-02-23 오후 6 09 22" src="https://github.com/stellaArtois-yam/Menupop/assets/102309691/8aca377b-eac0-4fd0-af5e-8d42c4a44dbb"></td>
     <td><img width="300" alt="스크린샷 2024-02-23 오후 6 13 27" src="https://github.com/stellaArtois-yam/Menupop/assets/102309691/90d988b7-ed17-44e4-865a-07386def80e1"></td>
+    <td><img width="360" alt="스크린샷 2024-02-23 오후 6 29 09" src="https://github.com/stellaArtois-yam/Menupop/assets/102309691/014026ae-c72c-46b0-b1be-df31d71ce57a"></td>
   </tr>
 </table>
 
