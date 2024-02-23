@@ -59,7 +59,6 @@
 - PostMan
 
 ## 💡DEMO
-<p>
 <table>
   <tr>
     <th>음식 등록</th>
@@ -69,15 +68,9 @@
   <tr>
     <td><img width="300" alt="스크린샷 2024-02-23 오후 6 10 42" src="https://github.com/stellaArtois-yam/Menupop/assets/102309691/e6646cd6-4dfd-4399-98d0-28ccc9438e43"></td>
     <td><img width="300" alt="스크린샷 2024-02-23 오후 6 09 22" src="https://github.com/stellaArtois-yam/Menupop/assets/102309691/8aca377b-eac0-4fd0-af5e-8d42c4a44dbb"></td>
-    <img width="300" alt="스크린샷 2024-02-23 오후 6 13 27" src="https://github.com/stellaArtois-yam/Menupop/assets/102309691/90d988b7-ed17-44e4-865a-07386def80e1">
+    <td><img width="300" alt="스크린샷 2024-02-23 오후 6 13 27" src="https://github.com/stellaArtois-yam/Menupop/assets/102309691/90d988b7-ed17-44e4-865a-07386def80e1"></td>
   </tr>
 </table>
-    
-<img width="300" alt="스크린샷 2024-02-23 오후 6 10 42" src="https://github.com/stellaArtois-yam/Menupop/assets/102309691/e6646cd6-4dfd-4399-98d0-28ccc9438e43">
-
-<img width="300" alt="스크린샷 2024-02-23 오후 6 09 22" src="https://github.com/stellaArtois-yam/Menupop/assets/102309691/8aca377b-eac0-4fd0-af5e-8d42c4a44dbb">
-<img width="300" alt="스크린샷 2024-02-23 오후 6 13 27" src="https://github.com/stellaArtois-yam/Menupop/assets/102309691/90d988b7-ed17-44e4-865a-07386def80e1">
-</p>
 
 
 
