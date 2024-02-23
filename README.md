@@ -84,6 +84,19 @@
     <td><img width="300" alt="스크린샷 2024-02-23 오후 6 13 27" src="https://github.com/stellaArtois-yam/Menupop/assets/102309691/90d988b7-ed17-44e4-865a-07386def80e1"></td>
     <td><img width="360" alt="스크린샷 2024-02-23 오후 6 29 09" src="https://github.com/stellaArtois-yam/Menupop/assets/102309691/014026ae-c72c-46b0-b1be-df31d71ce57a"></td>
   </tr>
+  <tr>
+    <th> 회원 탈퇴 화면 </th>
+    <th> 티켓 구매 화면 </th>
+      <th>개인정보보호 이용약관</th>
+      <th>마켓팅 정보 수입 이용약관 </th>
+  </tr>
+    <tr>
+        <td><img width="360" alt="스크린샷 2024-02-23 오후 6 48 42" src="https://github.com/stellaArtois-yam/Menupop/assets/102309691/807c3fbe-d8b0-4a8f-9c7b-d9d7035e287d">
+</td>
+        <td><img width="360" alt="스크린샷 2024-02-23 오후 6 29 01" src="https://github.com/stellaArtois-yam/Menupop/assets/102309691/b917af81-cfe2-42e2-b75d-50302334d285"></td>
+        <td><img width="360" alt="스크린샷 2024-02-23 오후 6 29 41" src="https://github.com/stellaArtois-yam/Menupop/assets/102309691/53d970d3-7196-4da5-ae55-cab63b7c5af6"></td>
+        <td><img width="360" alt="스크린샷 2024-02-23 오후 6 29 44" src="https://github.com/stellaArtois-yam/Menupop/assets/102309691/b96879d6-42e2-496d-897e-5ee2f2ec1e42"></td>
+    </tr>
 </table>
 
 
