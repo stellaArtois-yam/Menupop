@@ -92,7 +92,7 @@
   </tr>
     <tr>
         <td><img width="360" alt="스크린샷 2024-02-23 오후 6 48 42" src="https://github.com/stellaArtois-yam/Menupop/assets/102309691/807c3fbe-d8b0-4a8f-9c7b-d9d7035e287d"></td>
-        <td>![Screenshot_20240104_163545_Menupop 2](https://github.com/stellaArtois-yam/Menupop/assets/102309691/7aaab682-db97-462a-bf10-eb1be538e657)</td>
+        <td><img width="360" alt "번역 화면"src="https://github.com/stellaArtois-yam/Menupop/assets/102309691/76eb4a57-a3b8-46df-adb8-a8a5a5cb527f"></td>
         <td><img width="360" alt="스크린샷 2024-02-23 오후 6 29 01" src="https://github.com/stellaArtois-yam/Menupop/assets/102309691/b917af81-cfe2-42e2-b75d-50302334d285"></td>
         <td><img width="360" alt="스크린샷 2024-02-23 오후 6 29 41" src="https://github.com/stellaArtois-yam/Menupop/assets/102309691/53d970d3-7196-4da5-ae55-cab63b7c5af6"></td>
     </tr>
