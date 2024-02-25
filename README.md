@@ -92,7 +92,7 @@
   </tr>
     <tr>
         <td><img width="360" alt="스크린샷 2024-02-23 오후 6 48 42" src="https://github.com/stellaArtois-yam/Menupop/assets/102309691/807c3fbe-d8b0-4a8f-9c7b-d9d7035e287d"></td>
-        <td><img width="360" alt "번역 화면"src="https://github.com/stellaArtois-yam/Menupop/assets/102309691/76eb4a57-a3b8-46df-adb8-a8a5a5cb527f"></td>
+        <td><img width="360" alt "번역 화면"src="https://github-production-user-asset-6210df.s3.amazonaws.com/102309691/307575361-76eb4a57-a3b8-46df-adb8-a8a5a5cb527f.jpg?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=AKIAVCODYLSA53PQK4ZA%2F20240225%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Date=20240225T075141Z&X-Amz-Expires=300&X-Amz-Signature=5ef345760981d8ae17da7360235d333b64552974f9c10db09e2212a8a448db54&X-Amz-SignedHeaders=host&actor_id=102309691&key_id=0&repo_id=709688627"></td>
         <td><img width="360" alt="스크린샷 2024-02-23 오후 6 29 01" src="https://github.com/stellaArtois-yam/Menupop/assets/102309691/b917af81-cfe2-42e2-b75d-50302334d285"></td>
         <td><img width="360" alt="스크린샷 2024-02-23 오후 6 29 41" src="https://github.com/stellaArtois-yam/Menupop/assets/102309691/53d970d3-7196-4da5-ae55-cab63b7c5af6"></td>
     </tr>
