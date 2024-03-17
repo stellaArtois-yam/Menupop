@@ -1,55 +1,61 @@
-## 프로젝트 개요
-- 해외 여행 시, 사진 촬영을 통해 메뉴판 번역과 원화 변환 등록한 호/불호 음식에 대한 하이라이팅 처리를 해주는 어플리케이션
+## 📋 프로젝트 개요
+- 사진 촬영을 통해 메뉴판 번역과 등록한 호/불호 음식에 대한 하이라이팅 처리와 환율 계산을 해주는 어플리케이션
+- 개발 기간 : 2023.09 ~ 2024.02
+<br>
 
-## 기획 목적
+## 🤔 기획 목적
+- 미영어권 국가 여행 시, 고수, 마라 등 **특정 식자재에 대한 호/불호** 때문에 메뉴 선정의 어려움을 겪은 경험이 있음.
+- 단순 호/불호 문제를 떠나 **알러지나 기타 건강 이슈**로 인해 음식을 가려 먹어야 하는 경우도 있음.
+- 위와 같은 경험을 바탕으로 메뉴판 번역과 더불어 호/불호 음식을 표시해주는 어플리케이션의 필요성을 느낌.
+- 또한, 여행의 필수 요소인 **환율 계산**을 추가하여 여행에 특화된 어플리케이션으로 사용자의 편의성을 도모하고자 함.
+<br>
 
-- 해외 여행 시, 구글 렌즈와 빅스비 비전을 많이 사용함. 해당 기능같은 경우 영어가 가장 번역이 잘 되고, 아시아권 언어 번역 시 자연스러운 문장이나 단어로 이어지지 않고, 직해하는 경우가 많아 어려움을 겪음.
-    - 개인 경험: 동남아 로컬 맛집 같은 경우 영어 메뉴판 지원이 안되는 경우가 있어 메뉴 선택에 어려움을 겪는 경우가 있었음.
-- 또한, 부모님 세대의 경우 고수와 같은 식자재에 대한 불호성이 강하고, 요즘 젊은 사람들 사이에서도 오이, 민트 등 특정 식자재에 대한 호/불호 이슈가 있음.
-- 즉각적인 원화 변환으로 보다 현명한 소비를 권장하고자 함.
-- 따라서, 아시아권 언어 친화적인 메뉴 번역 기능과 직관적인 원화 변환을 메인으로 설정하고, 호/불호 식자재에 대한 필터링 기능을 제공하여 해외 여행에 있어 편의성을 도모하고자 함.
-
-## 주요 기능
+## 💁🏻‍♀️ 주요 기능
 
 #### **번역**
 
 - 촬영한 메뉴판 사진의 언어를 감지하여 한국어로 번역
-- 등록한 호/불호 음식을 감지하여 하이라이팅 처리
+- 번역 시 등록한 호/불호 음식을 감지하여 하이라이팅 처리하여 보여줌.
 
-#### **원화 변환**
+#### **환율 계산**
 
-- 실시간으로 환율 데이터를 가져와 원화로 바꿔줌
-- 또는, 환전 시 환율을 등록하면 해당 금액을 기준으로 원화로 변환
-
-## 🗓️ 개발 기간
-- 2023.09 ~ 2024.02
+- 환율 데이터를 가져와 원하는 국가의 환율을 계산
+- 기준 국가와 환전 국가를 선택 시 환전 국가 1원(화폐단위)당 기준 국가 환율을 계산
+<br>
 
 ## 💻 Skills
 
-- Language
+🗣️ **Language**
     - Kotlin
     - PHP
     - Python
     - PlantUML
-- **Design Patterns**
+      
+🎨 **Design Patterns**
     - MVVM
-- **서버 환경**
+      
+ **서버 환경**
     - AWS EC2
     - Apache2
-    - Mysql
+    - MySQL
     - Flask
+ 
 - **API**
-    - Retrofit2
+    - ExchangeRate API     
+    - ML kit Vision API
+    - Google Cloud Translator API
     - Kakao Pay API
     - Kakao Login API
     - Google Login API
-    - Firebase ML kit
-    - Google Cloud Translator
+    - Google AdMob API
+
+      
 - **Collaboration**
     - Github
     - Notion
     - Slack
     - Figma
+ <br>
 
 ## 🔨 IDE
 - AndroidStudio
@@ -57,45 +63,62 @@
 - MySQL Workbench
 - SELAB
 - PostMan
+<br>
 
 ## 💡DEMO
 <table>
-    <tr>
+<tr>
     <th>로그인</th>
     <th>회원가입</th>
     <th>아이디 찾기</th>
-    <th>비밀번호 찾기</th>
-  </tr>
-  <tr>
-    <td><img width="360" alt="스크린샷 2024-02-23 오후 6 29 25" src="https://github.com/stellaArtois-yam/Menupop/assets/102309691/a360744c-2c10-4164-91c6-63ec426bde9c"></td>
-    <td><img width="360" alt="회원가입" src="https://github.com/stellaArtois-yam/Menupop/assets/102309691/50bc24a7-ba0b-4a55-b424-c564d8c6f875"></td>
-    <td><img width="360" alt="스크린샷 2024-02-23 오후 6 29 33" src="https://github.com/stellaArtois-yam/Menupop/assets/102309691/914a3f9e-9028-4442-bf73-246ab50b59e4"></td>
-    <td><img width="360" alt="스크린샷 2024-02-23 오후 6 49 23" src="https://github.com/stellaArtois-yam/Menupop/assets/102309691/6f02ae7f-ed67-4596-9bd8-c81847b30c04"></td>
-  </tr>
-  <tr>
-    <th>음식 등록 화면</th>
-    <th>번역 국가 선택 화면</th>
-    <th>환율 정보 확인 화면</th>
-    <th>프로필 화면 </th>
-  </tr>
-  <tr>
-    <td><img width="300" alt="스크린샷 2024-02-23 오후 6 10 42" src="https://github.com/stellaArtois-yam/Menupop/assets/102309691/e6646cd6-4dfd-4399-98d0-28ccc9438e43"></td>
-    <td><img width="300" alt="스크린샷 2024-02-23 오후 6 09 22" src="https://github.com/stellaArtois-yam/Menupop/assets/102309691/8aca377b-eac0-4fd0-af5e-8d42c4a44dbb"></td>
-    <td><img width="300" alt="스크린샷 2024-02-23 오후 6 13 27" src="https://github.com/stellaArtois-yam/Menupop/assets/102309691/90d988b7-ed17-44e4-865a-07386def80e1"></td>
-    <td><img width="360" alt="스크린샷 2024-02-23 오후 6 29 09" src="https://github.com/stellaArtois-yam/Menupop/assets/102309691/014026ae-c72c-46b0-b1be-df31d71ce57a"></td>
-  </tr>
-  <tr>
-    <th> 회원 탈퇴 화면 </th>
-    <th> 메뉴판 번역 화면 </th>
-      <th>티켓 구매 화면</th>
-      <th>이용약관 화면 </th>
-  </tr>
-    <tr>
-        <td><img width="360" alt="스크린샷 2024-02-23 오후 6 48 42" src="https://github.com/stellaArtois-yam/Menupop/assets/102309691/807c3fbe-d8b0-4a8f-9c7b-d9d7035e287d"></td>
-        <td><img width="360" alt="스크린샷 2024-02-23 오후 6 48 42" src="https://github-production-user-asset-6210df.s3.amazonaws.com/102309691/307575361-76eb4a57-a3b8-46df-adb8-a8a5a5cb527f.jpg?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=AKIAVCODYLSA53PQK4ZA%2F20240225%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Date=20240225T075141Z&X-Amz-Expires=300&X-Amz-Signature=5ef345760981d8ae17da7360235d333b64552974f9c10db09e2212a8a448db54&X-Amz-SignedHeaders=host&actor_id=102309691&key_id=0&repo_id=709688627"></td>
-        <td><img width="360" alt="스크린샷 2024-02-23 오후 6 29 01" src="https://github.com/stellaArtois-yam/Menupop/assets/102309691/b917af81-cfe2-42e2-b75d-50302334d285"></td>
-        <td><img width="360" alt="스크린샷 2024-02-23 오후 6 29 41" src="https://github.com/stellaArtois-yam/Menupop/assets/102309691/53d970d3-7196-4da5-ae55-cab63b7c5af6"></td>
-    </tr>
+    <th>비밀번호 재설정</th>
+</tr>
+<tr>
+    <td><img width="360" alt="Login Acticity" src="https://github.com/stellaArtois-yam/Menupop/assets/56255288/9b1c7392-ee1f-4573-b3ab-bb9f3a3e96037"></td>
+    <td><img width="360" alt="SignUp Activity" src="https://github.com/stellaArtois-yam/Menupop/assets/56255288/320061cd-0b6b-43dc-a754-62bc2bf10040"></td>
+    <td><img width="360" alt="Find ID Activity" src="https://github.com/stellaArtois-yam/Menupop/assets/56255288/3b3161c3-f7c4-43ef-9755-7d24c1ecf826"></td>
+    <td><img width="360" alt="Reset Password Activity" src="https://github.com/stellaArtois-yam/Menupop/assets/56255288/454d54fa-4b40-4dad-a74a-5bfbf805668c"></td>
+
+</tr>
+    
+<tr>
+    <th>음식 등록</th>
+    <th>환율 정보 확인</th>
+    <th>프로필</th>
+    <th>회원 탈퇴</th>
+</tr>
+    
+<tr>
+    <td><img width="300" alt="FoodPreference Fragment" src="https://github.com/stellaArtois-yam/Menupop/assets/56255288/c0040c48-bfbe-43e9-909f-e151dfc138d0"></td>
+    <td><img width="300" alt="Exchange Fragment" src="https://github.com/stellaArtois-yam/Menupop/assets/56255288/e955a676-7ee7-48bc-a105-efe95efc7b56"></td>
+    <td><img width="360" alt="Profile Fragment" src="https://github.com/stellaArtois-yam/Menupop/assets/56255288/eafeb443-aa8e-428c-8277-191a6c27b342"></td>
+    <td><img width="360" alt="Withdrawal Fragment" src="https://github.com/stellaArtois-yam/Menupop/assets/56255288/cede4a8e-82eb-4596-8097-47efbfcaf835"></td>
+</tr>
+    
+<tr>
+    <th>티켓 구매</th>
+    <th>티켓 구매 방식 선택</th>
+    <th>리워드 티켓 구매</th>
+    <th>카카오페이 티켓 구매</th>
+</tr>
+
+<tr> 
+    <td><img width="360" alt="Ticket Activity" src="https://github.com/stellaArtois-yam/Menupop/assets/56255288/2475390a-e370-466d-9e0e-72350b6bd838"></td>
+    <td><img width="360" alt="Ticket Activity_purchase-2" src="https://github.com/stellaArtois-yam/Menupop/assets/56255288/bcc448be-475b-4074-b1ee-0918847361c8"></td>
+    <td><img width="360" alt="Ticket Activity_purchase-1" src="https://github.com/stellaArtois-yam/Menupop/assets/56255288/1d9d14a6-3458-460e-be1e-0330ad4d216c"</td>
+    <td><img width="360" alt="Ticket Activity_purchase" src="https://github.com/stellaArtois-yam/Menupop/assets/56255288/68cc366b-d539-4ddf-9bb1-382d7b7785a3"></td>        
+</tr>
+
+<tr>
+    <th>번역 국가 선택</th>
+    <th>메뉴판 번역</th>
+</tr>
+
+
+<tr>
+    <td><img width="300" alt="MenuSelection" src="https://github.com/stellaArtois-yam/Menupop/assets/56255288/4d319a7d-8266-47a2-8845-b740d616aeac"></td>
+    <td><img width="300" alt="TranslatedMenu" src="https://github.com/stellaArtois-yam/Menupop/assets/56255288/bd13d1e1-953e-400c-9e7b-3630537f78f4"></td>  
+</tr> 
 </table>
 
 
