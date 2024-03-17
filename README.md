@@ -44,6 +44,7 @@
     - ExchangeRate API     
     - ML Kit Vision API
     - Google Cloud Translation API
+    - Naver Login API
     - Kakao Pay API
     - Kakao Login API
     - Google Login API
