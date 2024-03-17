@@ -25,16 +25,16 @@
 
 ## 💻 Skills
 
-🗣️ **Language**
+- **Language**
     - Kotlin
     - PHP
     - Python
     - PlantUML
-      
-🎨 **Design Patterns**
+
+- **Design Patterns**
     - MVVM
       
- **서버 환경**
+ - **서버 환경**
     - AWS EC2
     - Apache2
     - MySQL
