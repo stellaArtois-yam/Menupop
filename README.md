@@ -29,7 +29,7 @@
     - Kotlin
     - PHP
     - Python
-    - PlantUML
+    - UML
 
 - **Design Patterns**
     - MVVM
@@ -42,8 +42,8 @@
  
 - **API**
     - ExchangeRate API     
-    - ML kit Vision API
-    - Google Cloud Translator API
+    - ML Kit Vision API
+    - Google Cloud Translation API
     - Kakao Pay API
     - Kakao Login API
     - Google Login API
