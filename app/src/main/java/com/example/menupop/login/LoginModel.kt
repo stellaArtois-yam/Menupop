@@ -3,6 +3,7 @@ package com.example.menupop.login
 import android.app.Application
 import android.content.SharedPreferences
 import android.util.Log
+import com.example.menupop.BuildConfig
 import com.example.menupop.RetrofitService
 import com.google.gson.Gson
 import com.google.gson.GsonBuilder
@@ -24,15 +25,16 @@ class LoginModel(val application: Application)  {
         .setLenient()
         .create()
     private val retrofit = Retrofit.Builder()
-        .baseUrl("http://3.135.51.201/") // 실제 서버의 기본 URL로 대체해야 합니다.
+        .baseUrl(BuildConfig.SERVER_IP)
         .addConverterFactory(GsonConverterFactory.create(gson))
         .addConverterFactory(ScalarsConverterFactory.create())
         .build()
 
     private val service = retrofit.create(RetrofitService::class.java)
-fun requestLogin(id: String, password: String, callback: (LoginResponseModel) -> Unit) {
+fun requestLogin(id: String, password: String,
+                 callback: (LoginResponseModel) -> Unit) {
+
     val call: Call<LoginResponseModel> = service.requestLogin(id, password)
-    Log.d(TAG, "requestLogin: ${password}")
 
     call.enqueue(object : Callback<LoginResponseModel> {
         override fun onResponse(call: Call<LoginResponseModel>, response: Response<LoginResponseModel>) {
@@ -55,7 +57,6 @@ fun requestLogin(id: String, password: String, callback: (LoginResponseModel) ->
                 call: Call<LoginResponseModel>,
                 response: Response<LoginResponseModel>
             ) {
-                Log.d(TAG, "onResponse: 요청 보냄 ${response.toString()}")
                 if (response.isSuccessful) {
                     callback(response.body()!!)
                 } else {

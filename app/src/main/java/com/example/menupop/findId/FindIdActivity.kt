@@ -22,7 +22,6 @@ class FindIdActivity : AppCompatActivity(),FindIdFragmentEvent {
     }
 
     fun init(){
-        Log.d(TAG, "init start")
 
         findIdFragment = FindIdFragment()
         findIdResultFragment = FindIdResultFragment()
@@ -42,7 +41,7 @@ class FindIdActivity : AppCompatActivity(),FindIdFragmentEvent {
     }
 
     override fun successFindId() {
-        Log.d(TAG, "successFindId: 호출")
+
         supportFragmentManager.beginTransaction().apply {
             replace(R.id.find_id_frame_layout, findIdResultFragment)
             commit()
@@ -50,7 +49,6 @@ class FindIdActivity : AppCompatActivity(),FindIdFragmentEvent {
     }
 
     override fun finishFindId() {
-        Log.d(TAG, "finishFindId: 호출")
         finish()
     }
 

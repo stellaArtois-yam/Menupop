@@ -67,51 +67,51 @@ class ResetPasswordEmailFragment : Fragment() {
         binding.lifecycleOwner = this
         binding.appbarMenu.findViewById<TextView>(R.id.appbar_status).text = "비밀번호 재설정"
 
-        resetPasswordViewModel.checkEamilForm.observe(viewLifecycleOwner, Observer { result ->
-            Log.d(TAG, "이메일 형식 확인 ${result}")
-            if(result){
-                binding.emailWarningText.visibility = View.GONE
-            } else{
-                binding.emailWarningText.visibility = View.VISIBLE
+        resetPasswordViewModel.checkEmailForm.observe(viewLifecycleOwner, Observer { result ->
+            when(result){
+                true -> binding.emailWarningText.visibility = View.GONE
+                else -> binding.emailWarningText.visibility = View.VISIBLE
             }
-
         })
 
         resetPasswordViewModel.remainingTime.observe(viewLifecycleOwner, Observer {time ->
-            Log.d(TAG, "init: ${time}")
             binding.passwordResetEmailCertificationWarningText.text = "시간 제한 : ${time}"
+
             if(time == "00:00"){
-                Log.d(TAG, "init: 종료 됨")
                 binding.certificationButton.text = "재인증"
                 binding.passwordResetEmailCertificationWarningText.text = "인증번호가 만료되었습니다."
             }
 
         })
         resetPasswordViewModel.verifycationCompleted.observe(viewLifecycleOwner, Observer { result ->
-            if(result){
-                resetPasswordViewModel.stopTimer()
-                Toast.makeText(context,"인증 완료.",Toast.LENGTH_SHORT).show()
-                binding.passwordResetEmailCertificationWarningText.visibility = View.GONE
-                binding.lastButton.setOnClickListener{
-                    event?.successVerifyEmail()
+            when(result){
+                true -> {
+                    resetPasswordViewModel.stopTimer()
+                    Toast.makeText(context,"인증 완료.",Toast.LENGTH_SHORT).show()
+                    binding.passwordResetEmailCertificationWarningText.visibility = View.GONE
+                    binding.lastButton.setOnClickListener{
+                        event?.successVerifyEmail()
+                    }
                 }
-            } else{
-                Toast.makeText(context,"인증번호를 확인해주세요.",Toast.LENGTH_SHORT).show()
+                else -> Toast.makeText(context,"인증번호를 확인해주세요.",Toast.LENGTH_SHORT).show()
             }
         })
 
         resetPasswordViewModel.verifiedEmail.observe(viewLifecycleOwner, Observer { result ->
-            Log.d(TAG, "verifycationCompleted 변경 확인")
             val email = "${binding.passwordResetEmailId.text}@${binding.passwordResetEmailSelection.selectedItem.toString()}"
-            if(result == false){
-                binding.emailWarningText.text = "사용자가 입력한 아아디와 일치하지 않은 이메일입니다."
-                binding.emailWarningText.visibility = View.VISIBLE
-            } else {
-                binding.emailWarningText.visibility = View.GONE
-                resetPasswordViewModel.sendVerifyCode(email)
-                resetPasswordViewModel.startTimer()
-                binding.certificationButton.text = "확인"
-                binding.passwordResetEmailCertificationWarningText.visibility = View.VISIBLE
+
+            when(result){
+                false -> {
+                    binding.emailWarningText.text = "사용자가 입력한 아아디와 일치하지 않은 이메일입니다."
+                    binding.emailWarningText.visibility = View.VISIBLE
+                }
+                else -> {
+                    binding.emailWarningText.visibility = View.GONE
+                    resetPasswordViewModel.sendVerifyCode(email)
+                    resetPasswordViewModel.startTimer()
+                    binding.certificationButton.text = "확인"
+                    binding.passwordResetEmailCertificationWarningText.visibility = View.VISIBLE
+                }
             }
 
         })
@@ -119,9 +119,10 @@ class ResetPasswordEmailFragment : Fragment() {
     }
     fun setListener(){
         binding.passwordResetEmailId.addTextChangedListener{
+
             val selectedItem = binding.passwordResetEmailSelection.selectedItem.toString()
             val emailFirst = binding.passwordResetEmailId.text.toString()
-            Log.d(TAG, "이메일 형식 ${selectedItem} @ ${emailFirst}")
+
             resetPasswordViewModel.checkEmailForm(emailFirst,selectedItem)
 
         }
@@ -134,10 +135,10 @@ class ResetPasswordEmailFragment : Fragment() {
             ) {
                 val selectedItem = parent?.getItemAtPosition(position).toString()
                 val emailFirst = binding.passwordResetEmailId.text.toString()
+
                 if(selectedItem != "선택"){
                     resetPasswordViewModel.checkEmailForm(emailFirst,selectedItem)
                 }
-                Log.d(TAG, "onItemSelected 이메일 형식 ${selectedItem} @ ${emailFirst}")
             }
 
             override fun onNothingSelected(parent: AdapterView<*>?) {
@@ -150,18 +151,21 @@ class ResetPasswordEmailFragment : Fragment() {
         }
 
         binding.certificationButton.setOnClickListener {
-            if(resetPasswordViewModel.checkEamilForm.value == false){
-                Toast.makeText(context,"이메일을 제대로 입력해주세요!",Toast.LENGTH_SHORT).show()
-            }else {
-                if (binding.certificationButton.text == "인증번호" || binding.certificationButton.text == "재인증") {
-                    val email =
-                        "${binding.passwordResetEmailId.text}@${binding.passwordResetEmailSelection.selectedItem.toString()}"
-                    resetPasswordViewModel.checkEmail(email)
-                } else {
-                    val verifyCode = binding.certificationNumber.text.toString()
-                    resetPasswordViewModel.checkVerifyCode(verifyCode)
+            when(resetPasswordViewModel.checkEmailForm.value){
+                false -> Toast.makeText(context,"이메일을 제대로 입력해주세요!",Toast.LENGTH_SHORT).show()
+
+                else -> {
+                    if (binding.certificationButton.text == "인증번호" || binding.certificationButton.text == "재인증") {
+                        val email =
+                            "${binding.passwordResetEmailId.text}@${binding.passwordResetEmailSelection.selectedItem.toString()}"
+                        resetPasswordViewModel.checkEmail(email)
+                    } else {
+                        val verifyCode = binding.certificationNumber.text.toString()
+                        resetPasswordViewModel.checkVerifyCode(verifyCode)
+                    }
                 }
             }
+
         }
     }
 }

@@ -25,10 +25,6 @@ class FindIdFragment : Fragment() {
     var event : FindIdFragmentEvent? = null
     private var context : Context? = null
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-
-    }
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
@@ -62,19 +58,15 @@ class FindIdFragment : Fragment() {
     }
 
     fun init(){
-        Log.d(TAG, "init: 호출")
+
         findIdViewModel = ViewModelProvider(requireActivity()).get(FindIdViewModel::class.java)
         binding.findIdViewModel = findIdViewModel
         binding.lifecycleOwner = this
 
         binding.appbarMenu.findViewById<TextView>(R.id.appbar_status).text = "아이디 찾기"
 
-        Log.d(TAG, "init textview visibility: ${binding.findIdInfoText.visibility}")
-
-
 
         findIdViewModel.checkEmailForm.observe(viewLifecycleOwner, Observer {
-            Log.d(TAG, "이메일 유효성 검사: $it")
 
             if(it){
                 binding.findIdEmailWarning.visibility = View.GONE
@@ -91,7 +83,7 @@ class FindIdFragment : Fragment() {
         binding.findIdEmail.addTextChangedListener {
             val domainSelection = binding.findIdEmailSelection.selectedItem.toString()
             val emailId = binding.findIdEmail.text.toString()
-            Log.d(TAG, "setListener email 형식 : ${emailId}@${domainSelection}")
+
             findIdViewModel.checkEmailForm(emailId, domainSelection)
         }
 
@@ -108,7 +100,6 @@ class FindIdFragment : Fragment() {
                 if(domainSelection != "선택"){
                     findIdViewModel.checkEmailForm(emailId, domainSelection)
                 }
-
             }
 
             override fun onNothingSelected(parent: AdapterView<*>?) {
@@ -119,28 +110,23 @@ class FindIdFragment : Fragment() {
 
 
         binding.findIdComfirmButton.setOnClickListener{
+
             if(findIdViewModel.checkEmailForm.value == true) {
                 val emailId = binding.findIdEmail.text.toString()
                 val domainSelection = binding.findIdEmailSelection.selectedItem.toString()
                 findIdViewModel.checkUserId(emailId, domainSelection)
 
-
-
             }
         }
 
 
-        findIdViewModel.userIdExistence.observe(viewLifecycleOwner, Observer{ result ->
-            Log.d(TAG, "findId Result: ${result.result} ${result.id}")
-
-            // observe 되고 넘겨
+        findIdViewModel.userIdExistence.observe(viewLifecycleOwner, Observer{
             event?.successFindId()
 
         })
+
         binding.appbarMenu.findViewById<ImageView>(R.id.appbar_back).setOnClickListener {
             event?.backButtonClick()
         }
-
-
     }
 }

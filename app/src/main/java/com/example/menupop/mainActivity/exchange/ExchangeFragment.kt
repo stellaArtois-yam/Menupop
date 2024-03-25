@@ -89,23 +89,6 @@ class ExchangeFragment : Fragment() {
 
 
         /**
-         * 메뉴판에 환율 적용 버튼
-         */
-//        binding.exchangeRateApplicationStatus.setOnCheckedChangeListener {_, status ->
-//            if(exchangeViewModel.checkedSetCurrency()){
-//                Log.d(TAG, "환율 적용 버튼: ${status}")
-//
-//                val sharedPreferences = context.getSharedPreferences("util", AppCompatActivity.MODE_PRIVATE)
-//                exchangeViewModel.exchangeRateApplicationStatus(sharedPreferences,status)
-//
-//            }else{
-//                Toast.makeText(requireContext(), "기준 화폐와 환전 화폐를 선택해주세요.", Toast.LENGTH_LONG).show()
-//            }
-//
-//        }
-
-
-        /**
          * 환전 화폐 선택
          */
         binding.exchangeTargetSpinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
@@ -182,15 +165,6 @@ class ExchangeFragment : Fragment() {
         return binding.root
     }
 
-
-    /**
-     * 이거 Model에서 가져와야 되는거 아닌가?
-     */
-    fun getStatus() : Boolean{
-        val sharedPreferences = context.getSharedPreferences("util", AppCompatActivity.MODE_PRIVATE)
-        val status = sharedPreferences.getBoolean("exchangeRateApplicationStatus",false)
-        return status
-    }
 
 
 }

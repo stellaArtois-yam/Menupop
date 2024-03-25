@@ -5,9 +5,10 @@
 
     <dimen name="login_height">56dp</dimen>
 
-    <dimen name="login_find_text">24dp</dimen>
+    <dimen name="login_find_text">48dp</dimen>
 
     <dimen name="standard_height">48dp</dimen>
+    <dimen name="button_height">45dp</dimen>
 
     <dimen name="edittext_width">264dp</dimen>
     <dimen name="button_width">88dp</dimen>

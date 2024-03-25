@@ -2,6 +2,8 @@ package com.example.menupop.mainActivity.profile
 
 import android.app.Dialog
 import android.content.Context
+import android.graphics.Color
+import android.graphics.drawable.ColorDrawable
 import android.os.Build
 import android.os.Bundle
 import android.util.Log
@@ -28,7 +30,7 @@ import com.example.menupop.mainActivity.MainActivityViewModel
 class WithdrawalFragment : Fragment() {
     val TAG = "WithdrawalFragment"
     lateinit var binding : FragmentWithdrawalBinding
-    private lateinit var withdrawalViewModel: MainActivityViewModel
+    private lateinit var mainViewModel: MainActivityViewModel
     var event: MainActivityEvent? = null
     private lateinit var context: Context
 
@@ -69,11 +71,11 @@ class WithdrawalFragment : Fragment() {
     }
 
     fun init(){
-        withdrawalViewModel = ViewModelProvider(requireActivity()).get(MainActivityViewModel::class.java)
-        binding.withdrawalViewModel = withdrawalViewModel
+        mainViewModel = ViewModelProvider(requireActivity()).get(MainActivityViewModel::class.java)
+        binding.withdrawalViewModel = mainViewModel
         binding.lifecycleOwner = this
 
-        withdrawalViewModel.accountWithdrawal.observe(viewLifecycleOwner){
+        mainViewModel.accountWithdrawal.observe(viewLifecycleOwner){
             event?.logout()
         }
 
@@ -100,7 +102,9 @@ class WithdrawalFragment : Fragment() {
 
         dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
         dialog.setContentView(R.layout.dialog_two_button)
-        dialog.window!!.setLayout(WindowManager.LayoutParams.MATCH_PARENT, WindowManager.LayoutParams.WRAP_CONTENT)
+        dialog.window!!.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+        val size = mainViewModel.getDisplaySize(0.9f, 0.3f)
+        dialog.window!!.setLayout(size.first, size.second)
         dialog.show()
 
         dialog.findViewById<TextView>(R.id.dialog_two_button_title).text = "회원 탈퇴"
@@ -114,7 +118,7 @@ class WithdrawalFragment : Fragment() {
             dialog.dismiss()
             //회원 탈퇴
             var sharedPreferences = context.getSharedPreferences("userInfo", AppCompatActivity.MODE_PRIVATE)
-            withdrawalViewModel.withdrawal(sharedPreferences)
+            mainViewModel.withdrawal(sharedPreferences)
 
         }
         val disagreeButton = dialog.findViewById<Button>(R.id.dialog_two_button_disagree)

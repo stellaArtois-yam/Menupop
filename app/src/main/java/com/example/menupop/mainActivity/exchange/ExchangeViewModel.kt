@@ -46,7 +46,7 @@ class ExchangeViewModel : ViewModel() {
 
     fun init() {
         _targetCurrency.value = "0"
-        _sourceCurrency.value = "1000"
+        _sourceCurrency.value = "0"
         _notifiedExchangeRate.value = "0"
         _sourceCurrencyUnit.value = ""
         _targetCurrencyUnit.value = ""

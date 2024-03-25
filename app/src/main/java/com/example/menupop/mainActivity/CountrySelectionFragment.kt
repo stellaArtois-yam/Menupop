@@ -59,7 +59,7 @@ class CountrySelectionFragment  : Fragment(){
         binding.countrySelectionHongkong.setOnClickListener {
             mainViewModel.selectionCountry(binding.countrySelectionHongkong)
         }
-        binding.countrySelectionJapan.setOnClickListener {
+        binding.countrySelectionTaiwan.setOnClickListener {
             mainViewModel.selectionCountry(binding.countrySelectionTaiwan)
         }
         binding.countrySelectionVietnam.setOnClickListener {

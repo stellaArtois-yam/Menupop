@@ -1,6 +1,7 @@
 package com.example.menupop.signup
 
 import android.util.Log
+import com.example.menupop.BuildConfig
 import com.example.menupop.SimpleResultDTO
 import com.example.menupop.RetrofitService
 import com.google.gson.Gson
@@ -19,7 +20,7 @@ class SignupModel {
         .setLenient()
         .create()
     private val retrofit = Retrofit.Builder()
-        .baseUrl("http://3.135.51.201/") // 실제 서버의 기본 URL로 대체해야 합니다.
+        .baseUrl(BuildConfig.SERVER_IP)
         .addConverterFactory(GsonConverterFactory.create(gson))
         .addConverterFactory(ScalarsConverterFactory.create())
         .build()

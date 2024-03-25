@@ -7,42 +7,41 @@
     </data>
     <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
 
-        android:layout_width="400dp"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="@drawable/dialog_background"
-        android:orientation="vertical">
+        android:orientation="vertical"
+        android:gravity="center">
 
         <TextView
             android:id="@+id/dialog_delete_preference_warning"
-            android:layout_width="400dp"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="[시금치]를 [불호]음식에서\n\n삭제 하시겠습니까?"
             android:textSize="20sp"
             android:textColor="@color/black"
             android:gravity="center"
-            android:padding="20dp"/>
+            android:paddingTop="20dp"/>
 
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="@string/dialog_delete_warning"
             android:textColor="@color/light_gray"
-            android:textSize="18sp"
+            android:textSize="16sp"
             android:gravity="center"
-            android:layout_marginTop="20dp"
-            android:layout_marginBottom="20dp"/>
+            android:layout_margin="@dimen/basic_margin"/>
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
-            android:gravity="center"
-            android:padding="20dp">
+            android:gravity="center" >
 
             <androidx.appcompat.widget.AppCompatButton
                 android:id="@+id/dialog_delete_preference_delete_button"
                 android:layout_width="100dp"
-                android:layout_height="wrap_content"
+                android:layout_height="@dimen/button_height"
                 android:background="@drawable/radius_30_stroke_light_gray"
                 android:backgroundTint="@color/orange"
                 android:text="삭제"
@@ -53,7 +52,7 @@
             <androidx.appcompat.widget.AppCompatButton
                 android:id="@+id/dialog_delete_preference_cancel_button"
                 android:layout_width="100dp"
-                android:layout_height="wrap_content"
+                android:layout_height="@dimen/button_height"
                 android:background="@drawable/radius_30_stroke_light_gray"
                 android:backgroundTint="@color/pale_gray"
                 android:textSize="18sp"

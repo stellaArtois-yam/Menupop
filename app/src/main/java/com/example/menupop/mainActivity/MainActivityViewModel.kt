@@ -1,13 +1,16 @@
 package com.example.menupop.mainActivity
 
 import android.app.Application
+import android.content.Context
 import android.content.SharedPreferences
 import android.content.res.Resources
+import android.graphics.Point
 import android.graphics.drawable.Drawable
 
 import android.os.Build
 import android.util.Log
 import android.view.View
+import android.view.WindowManager
 import androidx.annotation.RequiresApi
 import androidx.core.net.toUri
 import androidx.lifecycle.AndroidViewModel
@@ -43,6 +46,11 @@ class MainActivityViewModel(private val application: Application) : AndroidViewM
     private var callbackResult: ((String) -> Unit)? = null
     private var callbackFoodPreference: ((FoodPreferenceDataClass) -> Unit)? = null
     private var callbackAd: ((RewardedAd?) -> Unit)? = null
+    private val _tabStatus = MutableLiveData<Int>()
+
+    val tabStatus : LiveData<Int> get()= _tabStatus
+
+
 
 
     private val _rewardedAd = MutableLiveData<RewardedAd>()
@@ -88,9 +96,14 @@ class MainActivityViewModel(private val application: Application) : AndroidViewM
             imageList.add(ProfileSelectionDTO(image))
         }
 
+
         return imageList
     }
 
+
+    fun setTabStatus(status : Int){
+        _tabStatus.value = status
+    }
 
     /**
      * 메인
@@ -721,8 +734,26 @@ class MainActivityViewModel(private val application: Application) : AndroidViewM
             R.id.country_selection_taiwan -> _countrySelection.value = "taiwan"
             R.id.country_selection_vietnam -> _countrySelection.value = "vietnam"
         }
-//        Log.d(TAG, "selectionCountry: ${country}")
-//        _countrySelection.value = country
+
+    }
+
+    fun getDisplaySize(width : Float, height : Float) : Pair<Int, Int>{
+        val windowManager = application.getSystemService(Context.WINDOW_SERVICE) as WindowManager
+        var x = 0
+        var y = 0
+        if(Build.VERSION.SDK_INT < 30){
+            val size = Point()
+
+            x = (size.x * width).toInt()
+            y = (size.y * height).toInt()
+
+        }else{
+            val rect = windowManager.currentWindowMetrics.bounds
+
+            x = (rect.width() * width).toInt()
+            y = (rect.height() * height).toInt()
+        }
+        return Pair(x, y)
     }
 
 
