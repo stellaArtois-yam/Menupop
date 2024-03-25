@@ -11,8 +11,9 @@
     <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:gravity="center_horizontal"
-        android:orientation="vertical">
+        android:background="@drawable/dialog_background"
+        android:orientation="vertical"
+        android:gravity="center">
 
 
         <TextView
@@ -48,9 +49,11 @@
             <androidx.appcompat.widget.AppCompatButton
                 android:id="@+id/dialog_two_button_disagree"
                 android:layout_width="120dp"
-                android:layout_height="@dimen/standard_height"
+                android:layout_height="@dimen/button_height"
                 android:background="@drawable/profile_button"
                 android:backgroundTint="@color/yellow"
+                android:stateListAnimator="@null"
+
                 android:text="취소"
                 android:textColor="@color/white"
                 android:textSize="16sp"
@@ -59,9 +62,11 @@
             <androidx.appcompat.widget.AppCompatButton
                 android:id="@+id/dialog_two_button_agree"
                 android:layout_width="120dp"
-                android:layout_height="@dimen/standard_height"
+                android:layout_height="@dimen/button_height"
                 android:layout_marginStart="30dp"
                 android:background="@drawable/profile_button"
+                android:stateListAnimator="@null"
+
                 android:text="확인"
                 android:textColor="@color/white"
                 android:textSize="16sp"

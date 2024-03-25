@@ -12,7 +12,6 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.lifecycleScope
 import com.example.menupop.BuildConfig
 import com.example.menupop.mainActivity.MainActivity
 import com.example.menupop.R
@@ -35,7 +34,6 @@ import com.kakao.sdk.common.KakaoSdk
 import com.kakao.sdk.common.util.Utility
 import com.kakao.sdk.user.UserApiClient
 import com.navercorp.nid.NaverIdLoginSDK
-import kotlinx.coroutines.launch
 
 
 class LoginActivity : AppCompatActivity() {
@@ -47,7 +45,6 @@ class LoginActivity : AppCompatActivity() {
     private var mGoogleSignInClient: GoogleSignInClient? = null
     private var mAuth: FirebaseAuth? = null
 
-    val googleApiKey = "449200691212-qh37imbkld085r2d0aks63ci7nq63g28.apps.googleusercontent.com"
 
     private val googleAuthLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
         val task: Task<GoogleSignInAccount> = GoogleSignIn.getSignedInAccountFromIntent(result.data)
@@ -93,14 +90,14 @@ class LoginActivity : AppCompatActivity() {
         })
         loginViewModel.socialLoginResult.observe(this){ result ->
             Log.d(TAG, "onCreate: ${result.isNewUser} ${result.identifier} ${result.result}")
-            if(result.result == "local_login"){
-                showSocialWarningDialog(result.identifier)
-            } else if(result.result == "failed"){
-                Toast.makeText(this,"잠시 후 다시 시도해주세요.",Toast.LENGTH_SHORT).show()
-            } else {
-                var sharedPreferences = getSharedPreferences("userInfo", MODE_PRIVATE)
-                loginViewModel.saveIdentifier(sharedPreferences,result.identifier)
-                isNewUserCheck(result.isNewUser, result.identifier)
+            when(result.result){
+                "local_login" -> showSocialWarningDialog(result.identifier)
+                "failed" -> Toast.makeText(this,"잠시 후 다시 시도해주세요.",Toast.LENGTH_SHORT).show()
+                else -> {
+                    var sharedPreferences = getSharedPreferences("userInfo", MODE_PRIVATE)
+                    loginViewModel.saveIdentifier(sharedPreferences,result.identifier)
+                    isNewUserCheck(result.isNewUser, result.identifier)
+                }
             }
         }
     }
@@ -140,9 +137,9 @@ class LoginActivity : AppCompatActivity() {
             if (id.isEmpty() || password.isEmpty()) {
                 Toast.makeText(this, "아이디 또는 비밀번호를 입력해주세요.", Toast.LENGTH_SHORT).show()
             } else {
-                lifecycleScope.launch {
+//                lifecycleScope.launch {
                     loginViewModel.requestLogin(id, password)
-                }
+//                }
             }
         }
         binding.loginSignup.setOnClickListener {
@@ -173,7 +170,7 @@ class LoginActivity : AppCompatActivity() {
         Log.d(TAG, "getHash: ${keyHash}")
     }
     private fun kakaoLoginRequest(){
-        val apiKey = com.example.menupop.BuildConfig.KAKAO_NATIVE_APP_KEY
+        val apiKey = BuildConfig.KAKAO_NATIVE_APP_KEY
         KakaoSdk.init(this,apiKey)
         loginViewModel.requestKakaoSocialLogin()
     }
@@ -212,18 +209,17 @@ class LoginActivity : AppCompatActivity() {
     private fun getGoogleClient(): GoogleSignInClient {
         val googleSignInOption = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
             .requestScopes(Scope("https://www.googleapis.com/auth/pubsub"))
-            .requestServerAuthCode(googleApiKey)
-            .requestEmail() // 이메일도 요청할 수 있다.
+            .requestServerAuthCode(BuildConfig.GOOGLE_LOGIN_KEY)
+            .requestEmail()
             .build()
 
         return GoogleSignIn.getClient(applicationContext, googleSignInOption)
     }
     private fun signIn() {
         googleSignInClient.signOut()
-        Log.d(TAG, "signIn: ${googleApiKey}")
 
         val gso = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-            .requestIdToken(googleApiKey)
+            .requestIdToken(BuildConfig.GOOGLE_LOGIN_KEY)
             .requestProfile()
             .requestEmail()
             .build()

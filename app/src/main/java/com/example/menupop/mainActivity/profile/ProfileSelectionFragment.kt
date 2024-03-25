@@ -103,7 +103,4 @@ class ProfileSelectionFragment : Fragment() {
 
     }
 
-    fun clickListener(){
-
-    }
 }

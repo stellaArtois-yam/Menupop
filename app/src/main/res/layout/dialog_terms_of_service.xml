@@ -9,28 +9,29 @@
     android:gravity="center">
 
     <ScrollView
-        android:layout_width="380dp"
-        android:layout_height="650dp">
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="9"
+        android:layout_gravity="center">
 
         <ImageView
             android:id="@+id/dialog_service_image"
-            android:layout_width="380dp"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:src="@drawable/personal_private"/>
+            android:src="@drawable/personal"/>
 
     </ScrollView>
 
         <androidx.appcompat.widget.AppCompatButton
             android:id="@+id/dialog_service_button"
-            android:layout_width="80dp"
-            android:layout_height="40dp"
+            android:layout_width="100dp"
+            android:layout_height="0dp"
+            android:layout_weight="0.6"
+            android:layout_margin="@dimen/basic_margin"
             android:text="확인"
             android:textSize="18sp"
             android:textStyle="bold"
             android:textColor="@color/white"
-
-            android:layout_margin="@dimen/basic_margin"
-
             android:background="@drawable/radius_30_stroke_light_gray"
             android:backgroundTint="@color/orange" />
 

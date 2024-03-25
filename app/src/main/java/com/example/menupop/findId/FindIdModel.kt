@@ -1,6 +1,7 @@
 package com.example.menupop.findId
 
 import android.util.Log
+import com.example.menupop.BuildConfig
 import com.example.menupop.RetrofitService
 import com.google.gson.Gson
 import com.google.gson.GsonBuilder
@@ -18,8 +19,9 @@ class FindIdModel {
     val gson: Gson = GsonBuilder()
         .setLenient()
         .create()
+
     private val retrofit = Retrofit.Builder()
-        .baseUrl("http://3.135.51.201/") // 실제 서버의 기본 URL로 대체해야 합니다.
+        .baseUrl(BuildConfig.SERVER_IP)
         .addConverterFactory(GsonConverterFactory.create(gson))
         .addConverterFactory(ScalarsConverterFactory.create())
         .build()
@@ -34,6 +36,7 @@ class FindIdModel {
                 if(response.isSuccessful){
                     Log.d(TAG, "onResponse: ${response.body()}")
                     callback(response.body()!!)
+
                 }else{
                     Log.d(TAG, "onResponse: ${response.body()}")
                     callback(FindIdResponseDTO("failed", "none"))

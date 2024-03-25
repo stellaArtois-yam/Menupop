@@ -54,8 +54,8 @@
                     android:layout_height="wrap_content"
 
                     android:layout_gravity="start"
-                    android:layout_marginTop="30dp"
-                    android:layout_marginStart="30dp"
+                    android:layout_marginStart="@dimen/basic_margin"
+                    android:layout_marginTop="@dimen/basic_margin"
                     android:text="기준 화폐"
                     android:textColor="@color/light_gray"
 
@@ -65,13 +65,14 @@
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:orientation="horizontal">
+                    android:orientation="horizontal"
+                    android:layout_marginEnd="@dimen/basic_margin"
+                    android:layout_marginStart="@dimen/basic_margin">
 
                     <EditText
                         android:id="@+id/exchange_source_edittext"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
-                        android:layout_marginStart="30dp"
                         android:layout_marginEnd="30dp"
                         android:layout_weight="1"
                         android:maxLength="10"
@@ -84,7 +85,6 @@
                         android:id="@+id/exchange_source_spinner"
                         android:layout_width="0dp"
                         android:layout_height="@dimen/standard_height"
-                        android:layout_marginEnd="30dp"
                         android:layout_weight="0.5"
                         android:background="@drawable/profile_button"
                         android:backgroundTint="@color/button_gray"
@@ -98,10 +98,11 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
 
-                    android:layout_marginTop="10dp"
-                    android:layout_marginStart="25dp"
+                    android:layout_margin="@dimen/basic_margin"
+
                     android:textColor="@color/light_gray"
                     android:textSize="20sp"
+                    android:paddingStart="10dp"
 
                     android:text="@{exchangeRateViewModel.sourceCurrency + exchangeRateViewModel.sourceCurrencyUnit}"/>
 
@@ -110,8 +111,7 @@
                     android:layout_height="wrap_content"
 
                     android:layout_gravity="start"
-                    android:layout_marginTop="30dp"
-                    android:layout_marginStart="30dp"
+                    android:layout_marginStart="@dimen/basic_margin"
                     android:text="환전 화폐"
                     android:textColor="@color/light_gray"
 
@@ -121,13 +121,15 @@
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:layout_marginStart="@dimen/basic_margin"
+                    android:layout_marginEnd="@dimen/basic_margin"
                     android:orientation="horizontal">
 
                     <EditText
                         android:id="@+id/exchange_target_edittext"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
-                        android:layout_marginStart="30dp"
+
                         android:layout_marginEnd="30dp"
                         android:layout_weight="1"
                         android:enabled="false"
@@ -140,7 +142,6 @@
                         android:id="@+id/exchange_target_spinner"
                         android:layout_width="0dp"
                         android:layout_height="@dimen/standard_height"
-                        android:layout_marginEnd="30dp"
                         android:layout_weight="0.5"
                         android:background="@drawable/profile_button"
                         android:backgroundTint="@color/button_gray"
@@ -155,8 +156,10 @@
                     android:id="@+id/exchange_target_textview"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="10dp"
-                    android:layout_marginStart="25dp"
+
+                    android:layout_margin="@dimen/basic_margin"
+                    android:paddingStart="10dp"
+
                     android:textColor="@color/light_gray"
                     android:textSize="20sp"
                     android:text="@{exchangeRateViewModel.targetCurrency + exchangeRateViewModel.targetCurrencyUnit}"/>
@@ -167,8 +170,7 @@
                     android:layout_height="wrap_content"
 
                     android:layout_gravity="start"
-                    android:layout_marginTop="30dp"
-                    android:layout_marginStart="30dp"
+                    android:layout_marginStart="@dimen/basic_margin"
                     android:text="고시 환율"
                     android:textColor="@color/light_gray"
 
@@ -178,11 +180,11 @@
 
                 <EditText
                     android:id="@+id/exchange_standard"
-                    android:layout_width="220dp"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_gravity="start"
-                    android:layout_marginStart="30dp"
-                    android:layout_marginEnd="30dp"
+                    android:layout_marginStart="@dimen/basic_margin"
+                    android:layout_marginEnd="@dimen/basic_margin"
 
                     android:enabled="false"
                     android:text="@{exchangeRateViewModel.notifiedExchangeRate}"

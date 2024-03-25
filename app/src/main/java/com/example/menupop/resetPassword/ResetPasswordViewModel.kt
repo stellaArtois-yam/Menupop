@@ -12,7 +12,7 @@ import java.util.regex.Pattern
 
 class ResetPasswordViewModel : ViewModel() {
     private val TAG = "ResetPasswordViewModel"
-    private val id = MutableLiveData<String>()
+    private var _id = MutableLiveData<String>()
     private val resetPasswordModel = ResetPasswordModel() //뷰모델
     private var callback: ((String) -> Unit) ?= null // 콜백
     private var callbackList : ((SimpleResultDTO) -> Unit) ?= null
@@ -25,7 +25,7 @@ class ResetPasswordViewModel : ViewModel() {
 
     private var _checkEmailForm = MutableLiveData<Boolean>() //이메일 형식
 
-    val checkEamilForm : LiveData<Boolean>
+    val checkEmailForm : LiveData<Boolean>
         get() = _checkEmailForm
 
     private var verifyCode : String = ""
@@ -47,21 +47,20 @@ class ResetPasswordViewModel : ViewModel() {
 
     val conformResetPassword = MutableLiveData<Boolean>()
 
-    // 타이머를 시작하는 메서드
+
     fun startTimer() {
-        // 3분(180초)으로 초기화
+
         val initialTime = TimeUnit.MINUTES.toMillis(1)
 
         timer = object : CountDownTimer(initialTime, 1000) {
             override fun onTick(millisUntilFinished: Long) {
-                // 남은 시간을 LiveData에 업데이트
+
                 val minutes = TimeUnit.MILLISECONDS.toMinutes(millisUntilFinished)
                 val seconds = TimeUnit.MILLISECONDS.toSeconds(millisUntilFinished) % 60
                 remainingTime.value = String.format("%02d:%02d", minutes, seconds)
             }
 
             override fun onFinish() {
-                // 타이머가 종료되면 남은 시간을 00:00으로 설정
                 remainingTime.value = "00:00"
             }
         }
@@ -69,25 +68,24 @@ class ResetPasswordViewModel : ViewModel() {
         timer?.start()
     }
 
-    // 타이머를 중지하는 메서드
     fun stopTimer() {
         timer?.cancel()
     }
 
     override fun onCleared() {
-        // ViewModel이 소멸될 때 타이머도 중지
         stopTimer()
         super.onCleared()
     }
 
     fun checkId(id : String){
         callbackList = { response ->
-            Log.d(TAG, "checkId: ${response.result}")
-            if (response.result == "exist"){
-                _checkIdResult.value = true
-                 this.id.value = id
-            } else{
-                _checkIdResult.value = false
+
+            when(response.result){
+                "exist" -> {
+                    _checkIdResult.value = true
+                    _id.value = id
+                }
+                else ->  _checkIdResult.value = false
             }
         }
         resetPasswordModel.checkId(id,callbackList!!)
@@ -95,30 +93,27 @@ class ResetPasswordViewModel : ViewModel() {
 
     fun sendVerifyCode(email :String){
         callback = { result ->
-            Log.d(TAG, "checkId: ${result}")
             verifyCode = result
         }
         resetPasswordModel.sendVerifyCode(email,callback!!)
     }
 
     fun checkVerifyCode(verifyCode : String) {
-        Log.d(TAG, "checkVerifyCode: ${verifyCode} 인증코드 ${this.verifyCode}")
         val result = this.verifyCode == verifyCode
         verifycationCompleted.value = result
-
     }
+
     fun checkEmail(email:String){
         callback = {response ->
-            verifiedEmail.value = response.equals("확인")
-            Log.d(TAG, "checkEmail: ${response}response ${verifiedEmail.value}")
+            verifiedEmail.value = response == "확인"
         }
-        resetPasswordModel.checkEamil(id.value.toString(),email,callback!!)
+        resetPasswordModel.checkEamil(_id.value.toString(),email,callback!!)
     }
 
     fun checkEmailForm(email:String,emailType: String){
         val pattern: Pattern = Patterns.EMAIL_ADDRESS
         val email = "${email}@${emailType}"
-        Log.d(TAG, "emailSelection: 이메일 확인 ${email}")
+
         _checkEmailForm.value =pattern.matcher(email).matches()
     }
 
@@ -134,8 +129,6 @@ class ResetPasswordViewModel : ViewModel() {
 
         val count = listOf(hasDigit, hasLetter, hasSpecialChar).count { it }
 
-        Log.d(TAG, "validatePassword: $hasMinimumLength && $count")
-
         return hasMinimumLength && count >= 2
     }
 
@@ -144,32 +137,37 @@ class ResetPasswordViewModel : ViewModel() {
     }
 
     fun onPasswordTextChanged(password: String) {
-        if (validatePassword(password)) {
-            _passwordError.value = null
-            Log.d(TAG, "onPasswordTextChanged: null")
-        } else {
-            _passwordError.value = "비밀번호는 최소 8자에 영문, 숫자, 특수문자 중 2가지 이상을 사용해야 합니다."
-            lastCheck = false
+
+        when(validatePassword(password)){
+            true ->  _passwordError.value = null
+            false -> {
+                _passwordError.value = "비밀번호는 최소 8자에 영문, 숫자, 특수문자 중 2가지 이상을 사용해야 합니다."
+                lastCheck = false
+            }
         }
     }
 
     fun onConfirmPasswordTextChanged(password: String, confirmPassword: String) {
-        if (checkPasswordsMatch(password, confirmPassword)) {
-            _confirmPasswordError.value = null
-            lastCheck = true
-        } else {
-            _confirmPasswordError.value = "비밀번호가 일치하지 않습니다."
-            lastCheck = false
+
+        when(checkPasswordsMatch(password, confirmPassword)){
+            true -> {
+                _confirmPasswordError.value = null
+                lastCheck = true
+            }
+            false -> {
+                _confirmPasswordError.value = "비밀번호가 일치하지 않습니다."
+                lastCheck = false
+            }
         }
+
     }
 
     fun resetPassword(password : String){
         callback = {result ->
-            Log.d(TAG, "resetPassword: ${result}")
 
-            conformResetPassword.value = result.equals("완료")
+            conformResetPassword.value = result == "완료"
         }
-        resetPasswordModel.resetPassword(id.value.toString(),password,callback!!)
+        resetPasswordModel.resetPassword(_id.value.toString(),password,callback!!)
     }
 
 }

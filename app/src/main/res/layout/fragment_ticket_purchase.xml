@@ -23,11 +23,15 @@
 
             <LinearLayout
                 android:id="@+id/translation_ticket_box"
-                android:layout_width="350dp"
+                android:layout_width="match_parent"
                 android:layout_height="220dp"
                 android:orientation="vertical"
+
+                android:layout_marginStart="@dimen/basic_margin"
+                android:layout_marginEnd="@dimen/basic_margin"
+
                 android:background="@drawable/food_ticket_frame"
-               android:gravity="center">
+                android:gravity="center">
 
                 <ImageView
                     android:layout_width="20dp"
@@ -42,7 +46,7 @@
                     android:text="번역 티켓"
                     android:textColor="@color/black"
                     android:textStyle="bold"
-                    android:textSize="20sp" />
+                    android:textSize="20sp"/>
                 
                 <TextView
                     android:id="@+id/translation_ticket_count"
@@ -64,18 +68,19 @@
                     android:text="구매하기"
                     android:textStyle="bold"
                     android:textColor="@color/white"
-                    android:textSize="18sp"
-                    />
+                    android:textSize="18sp"/>
 
 
             </LinearLayout>
 
             <LinearLayout
                 android:id="@+id/food_ticket_box"
-                android:layout_width="350dp"
+                android:layout_width="match_parent"
                 android:layout_height="220dp"
                 android:orientation="vertical"
                 android:layout_marginTop="40dp"
+                android:layout_marginStart="@dimen/basic_margin"
+                android:layout_marginEnd="@dimen/basic_margin"
                 android:background="@drawable/translation_ticket_frame"
                 android:gravity="center">
 
@@ -121,13 +126,7 @@
 
             </LinearLayout>
 
-
-
-
-
         </LinearLayout>
-
-
 
     </FrameLayout>
 

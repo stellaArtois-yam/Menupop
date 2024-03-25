@@ -3,6 +3,7 @@ package com.example.menupop.signup
 import android.app.Dialog
 import android.content.Intent
 import android.graphics.Color
+import android.os.Build
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
@@ -10,11 +11,13 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.Window
+import android.view.WindowManager
 import android.widget.AdapterView
 import android.widget.Button
 import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
+import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.widget.addTextChangedListener
 import androidx.databinding.DataBindingUtil
@@ -318,14 +321,12 @@ class SignupActivity : AppCompatActivity() {
             }
         }
 
-        signupViewModel.saveResult.observe(this, Observer { result ->
-            if(result){
-                showCustomDialog("회원가입 완료", "반갑습니다 :)", true)
-
-
-            }else{
-                showCustomDialog("회원가입 실패", "다시 시도해주세요 :(", false)
+        signupViewModel.saveResult.observe(this, Observer {result->
+            when(result){
+                true -> showCustomDialog("회원가입 완료", "반갑습니다 :)", true)
+                else -> showCustomDialog("회원가입 실패", "다시 시도해주세요 :(", false)
             }
+
         })
     }
     private fun showCustomDialog(title : String, content : String, success : Boolean) {
@@ -345,20 +346,25 @@ class SignupActivity : AppCompatActivity() {
 
         dialog.show()
     }
+
     fun showInformationDialog(type : String){
-//        val bindingDialog : DialogWarningBinding = DataBindingUtil.inflate(LayoutInflater.from(this), R.layout.dialog_terms_of_service, null, false);
         val dialog = Dialog(this)
+
+        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
         dialog.setContentView(R.layout.dialog_terms_of_service)
+
+
+        dialog.window!!.setLayout(WindowManager.LayoutParams.MATCH_PARENT, WindowManager.LayoutParams.MATCH_PARENT)
+
         var imageview = dialog.findViewById<ImageView>(R.id.dialog_service_image)
 
         var button = dialog.findViewById<Button>(R.id.dialog_service_button)
 
-        if(type == "personal"){
-
-        }else{
-            imageview.setImageResource(R.drawable.marketing)
-
+        when(type){
+            "personal" -> imageview.setImageResource(R.drawable.personal)
+            "marketing" ->  imageview.setImageResource(R.drawable.marketing)
         }
+
         dialog.show()
 
         button.setOnClickListener{
@@ -373,7 +379,7 @@ class SignupActivity : AppCompatActivity() {
                 dialog.dismiss()
                 var intent = Intent(this, LoginActivity :: class.java)
                 startActivity(intent)
-            }, 3000) // 3초 후에 다이얼로그를 닫음
+            }, 1000)
 
 
         }

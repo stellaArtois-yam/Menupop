@@ -3,7 +3,11 @@ package com.example.menupop.mainActivity.foodPreference
 import android.annotation.SuppressLint
 import android.app.Dialog
 import android.content.Context
+import android.graphics.Color
+import android.graphics.Point
 import android.graphics.Typeface
+import android.graphics.drawable.ColorDrawable
+import android.os.Build
 import android.os.Bundle
 import android.text.Spannable
 import android.text.SpannableString
@@ -14,9 +18,12 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.Window
+import android.view.WindowManager
 import android.view.inputmethod.InputMethodManager
 import android.widget.Toast
+import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.getSystemService
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -142,14 +149,20 @@ class FoodPreferenceFragment : Fragment() {
         existBottomSheetDialog.show()
     }
     fun existTicketShowDialog(foodName:String,classfication : String){
-        val bindingDialog : DialogTicketBottomBinding = DataBindingUtil.inflate(LayoutInflater.from(context), R.layout.dialog_ticket_bottom, null, false);
+        val bindingDialog : DialogTicketBottomBinding = DataBindingUtil.inflate(LayoutInflater.from(context), R.layout.dialog_ticket_bottom, null, false)
         val foodTicket = mainViewModel.userInformation.value?.foodTicket.toString()
         val translationTicket = mainViewModel.userInformation.value?.translationTicket.toString()
+
         existBottomSheetDialog.setContentView(bindingDialog.root)
+
         bindingDialog.dialogTicketBottomFoodTicket.text = "음식 티켓 ${foodTicket} 개"
         bindingDialog.dialogTicketBottomTranslationTicket.text = "번역 티켓 ${translationTicket} 개"
         bindingDialog.dialogTicketBottomButton.text = "등록하기"
-        bindingDialog.dialogTicketBottomText.text = setTextBold("[${foodName}]를 [${classfication}] 음식으로\n등록하시겠습니까?",foodName,classfication)
+        
+        bindingDialog.dialogTicketBottomText.text =
+            setTextBold("[${foodName}]를 [${classfication}] 음식으로\n등록하시겠습니까?",
+            foodName,classfication)
+
         bindingDialog.dialogTicketBottomDown.setOnClickListener {
             existBottomSheetDialog.dismiss()
         }
@@ -164,12 +177,22 @@ class FoodPreferenceFragment : Fragment() {
 
         existBottomSheetDialog.show()
     }
+
+
+
+
+    @RequiresApi(Build.VERSION_CODES.R)
     @SuppressLint("NotifyDataSetChanged")
     fun deleteFoodPreferenceItem(foodName: String, classification: String, idx : Int){
         val dialog = Dialog(context)
         val binding : DialogDeletePreferenceBinding = DataBindingUtil.inflate(LayoutInflater.from(context), R.layout.dialog_delete_preference, null, false);
         dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
         dialog.setContentView(binding.root)
+        dialog.window!!.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+
+        var size = mainViewModel.getDisplaySize(0.9f, 0.3f)
+        dialog.window!!.setLayout(size.first, size.second)
+
         binding.dialogDeletePreferenceWarning.text = setTextBold("[${foodName}]를 [${classification}] 음식에서 \n삭제 하시겠습니까?",foodName,classification)
         binding.dialogDeletePreferenceDeleteButton.setOnClickListener {
             Log.d(TAG, "deleteFoodPreferenceItem: 호출")

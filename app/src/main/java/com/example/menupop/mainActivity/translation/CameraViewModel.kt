@@ -1,7 +1,6 @@
 package com.example.menupop.mainActivity.translation
 
 import android.app.Application
-import android.content.SharedPreferences
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.graphics.Canvas
@@ -12,7 +11,6 @@ import android.graphics.Typeface
 import android.graphics.drawable.BitmapDrawable
 import android.graphics.drawable.Drawable
 import android.util.Log
-import androidx.core.text.isDigitsOnly
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -71,12 +69,23 @@ class CameraViewModel(application: Application) : ViewModel() {
 
                 val resultText = getText(visionText)
 
-                checkLanguage(resultText)
+                if(country == "taiwan"){
+
+                    requestTranslation(resultText,"zh-TW")
+
+                }else{
+                    checkLanguage(resultText)
+                }
+
+
+
+
 
             } else {
                 _failed.value = true
             }
         }
+
 
         cameraModel.recognizedText(image,country, callbackText!!)
     }
@@ -121,7 +130,7 @@ class CameraViewModel(application: Application) : ViewModel() {
                 val jsonArray = JSONArray(it)
                 var decode = jsonArray.getString(0)
 
-                val decodeList = decode.split("%")
+                val decodeList = decode.split("__")
 
                 Log.d(TAG, "requestTranslation: ${decodeList}\nsize : ${decodeList.size}")
                 if (decode != null) {
@@ -129,6 +138,7 @@ class CameraViewModel(application: Application) : ViewModel() {
                     drawTranslatedText(decodeList)
                 }
             } else {
+                Log.d(TAG, "requestTranslation is Failed : $it")
                 _failed.value = true
             }
         }
@@ -145,7 +155,7 @@ class CameraViewModel(application: Application) : ViewModel() {
                 val lineText = line.text.lowercase()
                 val lineFrame = line.boundingBox
 
-                requestText = requestText.plus(lineText).plus("%")
+                requestText = requestText.plus(lineText).plus("__")
                 positionList.add(lineFrame!!)
             }
 
@@ -153,8 +163,10 @@ class CameraViewModel(application: Application) : ViewModel() {
 
         }
 
-
-        requestText = requestText.substring(0, requestText.length-1)
+        //마지막 '%' 잘라주기
+        requestText = requestText
+            .substring(0, requestText.length-2)
+            .replace(",", "").replace("|", "")
         Log.d(TAG, "text : ${requestText}")
         Log.d(TAG, "getText position size: ${positionList.size}")
         return requestText

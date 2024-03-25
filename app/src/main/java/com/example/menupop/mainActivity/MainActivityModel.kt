@@ -39,7 +39,7 @@ import java.util.Calendar
 import java.util.concurrent.TimeUnit
 
 
-class MainActivityModel(val application :Application) {
+class MainActivityModel(val application: Application) {
     val TAG = "MainActivityModel"
 
     val gson: Gson = GsonBuilder()
@@ -55,29 +55,30 @@ class MainActivityModel(val application :Application) {
     private val service = retrofit.create(RetrofitService::class.java)
 
 
-
-    fun getProfileImage(sharedPreferences: SharedPreferences) : String?{
+    fun getProfileImage(sharedPreferences: SharedPreferences): String? {
         val image = sharedPreferences.getString("profileImage", "")
 
-        if(image != ""){
+        if (image != "") {
             return image
         }
 
         return null
     }
 
-    fun updateTicketQuantity(identifier: Int,
-                             ticketType : String,
-                             operator : String,
-                             quantity : Int,
-                             callback: (String) ->Unit){
+    fun updateTicketQuantity(
+        identifier: Int,
+        ticketType: String,
+        operator: String,
+        quantity: Int,
+        callback: (String) -> Unit
+    ) {
         service.updateTicketQuantity(identifier, ticketType, operator, quantity)
-            .enqueue(object : Callback<String>{
+            .enqueue(object : Callback<String> {
                 override fun onResponse(call: Call<String>, response: Response<String>) {
                     Log.d(TAG, "update ticket quantity onResponse: ${response.body()}")
-                    if(response.isSuccessful){
+                    if (response.isSuccessful) {
                         callback(response.body()!!)
-                    }else{
+                    } else {
                         Log.d(TAG, "update ticket is not successful")
                         //여기도 예외 처리 필요
                     }
@@ -90,13 +91,13 @@ class MainActivityModel(val application :Application) {
             })
     }
 
-    fun updateRewardQuantity(identifier: Int, callback: (String) ->Unit){
-        service.updateRewardQuantity(identifier).enqueue(object : Callback<String>{
+    fun updateRewardQuantity(identifier: Int, callback: (String) -> Unit) {
+        service.updateRewardQuantity(identifier).enqueue(object : Callback<String> {
             override fun onResponse(call: Call<String>, response: Response<String>) {
                 Log.d(TAG, "update Reward onResponse: ${response.body()}")
-                if(response.isSuccessful){
+                if (response.isSuccessful) {
                     callback(response.body()!!)
-                }else{
+                } else {
                     Log.d(TAG, "update Reward is not successful")
                 }
             }
@@ -108,18 +109,15 @@ class MainActivityModel(val application :Application) {
     }
 
 
-
-
-
-    fun getFoodPreference(identifier: Int,callback : (FoodPreferenceDataClass)->Unit){
+    fun getFoodPreference(identifier: Int, callback: (FoodPreferenceDataClass) -> Unit) {
         Log.d(TAG, "getFoodPreference: 호출")
-        service.getFoodPreference(identifier).enqueue(object : Callback<FoodPreferenceDataClass>{
+        service.getFoodPreference(identifier).enqueue(object : Callback<FoodPreferenceDataClass> {
             override fun onResponse(
                 call: Call<FoodPreferenceDataClass>,
                 response: Response<FoodPreferenceDataClass>
             ) {
                 Log.d(TAG, "onResponse: ${response}")
-                if(response.isSuccessful){
+                if (response.isSuccessful) {
                     callback(response.body()!!)
                 }
             }
@@ -133,24 +131,35 @@ class MainActivityModel(val application :Application) {
     }
 
 
-    fun savePaymentHistory(ticketSaveModel: TicketSaveDTO, callback: (SimpleResultDTO) -> Unit){
+    fun savePaymentHistory(ticketSaveModel: TicketSaveDTO, callback: (SimpleResultDTO) -> Unit) {
 
-        val call : Call<SimpleResultDTO> = service.savePaymentHistory(ticketSaveModel.identifier,
-            ticketSaveModel.tid, ticketSaveModel.paymentType, ticketSaveModel.item, ticketSaveModel.price,
-            ticketSaveModel.approvedAt, ticketSaveModel.translationTicket, ticketSaveModel.foodTicket)
+        val call: Call<SimpleResultDTO> = service.savePaymentHistory(
+            ticketSaveModel.identifier,
+            ticketSaveModel.tid,
+            ticketSaveModel.paymentType,
+            ticketSaveModel.item,
+            ticketSaveModel.price,
+            ticketSaveModel.approvedAt,
+            ticketSaveModel.translationTicket,
+            ticketSaveModel.foodTicket
+        )
 
 
-        call.enqueue(object : Callback<SimpleResultDTO>{
-            override fun onResponse(call: Call<SimpleResultDTO>, response: Response<SimpleResultDTO>) {
-                if(response.isSuccessful){
+        call.enqueue(object : Callback<SimpleResultDTO> {
+            override fun onResponse(
+                call: Call<SimpleResultDTO>,
+                response: Response<SimpleResultDTO>
+            ) {
+                if (response.isSuccessful) {
                     Log.d(TAG, "onResponse: ${response.body()}")
                     callback(response.body()!!)
-                }else{
+                } else {
                     Log.d(TAG, "is not successful: ${response}")
                     callback(SimpleResultDTO("failed"))
                 }
 
             }
+
             override fun onFailure(call: Call<SimpleResultDTO>, t: Throwable) {
                 Log.d(TAG, "save payment history onFailure: ${t.message}")
                 callback(SimpleResultDTO("failed"))
@@ -159,22 +168,26 @@ class MainActivityModel(val application :Application) {
     }
 
 
+    fun requestUserInformation(identifier: Int, callback: (UserInformationDTO) -> Unit) {
+        val call: Call<UserInformationDTO> = service.requestUserInformation(identifier)
 
-    fun requestUserInformation(identifier : Int, callback: (UserInformationDTO) -> Unit){
-        val call : Call<UserInformationDTO> = service.requestUserInformation(identifier)
-
-        call.enqueue(object : Callback<UserInformationDTO>{
-            override fun onResponse(call: Call<UserInformationDTO>, response: Response<UserInformationDTO>) {
-                if(response.isSuccessful){
+        call.enqueue(object : Callback<UserInformationDTO> {
+            override fun onResponse(
+                call: Call<UserInformationDTO>,
+                response: Response<UserInformationDTO>
+            ) {
+                if (response.isSuccessful) {
                     Log.d(TAG, "onResponse: ${response.body()}")
                     callback(response.body()!!)
-                }else{
+                } else {
                     Log.d(TAG, "isNotSuccessful: ${response.body()}")
                     callback(
-                        UserInformationDTO("isNotSuccessful",
-                        null, null, null, null,
-                        0, 0, 0, 0,
-                        0, 0)
+                        UserInformationDTO(
+                            "isNotSuccessful",
+                            null, null, null, null,
+                            0, 0, 0, 0,
+                            0, 0
+                        )
                     )
 
                 }
@@ -182,10 +195,14 @@ class MainActivityModel(val application :Application) {
 
             override fun onFailure(call: Call<UserInformationDTO>, t: Throwable) {
                 Log.d(TAG, "request user info onFailure: ${t.message}")
-                callback(UserInformationDTO(t.message,
-                    null, null, null, null,
-                    0, 0, 0, 0,
-                        0, 0))
+                callback(
+                    UserInformationDTO(
+                        t.message,
+                        null, null, null, null,
+                        0, 0, 0, 0,
+                        0, 0
+                    )
+                )
             }
         })
     }
@@ -197,61 +214,86 @@ class MainActivityModel(val application :Application) {
         .build()
 
     private val kakaoPayService = kakaopay.create(RetrofitService::class.java)
-    val cid  = "TC0ONETIME"
+    val cid = "TC0ONETIME"
     val API_KEY = "KakaoAK " + BuildConfig.KAKAOPAY_ADMIN_KEY
-    val approvalUrl = "http://3.135.51.201/KakaoPayApprove"
-    val cancelUrl = "http://3.135.51.201/KakaoPayCancel"
-    val failUrl = "http://3.135.51.201/KakaoPayFail"
+    val approvalUrl = BuildConfig.SERVER_IP + "KakaoPayApprove"
+    val cancelUrl = BuildConfig.SERVER_IP + "KakaoPayCancel"
+    val failUrl = BuildConfig.SERVER_IP + "KakaoPayFail"
 
 
     @RequiresApi(Build.VERSION_CODES.O)
     val orderId = LocalDate.now().toString().replace("-", "") + hashCode().toString() //주문번호
 
-    fun requestCancelPayment(tid : String, cancelAmount : String, callback : (KakaoPayCancelResponseDTO) -> Unit){
+    fun requestCancelPayment(
+        tid: String,
+        cancelAmount: String,
+        callback: (KakaoPayCancelResponseDTO) -> Unit
+    ) {
 
-        var map  = HashMap<String, String>()
+        var map = HashMap<String, String>()
         map.put("cid", cid)
         map.put("tid", tid)
         map.put("cancel_amount", cancelAmount)
         map.put("cancel_tax_free_amount", "0")
 
 
-        val call : Call<KakaoPayCancelResponseDTO> = kakaoPayService.requestCancelPayment(API_KEY, map)
+        val call: Call<KakaoPayCancelResponseDTO> =
+            kakaoPayService.requestCancelPayment(API_KEY, map)
 
-        call.enqueue(object : Callback<KakaoPayCancelResponseDTO>{
+        call.enqueue(object : Callback<KakaoPayCancelResponseDTO> {
             override fun onResponse(
                 call: Call<KakaoPayCancelResponseDTO>,
                 response: Response<KakaoPayCancelResponseDTO>
             ) {
                 Log.d(TAG, "cancel onResponse: ${response}")
-                if(response.isSuccessful){
+                if (response.isSuccessful) {
                     callback(response.body()!!)
-                }else{
+                } else {
                     Log.d(TAG, "kakaopay cancel is not successful")
                     callback(
-                        KakaoPayCancelResponseDTO("null", "null", "null",
-                        "FAILED", "null", "null",
-                            "null", KakaoPayPriceDTO("0"), "null")
+                        KakaoPayCancelResponseDTO(
+                            "null", "null", "null",
+                            "FAILED", "null", "null",
+                            "null", KakaoPayPriceDTO("0"), "null"
+                        )
                     )
                 }
             }
 
             override fun onFailure(call: Call<KakaoPayCancelResponseDTO>, t: Throwable) {
                 Log.d(TAG, "kakaopay cancel onFailure: ${t.message}")
-                callback(  KakaoPayCancelResponseDTO("null", "null", "null",
-                    "FAILED", "null", "null",
-                    "null", KakaoPayPriceDTO("0"), "null"))
+                callback(
+                    KakaoPayCancelResponseDTO(
+                        "null", "null", "null",
+                        "FAILED", "null", "null",
+                        "null", KakaoPayPriceDTO("0"), "null"
+                    )
+                )
             }
         })
     }
 
     @RequiresApi(Build.VERSION_CODES.O)
-    fun createPaymentRequest(userId: String, item: String, quantity: String,
-                             totalAmount: String, callback: (KakaoPayReadyResponseDTO) -> Unit){
+    fun createPaymentRequest(
+        userId: String, item: String, quantity: String,
+        totalAmount: String, callback: (KakaoPayReadyResponseDTO) -> Unit
+    ) {
 
         val requestModel = HashMap<String, String>()
 
-        val kakaoPayRequestModel = KakaoPayRequestDTO(cid, orderId, userId, item, quantity, totalAmount, "0", approvalUrl, cancelUrl, failUrl)
+        val kakaoPayRequestModel =
+            KakaoPayRequestDTO(
+                cid,
+                orderId,
+                userId,
+                item,
+                quantity,
+                totalAmount,
+                "0",
+                approvalUrl,
+                cancelUrl,
+                failUrl
+            )
 
         val fields = kakaoPayRequestModel.javaClass.declaredFields
         for (field in fields) {
@@ -260,16 +302,17 @@ class MainActivityModel(val application :Application) {
             requestModel[field.name] = value
         }
 
-        val call : Call<KakaoPayReadyResponseDTO>
-                = kakaoPayService.createPaymentRequest(API_KEY, requestModel)
+        val call: Call<KakaoPayReadyResponseDTO> =
+            kakaoPayService.createPaymentRequest(API_KEY, requestModel)
 
-        call.enqueue(object  : Callback<KakaoPayReadyResponseDTO>{
-            override fun onResponse(call: Call<KakaoPayReadyResponseDTO>, response: Response<KakaoPayReadyResponseDTO>
+        call.enqueue(object : Callback<KakaoPayReadyResponseDTO> {
+            override fun onResponse(
+                call: Call<KakaoPayReadyResponseDTO>, response: Response<KakaoPayReadyResponseDTO>
             ) {
-                if(response.isSuccessful){
+                if (response.isSuccessful) {
                     Log.d(TAG, "onResponse: ${response.body()}")
                     callback(response.body()!!)
-                }else{
+                } else {
                     Log.d(TAG, "is not successful: ${response}")
                 }
             }
@@ -280,31 +323,37 @@ class MainActivityModel(val application :Application) {
         })
     }
 
-    fun foodPreferenceRegister(identifier: Int,foodName:String,classification:String,callback : (String) -> Unit){
+    fun foodPreferenceRegister(
+        identifier: Int,
+        foodName: String,
+        classification: String,
+        callback: (String) -> Unit
+    ) {
         Log.d(TAG, "foodPreferenceRegister: 호출됨")
-        service.foodPreferenceRegister(identifier,foodName,classification).enqueue(object : Callback<String>{
-            override fun onResponse(call: Call<String>, response: Response<String>) {
-                if(response.isSuccessful){
-                    Log.d(TAG, "onResponse: ${response}")
-                    callback(response.body()!!)
+        service.foodPreferenceRegister(identifier, foodName, classification)
+            .enqueue(object : Callback<String> {
+                override fun onResponse(call: Call<String>, response: Response<String>) {
+                    if (response.isSuccessful) {
+                        Log.d(TAG, "onResponse: ${response}")
+                        callback(response.body()!!)
+                    }
                 }
-            }
 
-            override fun onFailure(call: Call<String>, t: Throwable) {
-                Log.d(TAG, "food register onFailure: ${t}")
-            }
+                override fun onFailure(call: Call<String>, t: Throwable) {
+                    Log.d(TAG, "food register onFailure: ${t}")
+                }
 
-        })
+            })
     }
 
 
-    fun searchFood(query : String, callback:(FoodPreferenceSearchDTO) -> Unit){
-        service.searchFood(query).enqueue(object : Callback<FoodPreferenceSearchDTO>{
+    fun searchFood(query: String, callback: (FoodPreferenceSearchDTO) -> Unit) {
+        service.searchFood(query).enqueue(object : Callback<FoodPreferenceSearchDTO> {
             override fun onResponse(
                 call: Call<FoodPreferenceSearchDTO>,
                 response: Response<FoodPreferenceSearchDTO>
             ) {
-                if(response.isSuccessful){
+                if (response.isSuccessful) {
                     callback(response.body()!!)
                 }
             }
@@ -317,11 +366,10 @@ class MainActivityModel(val application :Application) {
     }
 
 
-
-    fun deleteFoodPreference(identifier: Int,foodName: String,callback: (String) -> Unit){
-        service.deleteFoodPreference(identifier,foodName).enqueue(object : Callback<String>{
+    fun deleteFoodPreference(identifier: Int, foodName: String, callback: (String) -> Unit) {
+        service.deleteFoodPreference(identifier, foodName).enqueue(object : Callback<String> {
             override fun onResponse(call: Call<String>, response: Response<String>) {
-                if(response.isSuccessful){
+                if (response.isSuccessful) {
                     callback(response.body()!!)
                     Log.d(TAG, "onResponse: $response")
                 }
@@ -335,8 +383,14 @@ class MainActivityModel(val application :Application) {
         })
 
     }
+
     @RequiresApi(Build.VERSION_CODES.O)
-    fun requestApprovePayment(tid : String, userId: String, pgToken : String, callback : (KakaoPayApproveResponseDTO) -> Unit){
+    fun requestApprovePayment(
+        tid: String,
+        userId: String,
+        pgToken: String,
+        callback: (KakaoPayApproveResponseDTO) -> Unit
+    ) {
 
         val requestModel = HashMap<String, String>()
         requestModel.put("cid", cid)
@@ -346,16 +400,18 @@ class MainActivityModel(val application :Application) {
         requestModel.put("pg_token", pgToken)
         Log.d(TAG, "requestModel: $requestModel")
 
-        val call : Call<KakaoPayApproveResponseDTO>
-                = kakaoPayService.requestApprovePayment(API_KEY, requestModel)
+        val call: Call<KakaoPayApproveResponseDTO> =
+            kakaoPayService.requestApprovePayment(API_KEY, requestModel)
 
-        call.enqueue(object : Callback<KakaoPayApproveResponseDTO>{
-            override fun onResponse(call: Call<KakaoPayApproveResponseDTO>, response: Response<KakaoPayApproveResponseDTO>
+        call.enqueue(object : Callback<KakaoPayApproveResponseDTO> {
+            override fun onResponse(
+                call: Call<KakaoPayApproveResponseDTO>,
+                response: Response<KakaoPayApproveResponseDTO>
             ) {
-                if(response.isSuccessful){
+                if (response.isSuccessful) {
                     Log.d(TAG, "onResponse: ${response.body()}")
                     callback(response.body()!!)
-                }else{
+                } else {
                     Log.d(TAG, "is not successful : $response")
                 }
             }
@@ -366,7 +422,7 @@ class MainActivityModel(val application :Application) {
         })
     }
 
-    fun setDelayTime() : Long {
+    fun setDelayTime(): Long {
 
         val midnight = Calendar.getInstance().apply {
             set(Calendar.HOUR_OF_DAY, 24) // 자정
@@ -376,7 +432,7 @@ class MainActivityModel(val application :Application) {
 
         val currentTime = Calendar.getInstance()
 
-        if(midnight.before(currentTime)){
+        if (midnight.before(currentTime)) {
             midnight.add(Calendar.HOUR_OF_DAY, 24)
         }
 
@@ -399,15 +455,17 @@ class MainActivityModel(val application :Application) {
             .build()
 
         WorkManager.getInstance(application.applicationContext)
-            .enqueueUniqueWork("midnightWork",
-                ExistingWorkPolicy.KEEP ,
-                midnightWorkRequest)
+            .enqueueUniqueWork(
+                "midnightWork",
+                ExistingWorkPolicy.KEEP,
+                midnightWorkRequest
+            )
 
         Log.d(TAG, "workManager first: ${midnightWorkRequest.id}")
 
         WorkManager.getInstance(application.applicationContext)
             .getWorkInfosForUniqueWorkLiveData("midnightWork")
-            .observeForever{
+            .observeForever {
                 Log.d(TAG, "workInfo Size: ${it.size}")
                 Log.d(TAG, "workInfo info: ${it[0]}")
 
@@ -422,25 +480,33 @@ class MainActivityModel(val application :Application) {
                         .build()
 
                     WorkManager.getInstance(application.applicationContext)
-                        .enqueueUniqueWork("midnightWork",
+                        .enqueueUniqueWork(
+                            "midnightWork",
                             ExistingWorkPolicy.KEEP,
-                            againWorkRequest)
+                            againWorkRequest
+                        )
 
                     Log.d(TAG, "WorkManager enqueue again: ${againWorkRequest.id}")
 
-                }else if(it == null){
+                } else if (it == null) {
                     Log.d(TAG, "WorkManager null")
-                }else{
+                } else {
                     Log.d(TAG, "${it[0].id}: ${it[0].state}")
                 }
             }
     }
 
 
-    fun withdrawal(identifier: Int,email:String,id:String,date:String,callback: (String) -> Unit){
-        service.withdrawal(identifier, email, id, date).enqueue(object : Callback<String>{
+    fun withdrawal(
+        identifier: Int,
+        email: String,
+        id: String,
+        date: String,
+        callback: (String) -> Unit
+    ) {
+        service.withdrawal(identifier, email, id, date).enqueue(object : Callback<String> {
             override fun onResponse(call: Call<String>, response: Response<String>) {
-                if(response.isSuccessful && response.body() != null){
+                if (response.isSuccessful && response.body() != null) {
                     callback(response.body()!!)
                 }
             }
@@ -454,17 +520,20 @@ class MainActivityModel(val application :Application) {
     }
 
 
-
-    fun saveSelectedProfile(drawable : String, sharedPreferences: SharedPreferences, callback: (String) -> Unit){
-        if(sharedPreferences.edit().putString("profileImage", drawable).commit()){
+    fun saveSelectedProfile(
+        drawable: String,
+        sharedPreferences: SharedPreferences,
+        callback: (String) -> Unit
+    ) {
+        if (sharedPreferences.edit().putString("profileImage", drawable).commit()) {
             callback("success")
-        }else{
+        } else {
             callback("failed")
         }
 
     }
 
-    fun requestAd(key:String,callback: ((RewardedAd) -> Unit)){
+    fun requestAd(key: String, callback: ((RewardedAd) -> Unit)) {
         val adRequest: AdRequest = AdRequest.Builder().build()
         RewardedAd.load(application, key,
             adRequest, object : RewardedAdLoadCallback() {
@@ -479,7 +548,6 @@ class MainActivityModel(val application :Application) {
                 }
             })
     }
-
 
 
     fun logout(sharedPreferences: SharedPreferences) {

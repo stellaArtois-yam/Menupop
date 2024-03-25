@@ -78,10 +78,9 @@ class KakaoPayWebView : Fragment() {
 
         ticketPurchaseViewModel.paymentReady.observe(viewLifecycleOwner, Observer {
             if (it != null) {
-                val url = it.next_redirect_mobile_url
+                val url = it.next_redirect_app_url
                 Log.d(TAG, "mobile url: $url")
                 webView?.loadUrl(url)
-
             }
         })
 
@@ -128,6 +127,7 @@ class KakaoPayWebView : Fragment() {
             if (pgToken != null) {
                 viewModel.updatePgToken(pgToken!!)
             }
+
 
             if (url.contains("KakaoPayApprove")) {
                 //여기서 결제 완료 observe해서 update 되면 이동

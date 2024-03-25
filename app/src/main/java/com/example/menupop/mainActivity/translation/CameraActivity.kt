@@ -41,13 +41,11 @@ class CameraActivity : ScanActivity() {
     lateinit var country : String
 
     var identifier = 0
-
-
+    val TAG = "CameraActivityTAG"
 
     private val callback = object : OnBackPressedCallback(true) {
         override fun handleOnBackPressed() {
             backPressed()
-            Log.d(TAG, "뒤로가기 클릭")
         }
     }
 
@@ -66,7 +64,7 @@ class CameraActivity : ScanActivity() {
         finish()
     }
 
-    val TAG = "CameraActivityTAG"
+
     fun init(){
         val intent = intent
         if (intent.getSerializableExtra("foodPreference")!=null){

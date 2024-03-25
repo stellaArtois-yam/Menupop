@@ -291,11 +291,7 @@ class SignupViewModel : ViewModel() {
         callbackList = {response ->
             Log.d(TAG, "sendUserInformation: ${response.result}")
 
-            if(response.result == "success"){
-                _saveResult.value = true
-            }else{
-                _saveResult.value = false
-            }
+            _saveResult.value = response.result == "success"
 
         }
         signupModel.sendUserInformation(id, password, email, identifier, callbackList!!)

@@ -1,6 +1,7 @@
 package com.example.menupop.mainActivity
 
 import android.app.Dialog
+import android.content.Context
 import android.content.Intent
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
@@ -14,11 +15,13 @@ import android.view.Window
 import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
+import androidx.activity.OnBackPressedCallback
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.lifecycleScope
 import com.example.menupop.BuildConfig
 import com.example.menupop.R
 import com.example.menupop.databinding.ActivityMainBinding
@@ -36,6 +39,8 @@ import com.example.menupop.mainActivity.translation.CameraActivity
 import com.google.android.gms.ads.OnUserEarnedRewardListener
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.bottomsheet.BottomSheetDialog
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import java.util.Calendar
 import kotlin.math.log
 
@@ -56,22 +61,44 @@ class MainActivity : AppCompatActivity(), MainActivityEvent{
 
     var identifierByIntent : Int = 0
 
+    lateinit var loadingDialog: Dialog
+
+    private var doubleBackToExitPressedOnce = false
+
+    private val callback = object : OnBackPressedCallback(true) {
+        override fun handleOnBackPressed() {
+
+            if (doubleBackToExitPressedOnce) {
+                finish()
+                return
+            }
+            doubleBackToExitPressedOnce = true
+            Toast.makeText(applicationContext, "한 번 더 누르면 종료합니다.", Toast.LENGTH_SHORT).show()
+
+            lifecycleScope.launch {
+                delay(2000) // 2초 대기
+                doubleBackToExitPressedOnce = false
+            }
+
+        }
+    }
+
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
+        loadingDialog = loadingDialog()
 
-        init()
+        init(loadingDialog)
 
         settingListener()
-
 
     }
 
 
-    private fun init(){
-        Log.d(TAG, "main activity init start")
+    private fun init(loadingDialog : Dialog){
         foodPreferenceFragment = FoodPreferenceFragment()
         exchangeFragment = ExchangeFragment()
         profileFragment = ProfileFragment()
@@ -93,45 +120,42 @@ class MainActivity : AppCompatActivity(), MainActivityEvent{
          */
 
         identifierByIntent = intent.getIntExtra("identifier", 0)
-        Log.d(TAG, "onCreate identifierByIntent: $identifierByIntent")
 
 
         if(identifierByIntent != 0){
             mainActivityViewModel.setIdentifier(identifierByIntent)
-            Log.d(TAG, "init: ")
+
         }else{
             Log.d(TAG, "identifier intent: ${mainActivityViewModel.identifier.value}")
         }
 
         mainActivityViewModel.identifier.observe(this, Observer{
+            Log.d(TAG, "init identifier observe: $it")
+
             if(it != null){
-                Log.d(TAG, "init identifier: $it")
                 mainActivityViewModel.requestUserInformation(it)
+
             }else{
                 Log.d(TAG, "identifier observe: ${mainActivityViewModel.identifier.value}")
             }
         })
 
         checkingTranslation = intent.getBooleanExtra("checkedTranslation", false)
-        Log.d(TAG, "init checkingTranslation: $checkingTranslation")
-
-
-
-
 
 
         mainActivityViewModel.checkingTranslationTicket.observe(this){ result ->
-            Log.d(TAG, "푸드 티켓 확인 값: ${result}")
-            if (result){ // 티켓이 있을때
-                supportFragmentManager.beginTransaction()
-                    .replace(R.id.home_frame_layout, countrySelectionFragment)
-                    .commit()
-                binding.appbarMenu.findViewById<TextView>(R.id.appbar_status).text = "번역"
 
-            }else { // 티켓이 없을때
-                emptyTicketShowDialog()
+            when(result){
+                true -> {
+                    supportFragmentManager.beginTransaction()
+                        .replace(R.id.home_frame_layout, countrySelectionFragment)
+                        .commit()
+                    binding.appbarMenu.findViewById<TextView>(R.id.appbar_status).text = "번역"
+                }
+                else -> {
+                    emptyTicketShowDialog()
+                }
             }
-
         }
 
 
@@ -140,7 +164,6 @@ class MainActivity : AppCompatActivity(), MainActivityEvent{
          */
         mainActivityViewModel.scheduleMidnightWork(application)
 
-        val loadingDialog = loadingDialog()
 
 
         mainActivityViewModel.isLoading.observe(this, Observer {
@@ -174,23 +197,28 @@ class MainActivity : AppCompatActivity(), MainActivityEvent{
                 loadingDialog.dismiss()
 
             }
+
         })
 
 
 
         mainActivityViewModel.rewardedAd.observe(this){
 
-            it.show(this, OnUserEarnedRewardListener { rewardItem ->
-                // Handle the reward.
-                val rewardAmount = rewardItem.amount
-                val rewardType = rewardItem.type
-                Log.d(TAG, "User earned the reward. ${rewardAmount} ${rewardType}")
-                mainActivityViewModel.rewardedSuccess()
-            })
+            if(it != null){
+                it.show(this, OnUserEarnedRewardListener { rewardItem ->
+                    // Handle the reward.
+                    val rewardAmount = rewardItem.amount
+                    val rewardType = rewardItem.type
+                    Log.d(TAG, "User earned the reward. ${rewardAmount} ${rewardType}")
+                    mainActivityViewModel.rewardedSuccess()
+                })
+
+                loadingDialog.dismiss()
+            }
 
         }
 
-
+        this.onBackPressedDispatcher.addCallback(this, callback)
 
     }
 
@@ -229,10 +257,10 @@ class MainActivity : AppCompatActivity(), MainActivityEvent{
         }
 
 
-        bindingDialog.dialogTicketBottomFoodTicket.text = "음식 티켓 $foodTicket 개"
-        bindingDialog.dialogTicketBottomTranslationTicket.text = "번역 티켓 $translationTicket 개"
+        bindingDialog.dialogTicketBottomFoodTicket.text = "음식 티켓 : $foodTicket 개"
+        bindingDialog.dialogTicketBottomTranslationTicket.text = "번역 티켓 : $translationTicket 개"
         bindingDialog.dialogTicketBottomButton.setOnClickListener {
-            Log.d(TAG, "favoriteItemClick: 결제 화면 띄우기")
+
             moveToTicketPurchase()
             bottomSheetDialog.dismiss()
         }
@@ -250,34 +278,48 @@ class MainActivity : AppCompatActivity(), MainActivityEvent{
         override fun onNavigationItemSelected(menuItem: MenuItem): Boolean {
             when (menuItem.itemId) {
                 R.id.tab_food -> {
-                    supportFragmentManager.beginTransaction()
-                        .replace(R.id.home_frame_layout, FoodPreferenceFragment())
-                        .commit()
-                    binding.appbarMenu.findViewById<TextView>(R.id.appbar_status).text = "음식 등록"
-                    backButtonGone()
+                    if(mainActivityViewModel.tabStatus.value != 1){
+                        supportFragmentManager.beginTransaction()
+                            .replace(R.id.home_frame_layout, FoodPreferenceFragment())
+                            .commit()
+                        binding.appbarMenu.findViewById<TextView>(R.id.appbar_status).text = "음식 등록"
+                        backButtonGone()
+                        mainActivityViewModel.setTabStatus(1)
+                    }
+
                     return true
                 }
                 R.id.tab_translation -> {
-                    Log.d(TAG, "onNavigationItemSelected: 카메라 탭 선택")
-                    mainActivityViewModel.checkingTranslationTicket()
-                    backButtonGone()
+                    if(mainActivityViewModel.tabStatus.value != 2){
+                        Log.d(TAG, "onNavigationItemSelected: 카메라 탭 선택")
+                        mainActivityViewModel.checkingTranslationTicket()
+                        backButtonGone()
+                        mainActivityViewModel.setTabStatus(2)
+                    }
                     return true
                 }
                 R.id.tab_exchange -> {
-                    supportFragmentManager.beginTransaction()
-                        .replace(R.id.home_frame_layout, ExchangeFragment())
-                        .commit()
-                    binding.appbarMenu.findViewById<TextView>(R.id.appbar_status).text = "환율"
-                    backButtonGone()
+                    if(mainActivityViewModel.tabStatus.value != 3){
+
+                        supportFragmentManager.beginTransaction()
+                            .replace(R.id.home_frame_layout, ExchangeFragment())
+                            .commit()
+                        binding.appbarMenu.findViewById<TextView>(R.id.appbar_status).text = "환율"
+                        backButtonGone()
+                        mainActivityViewModel.setTabStatus(3)
+                    }
                     return true
                 }
                 R.id.tab_profile -> {
+                    if(mainActivityViewModel.tabStatus.value != 4){
 
-                    supportFragmentManager.beginTransaction()
-                        .replace(R.id.home_frame_layout, profileFragment)
-                        .commit()
-                    binding.appbarMenu.findViewById<TextView>(R.id.appbar_status).text = "프로필 확인"
-                    backButtonGone()
+                        supportFragmentManager.beginTransaction()
+                            .replace(R.id.home_frame_layout, profileFragment)
+                            .commit()
+                        binding.appbarMenu.findViewById<TextView>(R.id.appbar_status).text = "프로필 확인"
+                        backButtonGone()
+                        mainActivityViewModel.setTabStatus(4)
+                    }
                     return true
                 }
             }
@@ -330,6 +372,8 @@ class MainActivity : AppCompatActivity(), MainActivityEvent{
             replace(R.id.home_frame_layout, webViewFragment)
             commit()
         }
+        binding.appbarMenu.visibility = View.GONE
+        binding.bottomNavigation.visibility = View.GONE
     }
 
     override fun completePayment() {
@@ -339,6 +383,8 @@ class MainActivity : AppCompatActivity(), MainActivityEvent{
             replace(R.id.home_frame_layout, profileFragment)
             commit()
         }
+        binding.appbarMenu.visibility = View.VISIBLE
+        binding.bottomNavigation.visibility = View.VISIBLE
     }
     fun backButtonGone(){
         binding.appbarMenu.findViewById<ImageView>(R.id.appbar_back).visibility = View.GONE
@@ -349,8 +395,7 @@ class MainActivity : AppCompatActivity(), MainActivityEvent{
         if(mainActivityViewModel.userInformation.value!!.dailyReward == 0){
             Toast.makeText(this,"하루에 받을 수 있는 리워드를 초과했습니다.", Toast.LENGTH_SHORT).show()
         }else{
-
-            loadingDialog()
+            loadingDialog.show()
             val key = BuildConfig.GOOGLE_AD_ID
             Log.d(TAG, "key: $key")
             mainActivityViewModel.loadAd(key)

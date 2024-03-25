@@ -25,16 +25,11 @@ class ResetPasswordCheckIdFragment : Fragment() {
     private var context : Context ?=null
 
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-    }
-
     override fun onAttach(context: Context) {
         super.onAttach(context)
         this.context = context
         if (context is ResetPasswordFragmentEvent) {
             event = context
-            Log.d(TAG, "onAttach: 호출됨")
         } else {
             throw RuntimeException(
                 context.toString()
@@ -48,7 +43,6 @@ class ResetPasswordCheckIdFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
         binding =  DataBindingUtil.inflate(inflater, R.layout.fragment_reset_password_check_id, container, false)
-        // Inflate the layout for this fragment
         return binding.root
     }
 
@@ -67,31 +61,31 @@ class ResetPasswordCheckIdFragment : Fragment() {
         binding.lifecycleOwner = this
         
         resetPasswordViewModel.checkIdResult.observe(viewLifecycleOwner, Observer { result ->
-            Log.d(TAG, "init: ${result}")
-            if(result) {
-                event?.existId()
-            } else{
-                binding.passwordResetCheckIdWarning.visibility = View.VISIBLE
+            when(result){
+                true ->  event?.existId()
+                else -> binding.passwordResetCheckIdWarning.visibility = View.VISIBLE
             }
-            
         })
-
     }
+
     fun setListener(){
         binding.passwordResetIdCheckButton.setOnClickListener {
-            var id = binding.passwordResetIdCheckEdittext.text.toString().replace(" ","")
-            if(id.isEmpty()){
-                Toast.makeText(context,"아이디를 입력해주세요.",Toast.LENGTH_SHORT).show()
-            } else{
-                resetPasswordViewModel.checkId(id)
+            var id = binding.passwordResetIdCheckEdittext.text.toString().trim()
+
+            when(id.isEmpty()){
+                true -> Toast.makeText(context,"아이디를 입력해주세요.",Toast.LENGTH_SHORT).show()
+                else ->  resetPasswordViewModel.checkId(id)
             }
         }
+
         binding.passwordResetBottomBackButton.setOnClickListener {
             activity?.finish()
         }
+
         binding.passwordResetIdCheckEdittext.addTextChangedListener{
             binding.passwordResetCheckIdWarning.visibility = View.GONE
         }
+
         binding.appbarMenu.findViewById<ImageView>(R.id.appbar_back).setOnClickListener {
             event?.backBtnClick()
         }

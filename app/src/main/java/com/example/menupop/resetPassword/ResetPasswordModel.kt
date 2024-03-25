@@ -1,6 +1,7 @@
 package com.example.menupop.resetPassword
 
 import android.util.Log
+import com.example.menupop.BuildConfig
 import com.example.menupop.RetrofitService
 import com.example.menupop.SimpleResultDTO
 import com.google.gson.Gson
@@ -18,14 +19,14 @@ class ResetPasswordModel {
     val gson: Gson = GsonBuilder()
         .setLenient()
         .create()
+
     private val retrofit = Retrofit.Builder()
-        .baseUrl("http://3.135.51.201/") // 실제 서버의 기본 URL로 대체해야 합니다.
+        .baseUrl(BuildConfig.SERVER_IP)
         .addConverterFactory(GsonConverterFactory.create(gson))
         .addConverterFactory(ScalarsConverterFactory.create())
         .build()
 
     private val service = retrofit.create(RetrofitService::class.java)
-
 
 
     fun checkId(id:String,callback: (SimpleResultDTO) -> Unit){
@@ -34,6 +35,7 @@ class ResetPasswordModel {
                 if(response.isSuccessful && response.body() != null) {
                     callback(response.body()!!)
                     Log.d(TAG, "onResponse: ${response.body()}")
+
                 }else{
                     callback(SimpleResultDTO("ServerException"))
                 }
@@ -47,13 +49,13 @@ class ResetPasswordModel {
 
     }
     fun checkEamil(id:String,email:String,callback: (String) -> Unit){
-        Log.d(TAG, "checkEamil: 호출됨")
+
         service.checkEmail(email,id).enqueue(object : Callback<String>{
             override fun onResponse(call: Call<String>, response: Response<String>) {
                 Log.d(TAG, "onResponse: ${response}")
+
                 if(response.isSuccessful && response.body() != null){
                     callback(response.body().toString())
-                    Log.d(TAG, "onResponse: ${response.body()}")
                 }
             }
 
@@ -65,12 +67,13 @@ class ResetPasswordModel {
         })
     }
     fun sendVerifyCode(email: String,callback: (String) -> Unit){
-        Log.d(TAG, "sendVerifyCode: ${email}")
+
         service.sendEmailVerifyCode(email).enqueue(object : Callback<String>{
             override fun onResponse(call: Call<String>, response: Response<String>) {
                 if (response.isSuccessful && response.body() != null){
                     callback(response.body().toString())
                     Log.d(TAG, "onResponse: ${response}")
+
                 } else{
                     callback("Exception")
                 }
@@ -85,12 +88,13 @@ class ResetPasswordModel {
     }
 
     fun resetPassword(id:String,password:String,callback: (String) -> Unit){
-        Log.d(TAG, "resetPassword 호출 ${id} ${password} ")
+
         service.resetPassword(id,password).enqueue(object : Callback<String>{
             override fun onResponse(call: Call<String>, response: Response<String>) {
                 Log.d(TAG, "onResponse: ${response}")
                 if(response.isSuccessful && response.body() != null){
                     callback("완료")
+
                 } else{
                     callback("Exception")
                 }

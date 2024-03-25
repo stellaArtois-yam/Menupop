@@ -3,12 +3,10 @@
     <style name="Base.Theme.Menupop" parent="Theme.Material3.Light.NoActionBar">
         <!-- Customize your light theme here. -->
          <item name="colorPrimary">@color/white</item>
+        <item name="colorContainer">@color/white</item>
+        <item name="colorSecondaryContainer">@android:color/transparent</item>
          <item name="windowActionBar">false</item>
         <item name="android:windowFullscreen">true</item>
-    </style>
-
-    <style name="Widget.BottomNavigationView" parent="Widget.Material3.BottomNavigationView">
-        <item name="colorControlHighlight">@android:color/transparent</item>
     </style>
 
 
