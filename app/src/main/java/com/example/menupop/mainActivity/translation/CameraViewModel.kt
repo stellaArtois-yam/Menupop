@@ -100,7 +100,6 @@ class CameraViewModel(application: Application) : ViewModel() {
                 _failed.value = true
             }
         }
-
         cameraModel.checkLanguage(text, callbackString!!)
     }
 
