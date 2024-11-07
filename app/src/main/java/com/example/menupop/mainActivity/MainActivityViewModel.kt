@@ -12,7 +12,7 @@ import android.util.Log
 import android.view.View
 import android.view.WindowManager
 import androidx.annotation.RequiresApi
-import androidx.core.net.toUri
+import androidx.core.content.res.ResourcesCompat
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -26,16 +26,17 @@ import com.example.menupop.SimpleResultDTO
 import com.example.menupop.mainActivity.profile.KakaoPayCancelResponseDTO
 import com.example.menupop.mainActivity.profile.ProfileSelectionDTO
 import com.google.android.gms.ads.rewarded.RewardedAd
-import org.intellij.lang.annotations.Identifier
 import java.text.DecimalFormat
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.util.Calendar
-import kotlin.coroutines.coroutineContext
 
 class MainActivityViewModel(private val application: Application) : AndroidViewModel(application) {
-    val TAG = "MainActivityViewModel"
-    val mainActivityModel = MainActivityModel(application)
+    companion object {
+        const val TAG = "mainActivityViewModel"
+    }
+
+    private val mainActivityModel = MainActivityModel(application)
 
     private var callback: ((SimpleResultDTO) -> Unit)? = null
     private var callbackUserInfo: ((UserInformationDTO) -> Unit)? = null
@@ -88,14 +89,13 @@ class MainActivityViewModel(private val application: Application) : AndroidViewM
 
     fun getProfileList(resources: Resources): ArrayList<ProfileSelectionDTO> {
         val imageNames = resources.getStringArray(R.array.profile)
-        var imageList: ArrayList<ProfileSelectionDTO> = ArrayList()
+        val imageList: ArrayList<ProfileSelectionDTO> = ArrayList()
 
         for (name in imageNames) {
             val imageName = resources.getIdentifier(name, "drawable", application.packageName)
-            val image = resources.getDrawable(imageName)
-            imageList.add(ProfileSelectionDTO(image))
+            val image = ResourcesCompat.getDrawable(resources, imageName, null)
+            imageList.add(ProfileSelectionDTO(image!!))
         }
-
 
         return imageList
     }
@@ -134,7 +134,6 @@ class MainActivityViewModel(private val application: Application) : AndroidViewM
     fun updateTicketQuantity(ticketType: String, operator: String, quantity: Int) {
         callbackResult = {
             Log.d(TAG, "updateTicketQuantity ticketType : $ticketType")
-            //여기서 update를 하자, switch문 같은거 쓰면 될듯
             if (it == "success") {
                 if (operator == "-") {
                     when (ticketType) {
@@ -164,7 +163,7 @@ class MainActivityViewModel(private val application: Application) : AndroidViewM
 
     }
 
-    fun buyTicketUsingReward(quantity: Int) {
+    private fun buyTicketUsingReward(quantity: Int) {
         Log.d(TAG, "buyTicketUsingReward")
         _userInformation.value!!.haveRewarded = _userInformation.value!!.haveRewarded - quantity
         _userInformation.value!!.foodTicket =
@@ -178,7 +177,7 @@ class MainActivityViewModel(private val application: Application) : AndroidViewM
         Log.d(TAG, "foodPreferenceRegister: 호출됨")
 
         callbackResult = { result ->
-            Log.d(TAG, "foodPreferenceRegister: ${result}")
+            Log.d(TAG, "foodPreferenceRegister: $result")
             _registerResult.value = result == "success"
             searchFood.value?.clear()
             Log.d(TAG, "foodPreferenceRegister: ${searchFood.value}")
@@ -191,9 +190,11 @@ class MainActivityViewModel(private val application: Application) : AndroidViewM
         )
     }
 
+    //여기가 유력하다력
     fun checkingTranslationTicket() {
+        Log.d(TAG, "checkingTranslationTicket: translationTicket(${userInformation.value!!.translationTicket}, freeTranslationTicket(${_userInformation.value!!.freeTranslationTicket}")
         _checkingTranslationTicket.value =
-            userInformation.value?.translationTicket!! > 0 || _userInformation.value!!.dailyReward > 0
+            userInformation.value!!.translationTicket > 0 || _userInformation.value!!.freeTranslationTicket > 0
 
     }
 
@@ -218,10 +219,10 @@ class MainActivityViewModel(private val application: Application) : AndroidViewM
             Log.d(TAG, "searchFood: test")
             if (result.result == "success") {
                 val foodPreferenceLists = ArrayList<String>()
-                _foodPreferenceList.value?.foodList?.forEach { it ->
+                _foodPreferenceList.value?.foodList?.forEach {
                     foodPreferenceLists.add(it.foodName)
                 }
-                result.foodList.removeAll(foodPreferenceLists)
+                result.foodList.removeAll(foodPreferenceLists.toSet())
             } else if (result.result == "notFound") {
                 Log.d(TAG, "searchFood: 찾을 수 없음")
             }
@@ -248,7 +249,7 @@ class MainActivityViewModel(private val application: Application) : AndroidViewM
             _userInformation.value = response
             Log.d(
                 TAG,
-                "requestUserInformation:  ${response}"
+                "requestUserInformation:  $response"
             )
             _todayRewarded.value = 3 - _userInformation.value!!.dailyReward
             _isLoading.value = response.result
@@ -259,7 +260,7 @@ class MainActivityViewModel(private val application: Application) : AndroidViewM
 
     fun loadAd(key: String) {
         callbackAd = { ad ->
-            Log.d(TAG, "loadAd: ${ad}")
+            Log.d(TAG, "loadAd: $ad")
             _rewardedAd.value = ad
         }
         mainActivityModel.requestAd(key, callbackAd!!)
@@ -279,7 +280,7 @@ class MainActivityViewModel(private val application: Application) : AndroidViewM
             if (it == "success") {
                 Log.d(TAG, "saveSelectedProfile: $it")
                 val image = resources.getIdentifier(imageName, "drawable", application.packageName)
-                _profileImage.value = resources.getDrawable(image)
+                _profileImage.value = ResourcesCompat.getDrawable(resources, image, null)
                 _isChangedProfile.value = true
             }else{
                 Log.d(TAG, "saveSelectedProfile not success")
@@ -295,7 +296,7 @@ class MainActivityViewModel(private val application: Application) : AndroidViewM
 
         if (getResult != null) {
             val image = resources.getIdentifier(getResult, "drawable", application.packageName)
-            _profileImage.value = resources.getDrawable(image)
+            _profileImage.value = ResourcesCompat.getDrawable(resources, image, null)
             _isChangedProfile.value = false
             Log.d(TAG, "getProfileImage not null")
         } else {
@@ -469,10 +470,10 @@ class MainActivityViewModel(private val application: Application) : AndroidViewM
 
         } else {
             _isRewardExceeded.value = false
-            var item = itemName(_rewardTranslationAmount, _rewardFoodAmount)
+            val item = itemName(_rewardTranslationAmount, _rewardFoodAmount)
             Log.d(TAG, "rewardPayment itemName: $item")
 
-            var time = LocalDateTime.now().toString()
+            val time = LocalDateTime.now().toString()
 
             savePaymentHistory(
                 identifier, Calendar.getInstance().hashCode().toString(), "REWARD", item, 0, time
@@ -506,30 +507,29 @@ class MainActivityViewModel(private val application: Application) : AndroidViewM
     }
 
 
-    fun countTicket(
+    private fun countTicket(
         ticketAmount: MutableLiveData<Int>,
         otherTicketAmount: MutableLiveData<Int>
     ): Int {
-        if (ticketAmount.value!! > 0 && otherTicketAmount.value!! > 0) {
-
-            return ticketAmount.value!! + otherTicketAmount.value!!
+        return if (ticketAmount.value!! > 0 && otherTicketAmount.value!! > 0) {
+            ticketAmount.value!! + otherTicketAmount.value!!
         } else {
-            return 1
+            1
         }
     }
 
-    fun itemName(
+    private fun itemName(
         ticketAmount: MutableLiveData<Int>,
         otherTicketAmount: MutableLiveData<Int>
     ): String {
-        if (ticketAmount.value!! > 0 && otherTicketAmount.value!! > 0) {
+        return if (ticketAmount.value!! > 0 && otherTicketAmount.value!! > 0) {
             val total = ticketAmount.value!! + otherTicketAmount.value!! - 1
-            return "번역 티켓 외 $total"
+            "번역 티켓 외 $total"
 
         } else if (ticketAmount.value!! > 0 && otherTicketAmount.value!! == 0) {
-            return "번역 티켓"
+            "번역 티켓"
         } else {
-            return "음식 티켓"
+            "음식 티켓"
         }
     }
 
@@ -621,7 +621,7 @@ class MainActivityViewModel(private val application: Application) : AndroidViewM
         Log.d(TAG, "setChangeTicket status: ${_changeTicket.value}")
     }
 
-    fun requestCancelPayment(tid: String, cancelAmount: String) {
+    private fun requestCancelPayment(tid: String, cancelAmount: String) {
         callbackKakaoCancel = { response ->
             when (response.status) {
                 "CANCEL_PAYMENT" -> _failedBuyTicket.value = true
@@ -635,7 +635,7 @@ class MainActivityViewModel(private val application: Application) : AndroidViewM
         mainActivityModel.requestCancelPayment(tid, cancelAmount, callbackKakaoCancel!!)
     }
 
-    fun savePaymentHistory(
+    private fun savePaymentHistory(
         identifier: Int, tid: String, paymentType: String, item: String,
         price: Int, approveAt: String
     ) {
@@ -739,8 +739,8 @@ class MainActivityViewModel(private val application: Application) : AndroidViewM
 
     fun getDisplaySize(width : Float, height : Float) : Pair<Int, Int>{
         val windowManager = application.getSystemService(Context.WINDOW_SERVICE) as WindowManager
-        var x = 0
-        var y = 0
+        val x: Int
+        val y: Int
         if(Build.VERSION.SDK_INT < 30){
             val size = Point()
 

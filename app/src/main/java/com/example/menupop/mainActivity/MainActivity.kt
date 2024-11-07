@@ -1,7 +1,6 @@
 package com.example.menupop.mainActivity
 
 import android.app.Dialog
-import android.content.Context
 import android.content.Intent
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
@@ -19,7 +18,6 @@ import androidx.activity.OnBackPressedCallback
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
-import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import com.example.menupop.BuildConfig
@@ -28,26 +26,22 @@ import com.example.menupop.databinding.ActivityMainBinding
 import com.example.menupop.databinding.DialogTicketBottomBinding
 import com.example.menupop.login.LoginActivity
 import com.example.menupop.mainActivity.exchange.ExchangeFragment
-import com.example.menupop.mainActivity.foodPreference.FoodPreferenceDataClass
 import com.example.menupop.mainActivity.foodPreference.FoodPreferenceFragment
 import com.example.menupop.mainActivity.profile.KakaoPayWebView
 import com.example.menupop.mainActivity.profile.ProfileFragment
 import com.example.menupop.mainActivity.profile.ProfileSelectionFragment
 import com.example.menupop.mainActivity.profile.TicketPurchaseFragment
 import com.example.menupop.mainActivity.profile.WithdrawalFragment
-import com.example.menupop.mainActivity.translation.CameraActivity
-import com.google.android.gms.ads.OnUserEarnedRewardListener
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import java.util.Calendar
-import kotlin.math.log
 
 
 class MainActivity : AppCompatActivity(), MainActivityEvent{
-    val TAG = "MainActivityTAG"
-
+    companion object{
+        const val TAG = "mainActivityTAG"
+    }
     lateinit var mainActivityViewModel: MainActivityViewModel
     lateinit var binding : ActivityMainBinding
 
@@ -129,16 +123,16 @@ class MainActivity : AppCompatActivity(), MainActivityEvent{
             Log.d(TAG, "identifier intent: ${mainActivityViewModel.identifier.value}")
         }
 
-        mainActivityViewModel.identifier.observe(this, Observer{
+        mainActivityViewModel.identifier.observe(this) {
             Log.d(TAG, "init identifier observe: $it")
 
-            if(it != null){
+            if (it != null) {
                 mainActivityViewModel.requestUserInformation(it)
 
-            }else{
+            } else {
                 Log.d(TAG, "identifier observe: ${mainActivityViewModel.identifier.value}")
             }
-        })
+        }
 
         checkingTranslation = intent.getBooleanExtra("checkedTranslation", false)
 
@@ -166,16 +160,23 @@ class MainActivity : AppCompatActivity(), MainActivityEvent{
 
 
 
-        mainActivityViewModel.isLoading.observe(this, Observer {
-            if(it.equals("success")){
-                if(checkingTranslation){
-                    if(mainActivityViewModel.userInformation.value!!.freeTranslationTicket > 0){
-                        mainActivityViewModel.updateTicketQuantity("free_translation_ticket", "-", 1)
+        mainActivityViewModel.isLoading.observe(this) {
+            if (it.equals("success")) {
+                //번역에 성공해서 번역 티켓을 사용해야한다
+                if (checkingTranslation) {
+                    //사용자에게 무료 번역 티켓이 존재한다
+                    if (mainActivityViewModel.userInformation.value!!.freeTranslationTicket > 0) {
+                        //"free_transaltion_ticket" 타입의 티켓을 업데이트 한다
+                        mainActivityViewModel.updateTicketQuantity(
+                            "free_translation_ticket",
+                            "-",
+                            1
+                        )
                         Log.d(TAG, "Free Translation Ticket Use")
-                    }else{
+                    } else {
+                        //없으면 ticket을 업데이트 한다
                         mainActivityViewModel.updateTicketQuantity("translation_ticket", "-", 1)
                     }
-                    Log.d(TAG, "init Translation Ticket: ${mainActivityViewModel.userInformation.value!!.translationTicket} ")
 
                 }
 
@@ -183,35 +184,35 @@ class MainActivity : AppCompatActivity(), MainActivityEvent{
                 binding.homeFrameLayout.visibility = View.VISIBLE
 
                 supportFragmentManager.beginTransaction().apply {
-                    replace(R.id.home_frame_layout,foodPreferenceFragment)
+                    replace(R.id.home_frame_layout, foodPreferenceFragment)
                     commit()
                 }
 
                 loadingDialog.dismiss()
 
-            }else if(it.equals("yet")){
+            } else if (it.equals("yet")) {
                 loadingDialog
 
-            }else if(it.equals("isNotSuccessful") || it.equals("timeout")){
+            } else if (it.equals("isNotSuccessful") || it.equals("timeout")) {
                 Toast.makeText(this, "서버 오류로 로딩이 불가합니다 :(", Toast.LENGTH_LONG).show()
                 loadingDialog.dismiss()
 
             }
 
-        })
+        }
 
 
 
         mainActivityViewModel.rewardedAd.observe(this){
 
             if(it != null){
-                it.show(this, OnUserEarnedRewardListener { rewardItem ->
+                it.show(this) { rewardItem ->
                     // Handle the reward.
                     val rewardAmount = rewardItem.amount
                     val rewardType = rewardItem.type
                     Log.d(TAG, "User earned the reward. ${rewardAmount} ${rewardType}")
                     mainActivityViewModel.rewardedSuccess()
-                })
+                }
 
                 loadingDialog.dismiss()
             }

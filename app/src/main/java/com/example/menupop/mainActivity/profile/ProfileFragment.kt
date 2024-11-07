@@ -16,29 +16,22 @@ import android.view.Window
 import android.view.WindowManager
 import android.widget.Button
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.net.toUri
 import androidx.databinding.DataBindingUtil
-import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import com.example.menupop.R
 import com.example.menupop.databinding.FragmentProfileBinding
 import com.example.menupop.mainActivity.MainActivityEvent
 import com.example.menupop.mainActivity.MainActivityViewModel
-import com.google.android.gms.ads.OnUserEarnedRewardListener
 
 @SuppressLint("ResourceAsColor")
 class ProfileFragment : Fragment() {
-    val TAG = "ProfileFragment"
+    val TAG = "profileFragment"
     lateinit var binding: FragmentProfileBinding
     private lateinit var profileViewModel: MainActivityViewModel
     var event: MainActivityEvent? = null
     private lateinit var context : Context
     private lateinit var sharedPreferences : SharedPreferences
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-
-    }
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
@@ -58,7 +51,7 @@ class ProfileFragment : Fragment() {
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
         binding = DataBindingUtil.inflate(inflater,R.layout.fragment_profile, container, false)
         return binding.root
     }
@@ -71,7 +64,7 @@ class ProfileFragment : Fragment() {
     }
 
     fun init(){
-        profileViewModel = ViewModelProvider(requireActivity()).get(MainActivityViewModel::class.java)
+        profileViewModel = ViewModelProvider(requireActivity())[MainActivityViewModel::class.java]
         binding.mainActivityViewModel = profileViewModel
         binding.lifecycleOwner = this
 
@@ -93,19 +86,20 @@ class ProfileFragment : Fragment() {
         }
 
 
-        profileViewModel.profileImage.observe(viewLifecycleOwner, Observer {
-            if(it == null){
+        profileViewModel.profileImage.observe(viewLifecycleOwner) {
+            if (it == null) {
                 binding.profileImage.setImageResource(R.drawable.profile_unselected)
 
-            }else{
+            } else {
                 Log.d(TAG, "init profile is not null")
             }
-        })
+        }
 
     }
 
-    fun setClick(){
+    private fun setClick(){
 
+        //프로필 누르면 프로필 이미지 바꿈
         binding.profileImage.setOnClickListener{
             event?.moveToProfileSelection()
         }
@@ -136,7 +130,7 @@ class ProfileFragment : Fragment() {
     }
 
 
-    fun showLogoutDialog(){
+    private fun showLogoutDialog(){
         val dialog = Dialog(context)
 
         dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
@@ -147,7 +141,7 @@ class ProfileFragment : Fragment() {
         dialog.findViewById<Button>(R.id.dialog_two_button_agree).setOnClickListener{
             dialog.dismiss()
 
-            var sharedPreferences = context?.getSharedPreferences("userInfo", AppCompatActivity.MODE_PRIVATE)
+            val sharedPreferences = context.getSharedPreferences("userInfo", AppCompatActivity.MODE_PRIVATE)
             profileViewModel.logout(sharedPreferences!!)
 
             event?.logout()
