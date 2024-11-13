@@ -1,12 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <layout>
-
     <data>
         <variable
             name="mainActivityViewModel"
             type="com.example.menupop.mainActivity.MainActivityViewModel" />
     </data>
-
 
     <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:app="http://schemas.android.com/apk/res-auto"
@@ -14,18 +12,34 @@
         android:layout_height="match_parent"
         android:orientation="vertical">
 
-
-        <include
-            android:id="@+id/appbar_menu"
-            layout="@layout/appbar"/>
-
-
-        <FrameLayout
-            android:id="@+id/home_frame_layout"
+        <androidx.appcompat.widget.Toolbar
+            android:id="@+id/toolbar"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:background="@drawable/stroke">
+
+            <TextView
+                android:id="@+id/toolbar_title"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Toolbar Title"
+                android:textColor="@color/black"
+                android:textSize="20sp"
+                android:textStyle="bold"
+                style="@style/TextAppearance.AppCompat.Widget.ActionBar.Title"
+                android:layout_gravity="center_horizontal" />
+
+        </androidx.appcompat.widget.Toolbar>
+
+        <androidx.fragment.app.FragmentContainerView
+            android:id="@+id/nav_host_fragment"
+            android:name="androidx.navigation.fragment.NavHostFragment"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
             android:layout_weight="1"
-            android:background="@color/white"/>
+            app:defaultNavHost="true"
+            android:visibility="visible"
+            app:navGraph="@navigation/nav_graph"/>
 
         <com.google.android.material.bottomnavigation.BottomNavigationView
             android:id="@+id/bottom_navigation"
@@ -33,8 +47,7 @@
             android:layout_height="wrap_content"
             android:layout_gravity="bottom"
             android:background="@color/pale_gray"
-            app:menu="@menu/bottom_navi_menu"/>
-
+            app:menu="@menu/bottom_navi_menu" />
 
     </LinearLayout>
 

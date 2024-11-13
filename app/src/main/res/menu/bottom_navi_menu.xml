@@ -1,28 +1,26 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
 
-
-
     <item
-        android:id="@+id/tab_food"
+        android:id="@+id/foodPreferenceFragment"
         android:enabled="true"
         android:icon="@drawable/food_navi"
         android:title="food"/>
 
     <item
-        android:id="@+id/tab_translation"
+        android:id="@+id/countrySelectionFragment"
         android:enabled="true"
         android:icon="@drawable/translation_navi"
         android:title="translation"/>
 
     <item
-        android:id="@+id/tab_exchange"
+        android:id="@+id/exchangeFragment"
         android:enabled="true"
         android:icon="@drawable/exchange_navi"
         android:title="exchange"/>
 
     <item
-        android:id="@+id/tab_profile"
+        android:id="@+id/profileFragment"
         android:enabled="true"
         android:icon="@drawable/profile_navi"
         android:title="profile"/>

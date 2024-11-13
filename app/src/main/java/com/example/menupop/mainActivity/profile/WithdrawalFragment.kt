@@ -2,17 +2,16 @@ package com.example.menupop.mainActivity.profile
 
 import android.app.Dialog
 import android.content.Context
+import android.content.Intent
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.os.Build
 import android.os.Bundle
-import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.Window
-import android.view.WindowManager
 import android.widget.Button
 import android.widget.TextView
 import android.widget.Toast
@@ -20,45 +19,36 @@ import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.ViewModelProvider
+import androidx.navigation.fragment.findNavController
 import com.example.menupop.R
 import com.example.menupop.databinding.FragmentWithdrawalBinding
-import com.example.menupop.mainActivity.MainActivityEvent
+import com.example.menupop.login.LoginActivity
 import com.example.menupop.mainActivity.MainActivityViewModel
 
 @RequiresApi(Build.VERSION_CODES.O)
 
 class WithdrawalFragment : Fragment() {
-    val TAG = "WithdrawalFragment"
-    lateinit var binding : FragmentWithdrawalBinding
+    companion object{
+        const val TAG ="WithdrawalFragment"
+    }
+    private var _binding : FragmentWithdrawalBinding? = null
+    private val binding get() = _binding!!
     private lateinit var mainViewModel: MainActivityViewModel
-    var event: MainActivityEvent? = null
     private lateinit var context: Context
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
         this.context = context
-        if (context is MainActivityEvent) {
-            event = context
-            Log.d(TAG, "onAttach: 호출")
-
-        } else {
-            throw RuntimeException(
-                context.toString()
-                        + "must implement MainActivityEvent"
-            )
-        }
-    }
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-
     }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
-        binding = DataBindingUtil.inflate(inflater, R.layout.fragment_withdrawal, container, false)
+    ): View {
+        mainViewModel = ViewModelProvider(requireActivity())[MainActivityViewModel::class.java]
+        _binding = DataBindingUtil.inflate(inflater, R.layout.fragment_withdrawal, container, false)
+        binding.withdrawalViewModel = mainViewModel
+        binding.lifecycleOwner = this
 
         return binding.root
     }
@@ -66,22 +56,15 @@ class WithdrawalFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        init()
+        mainViewModel.accountWithdrawal.observe(viewLifecycleOwner){
+            val intent = Intent(activity, LoginActivity::class.java)
+            startActivity(intent)
+        }
         clickListener()
     }
 
-    fun init(){
-        mainViewModel = ViewModelProvider(requireActivity()).get(MainActivityViewModel::class.java)
-        binding.withdrawalViewModel = mainViewModel
-        binding.lifecycleOwner = this
 
-        mainViewModel.accountWithdrawal.observe(viewLifecycleOwner){
-            event?.logout()
-        }
-
-    }
-
-    fun clickListener(){
+    private fun clickListener(){
         binding.withdrawalAgree.setOnClickListener {
             if(binding.withdrawalCheckBox.isChecked){
                 showDialog()
@@ -91,13 +74,11 @@ class WithdrawalFragment : Fragment() {
         }
 
         binding.withdrawalDisagree.setOnClickListener {
-            event?.moveToProfile()
+            findNavController().navigate(R.id.profileFragment)
         }
-
-
     }
 
-    fun showDialog(){
+    private fun showDialog(){
         val dialog = Dialog(context)
 
         dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
@@ -117,7 +98,7 @@ class WithdrawalFragment : Fragment() {
         agreeButton.setOnClickListener{
             dialog.dismiss()
             //회원 탈퇴
-            var sharedPreferences = context.getSharedPreferences("userInfo", AppCompatActivity.MODE_PRIVATE)
+            val sharedPreferences = context.getSharedPreferences("userInfo", AppCompatActivity.MODE_PRIVATE)
             mainViewModel.withdrawal(sharedPreferences)
 
         }

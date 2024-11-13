@@ -20,8 +20,11 @@ import com.example.menupop.databinding.FragmentExchangeBinding
 
 
 class ExchangeFragment : Fragment() {
-    private var TAG = "ExchangeFragmentTAG"
-    lateinit var binding : FragmentExchangeBinding
+    companion object{
+        const val TAG = "ExchangeFragmentTAG"
+    }
+    private var _binding : FragmentExchangeBinding? = null
+    private val binding get() = _binding!!
     private lateinit var exchangeViewModel : ExchangeViewModel
     private lateinit var context : Context
     lateinit var currencyUnits : Array<String>
@@ -31,10 +34,18 @@ class ExchangeFragment : Fragment() {
         this.context = context
     }
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
+    override fun onCreateView(
+        inflater: LayoutInflater, container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View? {
+        exchangeViewModel = ViewModelProvider(this).get(ExchangeViewModel::class.java)
+        _binding =  DataBindingUtil.inflate(inflater, R.layout.fragment_exchange, container, false)
+        binding.exchangeRateViewModel = exchangeViewModel
+        binding.lifecycleOwner = this
 
+        return binding.root
     }
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
@@ -46,9 +57,7 @@ class ExchangeFragment : Fragment() {
 
     }
     fun init() {
-        exchangeViewModel = ViewModelProvider(this).get(ExchangeViewModel::class.java)
-        binding.exchangeRateViewModel = exchangeViewModel
-        binding.lifecycleOwner = this
+        (activity as AppCompatActivity).supportActionBar?.setDisplayHomeAsUpEnabled(false)
 
         currencyUnits = resources.getStringArray(R.array.currencies)
 
@@ -156,15 +165,9 @@ class ExchangeFragment : Fragment() {
         }
     }
 
-    override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View? {
-        binding =  DataBindingUtil.inflate(inflater, R.layout.fragment_exchange, container, false)
-
-        return binding.root
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
     }
-
-
 
 }

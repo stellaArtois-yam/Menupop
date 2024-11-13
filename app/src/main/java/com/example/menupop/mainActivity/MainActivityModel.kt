@@ -31,9 +31,9 @@ import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 import retrofit2.Retrofit
+import retrofit2.await
 import retrofit2.converter.gson.GsonConverterFactory
 import retrofit2.converter.scalars.ScalarsConverterFactory
-import retrofit2.http.Field
 import java.time.LocalDate
 import java.util.Calendar
 import java.util.concurrent.TimeUnit
@@ -109,26 +109,21 @@ class MainActivityModel(val application: Application) {
     }
 
 
-    fun getFoodPreference(identifier: Int, callback: (FoodPreferenceDataClass) -> Unit) {
-        Log.d(TAG, "getFoodPreference: 호출")
-        service.getFoodPreference(identifier).enqueue(object : Callback<FoodPreferenceDataClass> {
-            override fun onResponse(
-                call: Call<FoodPreferenceDataClass>,
-                response: Response<FoodPreferenceDataClass>
-            ) {
-                Log.d(TAG, "onResponse: ${response}")
-                if (response.isSuccessful) {
-                    callback(response.body()!!)
-                }
+    suspend fun getFoodPreference(identifier: Int): FoodPreferenceDataClass {
+        return try {
+            val response = service.getFoodPreference(identifier).await()
+            if (response.result == "success") {
+                response
+            } else {
+                Log.d(TAG, "Response not successful: $response")
+                FoodPreferenceDataClass("failed", arrayListOf())
             }
-
-            override fun onFailure(call: Call<FoodPreferenceDataClass>, t: Throwable) {
-                Log.d(TAG, "get food preference onFailure: ${t}")
-            }
-
-        })
-
+        } catch (e: Exception) {
+            Log.d(TAG, "getFoodPreference failed: ${e.message}")
+            FoodPreferenceDataClass(e.message!!, arrayListOf())
+        }
     }
+
 
 
     fun savePaymentHistory(ticketSaveModel: TicketSaveDTO, callback: (SimpleResultDTO) -> Unit) {
@@ -168,44 +163,32 @@ class MainActivityModel(val application: Application) {
     }
 
 
-    fun requestUserInformation(identifier: Int, callback: (UserInformationDTO) -> Unit) {
-        val call: Call<UserInformationDTO> = service.requestUserInformation(identifier)
-
-        call.enqueue(object : Callback<UserInformationDTO> {
-            override fun onResponse(
-                call: Call<UserInformationDTO>,
-                response: Response<UserInformationDTO>
-            ) {
-                if (response.isSuccessful) {
-                    Log.d(TAG, "onResponse: ${response.body()}")
-                    callback(response.body()!!)
-                } else {
-                    Log.d(TAG, "isNotSuccessful: ${response.body()}")
-                    callback(
-                        UserInformationDTO(
-                            "isNotSuccessful",
-                            null, null, null, null,
-                            0, 0, 0, 0,
-                            0, 0
-                        )
-                    )
-
-                }
-            }
-
-            override fun onFailure(call: Call<UserInformationDTO>, t: Throwable) {
-                Log.d(TAG, "request user info onFailure: ${t.message}")
-                callback(
-                    UserInformationDTO(
-                        t.message,
-                        null, null, null, null,
-                        0, 0, 0, 0,
-                        0, 0
-                    )
+    suspend fun requestUserInformation(identifier: Int): UserInformationDTO {
+        return try {
+            val response = service.requestUserInformation(identifier).await()
+            if (response.result == "success") {
+                Log.d(TAG, "onResponse: $response")
+                response
+            } else {
+                Log.d(TAG, "isNotSuccessful: $response")
+                UserInformationDTO(
+                    "isNotSuccessful",
+                    null, null, null, 0,
+                    0, 0, 0, 0,
+                    0
                 )
             }
-        })
+        } catch (e: Exception) {
+            Log.d(TAG, "request user info onFailure: ${e.message}")
+            UserInformationDTO(
+                e.message,
+                null, null, null, 0,
+                0, 0, 0, 0,
+                0
+            )
+        }
     }
+
 
     private val kakaopay = Retrofit.Builder()
         .baseUrl("https://kapi.kakao.com/")
@@ -547,6 +530,7 @@ class MainActivityModel(val application: Application) {
                     Log.d(TAG, "Ad was loaded.")
                 }
             })
+
     }
 
 

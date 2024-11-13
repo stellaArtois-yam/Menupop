@@ -2,7 +2,6 @@ package com.example.menupop.mainActivity.profile
 
 import android.app.Dialog
 import android.content.Context
-import android.content.SharedPreferences
 import android.os.Build
 import android.os.Bundle
 import android.util.Log
@@ -14,46 +13,36 @@ import android.view.Window
 import android.view.WindowManager
 import android.widget.Toast
 import androidx.annotation.RequiresApi
-import androidx.appcompat.app.AppCompatActivity
 
 import androidx.databinding.DataBindingUtil
-import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
+import androidx.navigation.fragment.findNavController
 import com.example.menupop.R
 import com.example.menupop.databinding.DialogPaymentRegularBinding
 import com.example.menupop.databinding.DialogPaymentRewardBinding
 import com.example.menupop.databinding.DialogSelectPaymentTypeBinding
 import com.example.menupop.databinding.FragmentTicketPurchaseBinding
-import com.example.menupop.mainActivity.MainActivityEvent
+import com.example.menupop.mainActivity.MainActivity
 import com.example.menupop.mainActivity.MainActivityViewModel
 
 class TicketPurchaseFragment : Fragment() {
-    val TAG = "TicketPurchaseFragment"
-    lateinit var binding: FragmentTicketPurchaseBinding
+    companion object{
+        const val TAG = "TicketPurchaseFragment"
+    }
+
+    private var _binding: FragmentTicketPurchaseBinding? = null
+    private val binding get() = _binding!!
     private lateinit var ticketPurchaseViewModel: MainActivityViewModel
-    var event: MainActivityEvent? = null
     private lateinit var context: Context
     var identifier : Int ?= null
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
         this.context = context
-        if (context is MainActivityEvent) {
-            event = context
-            Log.d(TAG, "onAttach: 호출")
-
-        } else {
-            throw RuntimeException(
-                context.toString()
-                        + "must implement MainActivityEvent"
-            )
-        }
-
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
         identifier = arguments?.getInt("identifier")
         Log.d(TAG, "Identifier: $identifier")
     }
@@ -61,9 +50,15 @@ class TicketPurchaseFragment : Fragment() {
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
-        binding =
+    ): View {
+        ticketPurchaseViewModel =
+            ViewModelProvider(requireActivity())[MainActivityViewModel::class.java]
+
+        _binding =
             DataBindingUtil.inflate(inflater, R.layout.fragment_ticket_purchase, container, false)
+        binding.ticketPurchaseViewModel = ticketPurchaseViewModel
+        binding.lifecycleOwner = this
+
         return binding.root
     }
 
@@ -77,22 +72,21 @@ class TicketPurchaseFragment : Fragment() {
     }
 
     fun init() {
-        ticketPurchaseViewModel =
-            ViewModelProvider(requireActivity()).get(MainActivityViewModel::class.java)
-        binding.ticketPurchaseViewModel = ticketPurchaseViewModel
-        binding.lifecycleOwner = this
 
-        ticketPurchaseViewModel.paymentReady.observe(viewLifecycleOwner, Observer {
-            if(it!=null){
-                event?.moveToWebView()
+        ticketPurchaseViewModel.paymentReady.observe(viewLifecycleOwner) {
+            if (it != null) {
+                findNavController().navigate(R.id.kakaoPayWebView)
             }
-        })
-
-
+        }
     }
 
     @RequiresApi(Build.VERSION_CODES.O)
     fun clickListener() {
+
+        (activity as MainActivity).binding.toolbar.setNavigationOnClickListener {
+            findNavController().navigateUp()  // 뒤로 가기
+        }
+
         binding.foodTicketPurchaseButton.setOnClickListener {
             Log.d(TAG, "haveRewarded: ${ticketPurchaseViewModel.userInformation.value!!.haveRewarded}")
             if(ticketPurchaseViewModel.userInformation.value!!.haveRewarded > 0){
@@ -100,9 +94,6 @@ class TicketPurchaseFragment : Fragment() {
             }else{
                 paymentRegularDialog()
             }
-
-
-
         }
 
         binding.translationTicketPurchaseButton.setOnClickListener {
@@ -112,10 +103,7 @@ class TicketPurchaseFragment : Fragment() {
             }else{
                 paymentRegularDialog()
             }
-
         }
-
-
     }
 
     @RequiresApi(Build.VERSION_CODES.O)
@@ -203,9 +191,6 @@ class TicketPurchaseFragment : Fragment() {
             Log.d(TAG, "paymentRegularDialog: ?!?!??")
 
         }
-
-
-
     }
 
     @RequiresApi(Build.VERSION_CODES.O)
@@ -229,25 +214,29 @@ class TicketPurchaseFragment : Fragment() {
         dialogReward.setContentView(dataBindingReward.root)
         dialogReward.show()
 
-        ticketPurchaseViewModel.isRewardExceeded.observe(viewLifecycleOwner, Observer {
-            if(it){
+        ticketPurchaseViewModel.isRewardExceeded.observe(viewLifecycleOwner) {
+            if (it) {
                 dataBindingReward.rewardTicketPurchaseWarning.visibility = View.VISIBLE
-            }else{
+            } else {
                 dataBindingReward.rewardTicketPurchaseWarning.visibility = View.GONE
             }
 
-        })
+        }
 
-        ticketPurchaseViewModel.changeTicket.observe(viewLifecycleOwner, Observer {
-            if(it == "success"){
+        ticketPurchaseViewModel.changeTicket.observe(viewLifecycleOwner) {
+            if (it == "success") {
                 dialogReward.dismiss()
-                event?.completePayment()
-            }else if(it == "failed"){
+                ticketPurchaseViewModel.setChangeTicket()
+                findNavController().navigate(R.id.profileFragment)
+
+            } else if (it == "failed") {
                 dialogReward.dismiss()
-                event?.completePayment()
-                Toast.makeText(requireContext(), "결제가 실패하였습니다. 다시 시도해주세요 :(", Toast.LENGTH_LONG).show()
+                ticketPurchaseViewModel.setChangeTicket()
+                findNavController().navigate(R.id.profileFragment)
+                Toast.makeText(requireContext(), "결제가 실패하였습니다. 다시 시도해주세요 :(", Toast.LENGTH_LONG)
+                    .show()
             }
-        })
+        }
 
 
         dataBindingReward.paymentRewardCancel.setOnClickListener {

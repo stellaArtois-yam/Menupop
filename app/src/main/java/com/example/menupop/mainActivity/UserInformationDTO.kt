@@ -1,13 +1,12 @@
 package com.example.menupop.mainActivity
 
-import android.graphics.drawable.Drawable
+import com.example.menupop.mainActivity.foodPreference.FoodPreference
 
 data class UserInformationDTO(
     var result : String?,
     var id : String?,
     var email : String?,
-    var favoriteFood : String?,
-    var unFavoriteFood : String?,
+    var foodPreference : ArrayList<FoodPreference>?,
     var foodTicket : Int,
     var translationTicket : Int,
     var freeTranslationTicket : Int,
@@ -15,3 +14,7 @@ data class UserInformationDTO(
     var dailyReward : Int,
     var haveRewarded : Int
 )
+
+
+//    var favoriteFood : String?,
+//    var unFavoriteFood : String?,

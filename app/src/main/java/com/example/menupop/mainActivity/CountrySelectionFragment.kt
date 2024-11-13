@@ -3,22 +3,27 @@ package com.example.menupop.mainActivity
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
+import androidx.navigation.fragment.findNavController
 import com.example.menupop.R
+import com.example.menupop.databinding.DialogTicketBottomBinding
 import com.example.menupop.databinding.FragmentCountrySelectionBinding
 import com.example.menupop.mainActivity.translation.CameraActivity
-import com.example.menupop.resetPassword.ResetPasswordFragmentEvent
+import com.google.android.material.bottomsheet.BottomSheetDialog
 
 class CountrySelectionFragment  : Fragment(){
-    private val TAG = "CountrySelectionFragment"
+    companion object {
+        const val TAG = "CountrySelectionFragment"
+    }
     private lateinit var context : Context
-    lateinit var binding : FragmentCountrySelectionBinding
+    private var _binding : FragmentCountrySelectionBinding? = null
+    private val binding get() = _binding!!
     private lateinit var mainViewModel : MainActivityViewModel
     override fun onAttach(context: Context) {
         super.onAttach(context)
@@ -28,28 +33,30 @@ class CountrySelectionFragment  : Fragment(){
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
-        binding =  DataBindingUtil.inflate(inflater, R.layout.fragment_country_selection, container, false)
-        mainViewModel = ViewModelProvider(requireActivity()).get(MainActivityViewModel::class.java)
+    ): View {
+        mainViewModel = ViewModelProvider(requireActivity())[MainActivityViewModel::class.java]
+        _binding =  DataBindingUtil.inflate(inflater, R.layout.fragment_country_selection, container, false)
         binding.mainActivityViewModel = mainViewModel
         binding.lifecycleOwner = this
-        // Inflate the layout for this fragment
+
         return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        (activity as AppCompatActivity).supportActionBar?.setDisplayHomeAsUpEnabled(false)
+
         mainViewModel.countrySelection.observe(viewLifecycleOwner){
-            Log.d(TAG, "onViewCreated: ${it}")
             val intent = Intent(context, CameraActivity::class.java)
             intent.putExtra("foodPreference",mainViewModel.foodPreferenceList.value?.foodList)
             intent.putExtra("country",it)
             startActivity(intent)
         }
         setListener()
+        observeData()
     }
-    fun setListener(){
+    private fun setListener(){
         binding.countrySelectionAmerica.setOnClickListener {
             mainViewModel.selectionCountry(binding.countrySelectionAmerica)
         }
@@ -68,5 +75,35 @@ class CountrySelectionFragment  : Fragment(){
         binding.countrySelectionJapan.setOnClickListener {
             mainViewModel.selectionCountry(binding.countrySelectionJapan)
         }
+    }
+
+    private fun observeData(){
+        if(!mainViewModel.checkingTranslationTicket()){
+            emptyTicketShowDialog()
+        }
+    }
+
+    private fun emptyTicketShowDialog() {
+        val bindingDialog: DialogTicketBottomBinding = DataBindingUtil.inflate(
+            LayoutInflater.from(context),
+            R.layout.dialog_ticket_bottom,
+            null,
+            false
+        )
+        bindingDialog.viewModel = mainViewModel
+        val bottomSheetDialog = BottomSheetDialog(context)
+        bottomSheetDialog.setContentView(bindingDialog.root)
+
+        bindingDialog.dialogTicketBottomDown.setOnClickListener {
+            findNavController().navigateUp()
+            bottomSheetDialog.dismiss()
+        }
+
+        bindingDialog.dialogTicketBottomButton.setOnClickListener {
+            findNavController().navigate(R.id.ticketPurchaseFragment)
+            bottomSheetDialog.dismiss()
+        }
+
+        bottomSheetDialog.show()
     }
 }
