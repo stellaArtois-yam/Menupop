@@ -22,14 +22,13 @@ class ResetPasswordActivity : AppCompatActivity(),ResetPasswordFragmentEvent {
         init()
     }
     fun init() {
-        Log.d(TAG, "init: 호출")
 
         checkIdFragment = ResetPasswordCheckIdFragment()
         verifyEamilFragment = ResetPasswordEmailFragment()
         conformFragment = ResetPasswordConfirmFragment()
 
         binding = DataBindingUtil.setContentView(this, R.layout.activity_reset_password)
-        resetPasswordViewModel = ViewModelProvider(this).get(ResetPasswordViewModel::class.java)
+        resetPasswordViewModel = ViewModelProvider(this)[ResetPasswordViewModel::class.java]
         binding.resetPasswordViewModel = resetPasswordViewModel
         binding.lifecycleOwner = this
 

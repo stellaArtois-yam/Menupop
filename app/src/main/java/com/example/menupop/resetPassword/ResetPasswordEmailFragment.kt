@@ -13,15 +13,19 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.core.widget.addTextChangedListener
 import androidx.databinding.DataBindingUtil
-import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.lifecycleScope
 import com.example.menupop.R
 import com.example.menupop.databinding.FragmentResetPasswordEmailBinding
+import kotlinx.coroutines.launch
 
 
 class ResetPasswordEmailFragment : Fragment() {
-    private var TAG = "ResetPasswordEamilFragment"
-    lateinit var binding : FragmentResetPasswordEmailBinding
+    companion object{
+        const val TAG = "ResetPasswordEmailFragment"
+    }
+    private var _binding : FragmentResetPasswordEmailBinding? = null
+    private val binding get() = _binding!!
     private lateinit var resetPasswordViewModel: ResetPasswordViewModel
     private var event: ResetPasswordFragmentEvent? = null
     private var context : Context?=null
@@ -39,51 +43,50 @@ class ResetPasswordEmailFragment : Fragment() {
             )
         }
     }
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-    }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
-        binding =  DataBindingUtil.inflate(inflater, R.layout.fragment_reset_password_email, container, false)
-        // Inflate the layout for this fragment
+    ): View {
+        resetPasswordViewModel = ViewModelProvider(requireActivity())[ResetPasswordViewModel::class.java]
+        _binding =  DataBindingUtil.inflate(inflater, R.layout.fragment_reset_password_email, container, false)
+        binding.resetPasswordViewModel = resetPasswordViewModel
+        binding.lifecycleOwner = this
+
         return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        init()
+        binding.appbarMenu.findViewById<TextView>(R.id.appbar_status).text = "비밀번호 재설정"
+
+        setObserver()
 
         setListener()
 
     }
 
-    fun init() {
-        resetPasswordViewModel = ViewModelProvider(requireActivity()).get(ResetPasswordViewModel::class.java)
-        binding.resetPasswordViewModel = resetPasswordViewModel
-        binding.lifecycleOwner = this
-        binding.appbarMenu.findViewById<TextView>(R.id.appbar_status).text = "비밀번호 재설정"
+    private fun setObserver() {
 
-        resetPasswordViewModel.checkEmailForm.observe(viewLifecycleOwner, Observer { result ->
+        resetPasswordViewModel.checkEmailForm.observe(viewLifecycleOwner) { result ->
             when(result){
                 true -> binding.emailWarningText.visibility = View.GONE
                 else -> binding.emailWarningText.visibility = View.VISIBLE
             }
-        })
+        }
 
-        resetPasswordViewModel.remainingTime.observe(viewLifecycleOwner, Observer {time ->
-            binding.passwordResetEmailCertificationWarningText.text = "시간 제한 : ${time}"
+        resetPasswordViewModel.remainingTime.observe(viewLifecycleOwner) {time ->
+            binding.passwordResetEmailCertificationWarningText.text = "시간 제한 : $time"
 
             if(time == "00:00"){
                 binding.certificationButton.text = "재인증"
                 binding.passwordResetEmailCertificationWarningText.text = "인증번호가 만료되었습니다."
             }
 
-        })
-        resetPasswordViewModel.verifycationCompleted.observe(viewLifecycleOwner, Observer { result ->
+        }
+
+        resetPasswordViewModel.verifycationCompleted.observe(viewLifecycleOwner){ result ->
             when(result){
                 true -> {
                     resetPasswordViewModel.stopTimer()
@@ -95,10 +98,10 @@ class ResetPasswordEmailFragment : Fragment() {
                 }
                 else -> Toast.makeText(context,"인증번호를 확인해주세요.",Toast.LENGTH_SHORT).show()
             }
-        })
+        }
 
-        resetPasswordViewModel.verifiedEmail.observe(viewLifecycleOwner, Observer { result ->
-            val email = "${binding.passwordResetEmailId.text}@${binding.passwordResetEmailSelection.selectedItem.toString()}"
+        resetPasswordViewModel.verifiedEmail.observe(viewLifecycleOwner) { result ->
+            val email = "${binding.passwordResetEmailId.text}@${binding.passwordResetEmailSelection.selectedItem}"
 
             when(result){
                 false -> {
@@ -107,17 +110,19 @@ class ResetPasswordEmailFragment : Fragment() {
                 }
                 else -> {
                     binding.emailWarningText.visibility = View.GONE
-                    resetPasswordViewModel.sendVerifyCode(email)
+
+                    lifecycleScope.launch {
+                        resetPasswordViewModel.sendVerifyCode(email)
+                    }
                     resetPasswordViewModel.startTimer()
                     binding.certificationButton.text = "확인"
                     binding.passwordResetEmailCertificationWarningText.visibility = View.VISIBLE
                 }
             }
-
-        })
+        }
 
     }
-    fun setListener(){
+    private fun setListener(){
         binding.passwordResetEmailId.addTextChangedListener{
 
             val selectedItem = binding.passwordResetEmailSelection.selectedItem.toString()
@@ -157,7 +162,7 @@ class ResetPasswordEmailFragment : Fragment() {
                 else -> {
                     if (binding.certificationButton.text == "인증번호" || binding.certificationButton.text == "재인증") {
                         val email =
-                            "${binding.passwordResetEmailId.text}@${binding.passwordResetEmailSelection.selectedItem.toString()}"
+                            "${binding.passwordResetEmailId.text}@${binding.passwordResetEmailSelection.selectedItem}"
                         resetPasswordViewModel.checkEmail(email)
                     } else {
                         val verifyCode = binding.certificationNumber.text.toString()

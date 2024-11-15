@@ -1,21 +1,22 @@
 package com.example.menupop.resetPassword
 
 import android.os.CountDownTimer
-import android.util.Log
 import android.util.Patterns
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import com.example.menupop.SimpleResultDTO
+import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.launch
 import java.util.concurrent.TimeUnit
 import java.util.regex.Pattern
 
 class ResetPasswordViewModel : ViewModel() {
-    private val TAG = "ResetPasswordViewModel"
+    companion object{
+        const val TAG = "ResetPasswordViewModel"
+    }
+
     private var _id = MutableLiveData<String>()
-    private val resetPasswordModel = ResetPasswordModel() //뷰모델
-    private var callback: ((String) -> Unit) ?= null // 콜백
-    private var callbackList : ((SimpleResultDTO) -> Unit) ?= null
+    private val resetPasswordModel = ResetPasswordModel()
 
     var verifiedEmail = MutableLiveData<Boolean>()
 
@@ -30,23 +31,26 @@ class ResetPasswordViewModel : ViewModel() {
 
     private var verifyCode : String = ""
 
-    val remainingTime = MutableLiveData<String>() //타이머 시간
+    private val _remainingTime = MutableLiveData<String>() //타이머 시간
+    val remainingTime : LiveData<String>
+        get() = _remainingTime
 
     private var timer: CountDownTimer? = null // 타이머 객체
 
     val verifycationCompleted = MutableLiveData<Boolean>() //인증 완료
-    private val _passwordError = MutableLiveData<String>()
-    val passwordError : LiveData<String>
+    private val _passwordError = MutableLiveData<String?>()
+    val passwordError : LiveData<String?>
         get() = _passwordError
 
-    private val _confirmPasswordError = MutableLiveData<String>()
-    val confirmPasswordError : LiveData<String>
+    private val _confirmPasswordError = MutableLiveData<String?>()
+    val confirmPasswordError : LiveData<String?>
         get() = _confirmPasswordError
 
-    var lastCheck = false
+    private var lastCheck = false
 
-    val conformResetPassword = MutableLiveData<Boolean>()
-
+    private val _conformResetPassword = MutableLiveData<Boolean>()
+    val conformResetPassword : LiveData<Boolean>
+        get() =_conformResetPassword
 
     fun startTimer() {
 
@@ -57,11 +61,11 @@ class ResetPasswordViewModel : ViewModel() {
 
                 val minutes = TimeUnit.MILLISECONDS.toMinutes(millisUntilFinished)
                 val seconds = TimeUnit.MILLISECONDS.toSeconds(millisUntilFinished) % 60
-                remainingTime.value = String.format("%02d:%02d", minutes, seconds)
+                _remainingTime.value = String.format("%02d:%02d", minutes, seconds)
             }
 
             override fun onFinish() {
-                remainingTime.value = "00:00"
+                _remainingTime.value = "00:00"
             }
         }
 
@@ -77,8 +81,9 @@ class ResetPasswordViewModel : ViewModel() {
         super.onCleared()
     }
 
-    fun checkId(id : String){
-        callbackList = { response ->
+    suspend fun checkId(id : String){
+        viewModelScope.launch {
+            val response = resetPasswordModel.checkId(id)
 
             when(response.result){
                 "exist" -> {
@@ -88,14 +93,14 @@ class ResetPasswordViewModel : ViewModel() {
                 else ->  _checkIdResult.value = false
             }
         }
-        resetPasswordModel.checkId(id,callbackList!!)
+
     }
 
-    fun sendVerifyCode(email :String){
-        callback = { result ->
-            verifyCode = result
+    suspend fun sendVerifyCode(email :String){
+        viewModelScope.launch{
+            val response =  resetPasswordModel.sendVerifyCode(email)
+            verifyCode = response
         }
-        resetPasswordModel.sendVerifyCode(email,callback!!)
     }
 
     fun checkVerifyCode(verifyCode : String) {
@@ -104,10 +109,10 @@ class ResetPasswordViewModel : ViewModel() {
     }
 
     fun checkEmail(email:String){
-        callback = {response ->
+        viewModelScope.launch {
+            val response = resetPasswordModel.checkEmail(_id.value.toString(), email)
             verifiedEmail.value = response == "확인"
         }
-        resetPasswordModel.checkEamil(_id.value.toString(),email,callback!!)
     }
 
     fun checkEmailForm(email:String,emailType: String){
@@ -117,7 +122,7 @@ class ResetPasswordViewModel : ViewModel() {
         _checkEmailForm.value =pattern.matcher(email).matches()
     }
 
-    fun validatePassword(password: String): Boolean {
+    private fun validatePassword(password: String): Boolean {
         val digitPattern = ".*\\d.*"
         val letterPattern = ".*[a-zA-Z].*"
         val specialCharPattern = ".*[@#\$%^&+=].*"
@@ -132,7 +137,7 @@ class ResetPasswordViewModel : ViewModel() {
         return hasMinimumLength && count >= 2
     }
 
-    fun checkPasswordsMatch(password: String, confirmPassword: String): Boolean {
+    private fun checkPasswordsMatch(password: String, confirmPassword: String): Boolean {
         return password == confirmPassword
     }
 
@@ -163,11 +168,12 @@ class ResetPasswordViewModel : ViewModel() {
     }
 
     fun resetPassword(password : String){
-        callback = {result ->
-
-            conformResetPassword.value = result == "완료"
+        viewModelScope.launch {
+            when(resetPasswordModel.resetPassword(_id.value.toString(),password)){
+                "success" -> _conformResetPassword.value = true
+                else -> _conformResetPassword.value = false
+            }
         }
-        resetPasswordModel.resetPassword(_id.value.toString(),password,callback!!)
     }
 
 }

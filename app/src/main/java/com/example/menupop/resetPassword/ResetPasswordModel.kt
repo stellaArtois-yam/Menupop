@@ -6,17 +6,18 @@ import com.example.menupop.RetrofitService
 import com.example.menupop.SimpleResultDTO
 import com.google.gson.Gson
 import com.google.gson.GsonBuilder
-import retrofit2.Call
-import retrofit2.Callback
-import retrofit2.Response
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import retrofit2.converter.scalars.ScalarsConverterFactory
 
 class ResetPasswordModel {
-    val TAG = "ResetPasswordModel"
+    companion object{
+        const val TAG = "ResetPasswordModel"
+    }
 
-    val gson: Gson = GsonBuilder()
+    private val gson: Gson = GsonBuilder()
         .setLenient()
         .create()
 
@@ -29,83 +30,65 @@ class ResetPasswordModel {
     private val service = retrofit.create(RetrofitService::class.java)
 
 
-    fun checkId(id:String,callback: (SimpleResultDTO) -> Unit){
-        service.checkDuplicateId(id).enqueue(object : Callback<SimpleResultDTO>{
-            override fun onResponse(call: Call<SimpleResultDTO>, response: Response<SimpleResultDTO>) {
-                if(response.isSuccessful && response.body() != null) {
-                    callback(response.body()!!)
-                    Log.d(TAG, "onResponse: ${response.body()}")
-
+    suspend fun checkId(id:String) : SimpleResultDTO{
+        return withContext(Dispatchers.IO){
+            try{
+                val response = service.checkDuplicateId(id)
+                if(response.isSuccessful){
+                    response.body()!!
                 }else{
-                    callback(SimpleResultDTO("ServerException"))
+                    SimpleResultDTO("error : ${response.code()}")
                 }
+            }catch (e : Exception){
+               SimpleResultDTO("error : ${e.message}")
             }
+        }
 
-            override fun onFailure(call: Call<SimpleResultDTO>, t: Throwable) {
-                callback(SimpleResultDTO("ServerException"))
-            }
-
-        })
 
     }
-    fun checkEamil(id:String,email:String,callback: (String) -> Unit){
-
-        service.checkEmail(email,id).enqueue(object : Callback<String>{
-            override fun onResponse(call: Call<String>, response: Response<String>) {
-                Log.d(TAG, "onResponse: ${response}")
-
-                if(response.isSuccessful && response.body() != null){
-                    callback(response.body().toString())
+    suspend fun checkEmail(id:String,email:String) : String{
+        return withContext(Dispatchers.IO){
+            try{
+                val response = service.checkEmail(email, id)
+                if(response.isSuccessful){
+                    response.body()!!
+                }else{
+                    response.code().toString()
                 }
+            }catch (e : Exception){
+                e.message!!
             }
-
-            override fun onFailure(call: Call<String>, t: Throwable) {
-                Log.d(TAG, "onFailure: ${t}")
-                callback("Exception")
-            }
-
-        })
+        }
     }
-    fun sendVerifyCode(email: String,callback: (String) -> Unit){
-
-        service.sendEmailVerifyCode(email).enqueue(object : Callback<String>{
-            override fun onResponse(call: Call<String>, response: Response<String>) {
-                if (response.isSuccessful && response.body() != null){
-                    callback(response.body().toString())
-                    Log.d(TAG, "onResponse: ${response}")
-
-                } else{
-                    callback("Exception")
+    suspend fun sendVerifyCode(email: String) : String{
+        return withContext(Dispatchers.IO) {
+            try {
+                val response = service.sendEmailVerifyCode(email)
+                if(response.isSuccessful){
+                    response.body()!!
+                }else{
+                    response.code().toString()
                 }
+            } catch (e: Exception) {
+                "onFailure: ${e.message}"
             }
-
-            override fun onFailure(call: Call<String>, t: Throwable) {
-                callback("Exception")
-                Log.d(TAG, "onFailure: ${t}")
-            }
-
-        })
+        }
     }
 
-    fun resetPassword(id:String,password:String,callback: (String) -> Unit){
-
-        service.resetPassword(id,password).enqueue(object : Callback<String>{
-            override fun onResponse(call: Call<String>, response: Response<String>) {
-                Log.d(TAG, "onResponse: ${response}")
-                if(response.isSuccessful && response.body() != null){
-                    callback("완료")
-
-                } else{
-                    callback("Exception")
+    suspend fun resetPassword(id:String,password:String) :String{
+        return withContext(Dispatchers.IO){
+            try {
+                val response = service.resetPassword(id, password)
+                Log.d(TAG, "resetPassword: ${response.body()}")
+                if(response.isSuccessful){
+                    response.body()!!
+                }else{
+                    response.code().toString()
                 }
+            }catch (e :Exception){
+                "onFailure: ${e.message}"
             }
-
-            override fun onFailure(call: Call<String>, t: Throwable) {
-                callback("Exception")
-                Log.d(TAG, "onFailure: ${t}")
-            }
-
-        })
-
+        }
     }
+
 }

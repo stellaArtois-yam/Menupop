@@ -1,7 +1,6 @@
 package com.example.menupop.findId
 
 import android.content.Context
-import android.graphics.Color
 import android.os.Bundle
 import android.util.Log
 import androidx.fragment.app.Fragment
@@ -11,14 +10,14 @@ import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.databinding.DataBindingUtil
-import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import com.example.menupop.R
 import com.example.menupop.databinding.FragmentFindIdResultBinding
 
 class FindIdResultFragment : Fragment() {
     val TAG = "FindIdResultFragment"
-    lateinit var binding : FragmentFindIdResultBinding
+    private var _binding : FragmentFindIdResultBinding? = null
+    private val binding get() = _binding!!
     private lateinit var findIdViewModel: FindIdViewModel
     var event: FindIdFragmentEvent? = null
     private lateinit var context : Context
@@ -37,16 +36,14 @@ class FindIdResultFragment : Fragment() {
         }
     }
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-
-    }
-
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
-        binding = DataBindingUtil.inflate(inflater, R.layout.fragment_find_id_result, container, false)
+    ): View {
+        findIdViewModel = ViewModelProvider(requireActivity())[FindIdViewModel::class.java]
+        _binding = DataBindingUtil.inflate(inflater, R.layout.fragment_find_id_result, container, false)
+        binding.findIdViewModel = findIdViewModel
+        binding.lifecycleOwner = this
 
         return binding.root
     }
@@ -59,14 +56,10 @@ class FindIdResultFragment : Fragment() {
     }
 
     fun init(){
-        findIdViewModel = ViewModelProvider(requireActivity()).get(FindIdViewModel::class.java)
-        binding.findIdViewModel = findIdViewModel
-        binding.lifecycleOwner = this
 
         binding.appbarMenu.findViewById<TextView>(R.id.appbar_status).text = "아이디 확인"
 
-
-        findIdViewModel.userIdExistence.observe(viewLifecycleOwner, Observer{ result ->
+        findIdViewModel.userIdExistence.observe(viewLifecycleOwner){ result ->
             Log.d(TAG, "findId Result: ${result.result} ${result.id}")
 
             if(result.result == "exist"){
@@ -75,14 +68,11 @@ class FindIdResultFragment : Fragment() {
                 binding.findIdResultTextBottom.visibility = View.GONE
                 binding.findIdResultInformation.visibility = View.GONE
             }
-
-        })
+        }
     }
 
-
-
-    fun setListener(){
-        binding.findIdResultButton.setOnClickListener{
+    private fun setListener() {
+        binding.findIdResultButton.setOnClickListener {
             event?.finishFindId()
         }
         binding.appbarMenu.findViewById<ImageView>(R.id.appbar_back).setOnClickListener {
@@ -90,5 +80,8 @@ class FindIdResultFragment : Fragment() {
         }
     }
 
-
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
+    }
 }

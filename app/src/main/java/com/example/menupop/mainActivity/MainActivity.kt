@@ -113,23 +113,26 @@ class MainActivity : AppCompatActivity() {
 
     private fun init() {
         mainActivityViewModel.scheduleMidnightWork(application)
-//
+
         mainActivityViewModel.isLoaded.observe(this) {
+            Log.d(TAG, "init isLoaded: $it")
             if (it.equals("success")) {
                 //번역에 성공해서 번역 티켓을 사용해야한다
                 if (checkingTranslation) {
                     //사용자에게 무료 번역 티켓이 존재
-                    if (mainActivityViewModel.userInformation.value!!.freeTranslationTicket > 0) {
-                        //"free_transaltion_ticket" 타입의 티켓을 업데이트 한다
-                        mainActivityViewModel.updateTicketQuantity(
-                            ticketType = "free_translation_ticket",
-                            operator = "-",
-                            quantity = 1
-                        )
+                    lifecycleScope.launch {
+                        if (mainActivityViewModel.userInformation.value!!.freeTranslationTicket > 0) {
+                            //"free_transaltion_ticket" 타입의 티켓을 업데이트 한다
+                            mainActivityViewModel.updateTicketQuantity(
+                                ticketType = "free_translation_ticket",
+                                operator = "-",
+                                quantity = 1
+                            )
 
-                    } else {
-                        //없으면 ticket을 업데이트 한다
-                        mainActivityViewModel.updateTicketQuantity("translation_ticket", "-", 1)
+                        } else {
+                            //없으면 ticket을 업데이트 한다
+                            mainActivityViewModel.updateTicketQuantity("translation_ticket", "-", 1)
+                        }
                     }
                 }
 
@@ -143,18 +146,18 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
-        mainActivityViewModel.rewardedAd.observe(this) {
-
-            if (it != null) {
-                it.show(this) { rewardItem ->
-                    val rewardAmount = rewardItem.amount
-                    val rewardType = rewardItem.type
-                    Log.d(TAG, "User earned the reward. $rewardAmount, $rewardType")
-                    mainActivityViewModel.rewardedSuccess()
-                }
-                loadingDialog.dismiss()
-            }
-        }
+//        mainActivityViewModel.rewardedAd.observe(this) {
+//
+//            if (it != null) {
+//                it.show(this) { rewardItem ->
+//                    val rewardAmount = rewardItem.amount
+//                    val rewardType = rewardItem.type
+//                    Log.d(TAG, "User earned the reward. $rewardAmount, $rewardType")
+//                    mainActivityViewModel.rewardedSuccess()
+//                }
+//                loadingDialog.dismiss()
+//            }
+//        }
 
         this.onBackPressedDispatcher.addCallback(this, callback)
 

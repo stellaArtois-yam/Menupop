@@ -19,11 +19,13 @@ import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import com.example.menupop.R
 import com.example.menupop.databinding.FragmentWithdrawalBinding
 import com.example.menupop.login.LoginActivity
 import com.example.menupop.mainActivity.MainActivityViewModel
+import kotlinx.coroutines.launch
 
 @RequiresApi(Build.VERSION_CODES.O)
 
@@ -99,8 +101,9 @@ class WithdrawalFragment : Fragment() {
             dialog.dismiss()
             //회원 탈퇴
             val sharedPreferences = context.getSharedPreferences("userInfo", AppCompatActivity.MODE_PRIVATE)
-            mainViewModel.withdrawal(sharedPreferences)
-
+            lifecycleScope.launch {
+                mainViewModel.withdrawal(sharedPreferences)
+            }
         }
         val disagreeButton = dialog.findViewById<Button>(R.id.dialog_two_button_disagree)
         disagreeButton.text = "더 써볼래요"

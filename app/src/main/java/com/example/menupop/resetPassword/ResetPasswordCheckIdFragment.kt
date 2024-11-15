@@ -14,8 +14,10 @@ import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.lifecycleScope
 import com.example.menupop.R
 import com.example.menupop.databinding.FragmentResetPasswordCheckIdBinding
+import kotlinx.coroutines.launch
 
 class ResetPasswordCheckIdFragment : Fragment() {
     private var TAG = "ResetPasswordCheckIdFragment"
@@ -41,7 +43,7 @@ class ResetPasswordCheckIdFragment : Fragment() {
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
         binding =  DataBindingUtil.inflate(inflater, R.layout.fragment_reset_password_check_id, container, false)
         return binding.root
     }
@@ -60,21 +62,25 @@ class ResetPasswordCheckIdFragment : Fragment() {
         binding.resetPasswordViewModel = resetPasswordViewModel
         binding.lifecycleOwner = this
         
-        resetPasswordViewModel.checkIdResult.observe(viewLifecycleOwner, Observer { result ->
+        resetPasswordViewModel.checkIdResult.observe(viewLifecycleOwner) { result ->
             when(result){
                 true ->  event?.existId()
                 else -> binding.passwordResetCheckIdWarning.visibility = View.VISIBLE
             }
-        })
+        }
     }
 
-    fun setListener(){
+    private fun setListener(){
         binding.passwordResetIdCheckButton.setOnClickListener {
             var id = binding.passwordResetIdCheckEdittext.text.toString().trim()
 
             when(id.isEmpty()){
                 true -> Toast.makeText(context,"아이디를 입력해주세요.",Toast.LENGTH_SHORT).show()
-                else ->  resetPasswordViewModel.checkId(id)
+                else ->  {
+                    lifecycleScope.launch{
+                        resetPasswordViewModel.checkId(id)
+                    }
+                }
             }
         }
 

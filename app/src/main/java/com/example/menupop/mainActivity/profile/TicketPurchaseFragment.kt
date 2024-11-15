@@ -34,17 +34,10 @@ class TicketPurchaseFragment : Fragment() {
     private val binding get() = _binding!!
     private lateinit var ticketPurchaseViewModel: MainActivityViewModel
     private lateinit var context: Context
-    var identifier : Int ?= null
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
         this.context = context
-    }
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        identifier = arguments?.getInt("identifier")
-        Log.d(TAG, "Identifier: $identifier")
     }
 
     override fun onCreateView(
@@ -188,7 +181,6 @@ class TicketPurchaseFragment : Fragment() {
             //카카오페이 결제 요청
             dialogRegular.dismiss()
             ticketPurchaseViewModel.createPaymentRequest()
-            Log.d(TAG, "paymentRegularDialog: ?!?!??")
 
         }
     }
@@ -196,7 +188,7 @@ class TicketPurchaseFragment : Fragment() {
     @RequiresApi(Build.VERSION_CODES.O)
     fun paymentRewardDialog() {
         Log.d(TAG, "paymentRewardDialog start");
-        val dialogReward = Dialog(context)
+        val dialogReward = Dialog(this.context)
 
         val dataBindingReward: DialogPaymentRewardBinding = DataBindingUtil.inflate(
             LayoutInflater.from(context),
@@ -207,7 +199,6 @@ class TicketPurchaseFragment : Fragment() {
 
         dataBindingReward.ticketPurchaseViewModel = ticketPurchaseViewModel
         dataBindingReward.lifecycleOwner = this
-
 
 
         dialogReward.requestWindowFeature(Window.FEATURE_NO_TITLE)
@@ -264,7 +255,7 @@ class TicketPurchaseFragment : Fragment() {
         }
 
         dataBindingReward.rewardTicketPurchaseButton.setOnClickListener {
-            ticketPurchaseViewModel.rewardPayment(identifier!!)
+            ticketPurchaseViewModel.rewardPayment()
 
         }
     }

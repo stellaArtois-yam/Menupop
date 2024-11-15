@@ -3,12 +3,8 @@ package com.example.menupop.signup
 import android.app.Dialog
 import android.content.Intent
 import android.graphics.Color
-import android.os.Build
 import android.os.Bundle
-import android.os.Handler
-import android.os.Looper
 import android.util.Log
-import android.view.LayoutInflater
 import android.view.View
 import android.view.Window
 import android.view.WindowManager
@@ -17,33 +13,31 @@ import android.widget.Button
 import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
-import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.widget.addTextChangedListener
 import androidx.databinding.DataBindingUtil
-import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import com.example.menupop.R
 import com.example.menupop.databinding.ActivitySignupBinding
-import com.example.menupop.databinding.DialogTicketBottomBinding
-import com.example.menupop.databinding.DialogWarningBinding
 import com.example.menupop.login.LoginActivity
-import com.google.android.material.bottomsheet.BottomSheetDialog
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 class SignupActivity : AppCompatActivity() {
-
-    val TAG = "SignupActivity"
+    companion object{
+        const val TAG = "SignupActivity"
+    }
 
     private lateinit var signupViewModel: SignupViewModel
+    private var _binding : ActivitySignupBinding? = null
+    private val binding get() = _binding!!
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        val binding: ActivitySignupBinding = DataBindingUtil.setContentView(this, R.layout.activity_signup)
-
-        signupViewModel = ViewModelProvider(this).get(SignupViewModel::class.java)
+        signupViewModel = ViewModelProvider(this)[SignupViewModel::class.java]
+        _binding = DataBindingUtil.setContentView(this, R.layout.activity_signup)
         binding.viewModel = signupViewModel
         binding.lifecycleOwner = this
 
@@ -54,31 +48,25 @@ class SignupActivity : AppCompatActivity() {
         }
 
 
-
-        /**
-         * 1. edittext의 아이디 입력 감지
-         */
         binding.signupIdEdittext.addTextChangedListener {
             Log.d(TAG, "it: ${it.toString()}")
             signupViewModel.onIdTextChanged(it.toString())
         }
 
-        /**
-         * 2. 아이디 유효성 검사 관찰
-         */
-        signupViewModel.isValidId.observe(this, Observer { idValidate ->
+
+        signupViewModel.isValidId.observe(this){ idValidate ->
             if (idValidate == false) {
                 binding.signupIdWarning.visibility = View.VISIBLE
                 binding.signupIdWarning.setTextColor(Color.RED)
             } else {
                 binding.signupIdWarning.visibility = View.GONE
             }
-        })
+        }
 
-        binding.signupPersonalCheckbox.setOnCheckedChangeListener { compoundButton, isCheck ->
+        binding.signupPersonalCheckbox.setOnCheckedChangeListener { _, isCheck ->
             signupViewModel.personalCheckBoxChecked(isCheck)
         }
-        binding.signupMarketingCheckbox.setOnCheckedChangeListener { compoundButton, isCheck ->
+        binding.signupMarketingCheckbox.setOnCheckedChangeListener { _, isCheck ->
             signupViewModel.marketingCheckBoxChecked(isCheck)
         }
 
@@ -89,7 +77,7 @@ class SignupActivity : AppCompatActivity() {
             //중복확인을 안한 상태
             if (binding.signupIdDuplicationButton.text.equals("중복확인")) {
 
-                var id = binding.signupIdEdittext.text.toString().trim()
+                val id = binding.signupIdEdittext.text.toString().trim()
 
                 if (id.isEmpty()) {
                     binding.signupIdWarning.visibility = View.VISIBLE
@@ -117,7 +105,7 @@ class SignupActivity : AppCompatActivity() {
         /**
          * 중복검사 조회
          */
-        signupViewModel.isIdDuplication.observe(this, Observer { isDuplicate ->
+        signupViewModel.isIdDuplication.observe(this) { isDuplicate ->
 
             if (isDuplicate) {
                 binding.signupIdWarning.visibility = View.VISIBLE
@@ -131,7 +119,7 @@ class SignupActivity : AppCompatActivity() {
                 binding.signupIdEdittext.isClickable = false
                 binding.signupIdDuplicationButton.text = "재입력"
             }
-        })
+        }
 
         /**
          * 1. 비밀번호 입력 감지
@@ -209,7 +197,7 @@ class SignupActivity : AppCompatActivity() {
         /**
          * 3. 이메일 유효성 관찰
          */
-        signupViewModel.checkEmailForm.observe(this, Observer {valid->
+        signupViewModel.checkEmailForm.observe(this) {valid->
 
             if (valid) {
                 binding.signupEmailWarning.visibility = View.GONE
@@ -218,7 +206,7 @@ class SignupActivity : AppCompatActivity() {
                 binding.signupEmailWarning.setTextColor(Color.RED)
                 binding.signupEmailWarning.visibility = View.VISIBLE
             }
-        })
+        }
 
         binding.signupCheckProvideInformation.setOnClickListener {
             showInformationDialog("personal")
@@ -255,7 +243,7 @@ class SignupActivity : AppCompatActivity() {
 
         }
 
-        signupViewModel.isEmailExistence.observe(this, Observer {exist ->
+        signupViewModel.isEmailExistence.observe(this) {exist ->
             if(!exist){
                 binding.signupEmailWarning.visibility = View.GONE
 
@@ -273,19 +261,18 @@ class SignupActivity : AppCompatActivity() {
                 binding.signupEmailWarning.visibility = View.VISIBLE
                 binding.signupEmailWarning.setTextColor(Color.RED)
             }
-        })
+        }
 
-        signupViewModel.isTimeExpired.observe(this, Observer {
-
+        signupViewModel.isTimeExpired.observe(this) {
             if (it) {
                 Log.d(TAG, "timer 종료")
                 binding.signupCertificationButton.text = "재인증"
                 binding.signupSubmitButton.isEnabled = false
             }
-        })
+        }
 
 
-        signupViewModel.verifyCompleted.observe(this, Observer { result ->
+        signupViewModel.verifyCompleted.observe(this) { result ->
             if (result) {
                 signupViewModel.stopTimer()
                 binding.signupCertificationEdittext.isEnabled = false
@@ -295,7 +282,7 @@ class SignupActivity : AppCompatActivity() {
             }else{
                 showCustomDialog("인증번호 불일치", "인증번호가 일치하지 않습니다. \n다시 입력해주세요.", false)
             }
-        })
+        }
 
         // 가입 버튼 리스너 설정
         binding.signupSubmitButton.setOnClickListener {
@@ -309,7 +296,11 @@ class SignupActivity : AppCompatActivity() {
                 val email = "${binding.signupEmailIdEdittext.text.toString().trim()}@${binding.signupEmailSelection.selectedItem}"
                 val identifier = id.hashCode()
                 if(signupViewModel.checkBoxChecked()){
-                    signupViewModel.sendUserInformation(id, password, email, identifier)
+
+                    lifecycleScope.launch{
+                        signupViewModel.sendUserInformation(id, password, email, identifier)
+                    }
+
                 }else{
                     Toast.makeText(this, "약관에 동의 해주세요.",Toast.LENGTH_LONG).show()
                 }
@@ -321,13 +312,12 @@ class SignupActivity : AppCompatActivity() {
             }
         }
 
-        signupViewModel.saveResult.observe(this, Observer {result->
+        signupViewModel.saveResult.observe(this) {result->
             when(result){
                 true -> showCustomDialog("회원가입 완료", "반갑습니다 :)", true)
                 else -> showCustomDialog("회원가입 실패", "다시 시도해주세요 :(", false)
             }
-
-        })
+        }
     }
     private fun showCustomDialog(title : String, content : String, success : Boolean) {
         val dialog = Dialog(this)
@@ -347,7 +337,7 @@ class SignupActivity : AppCompatActivity() {
         dialog.show()
     }
 
-    fun showInformationDialog(type : String){
+    private fun showInformationDialog(type : String){
         val dialog = Dialog(this)
 
         dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
@@ -356,9 +346,8 @@ class SignupActivity : AppCompatActivity() {
 
         dialog.window!!.setLayout(WindowManager.LayoutParams.MATCH_PARENT, WindowManager.LayoutParams.MATCH_PARENT)
 
-        var imageview = dialog.findViewById<ImageView>(R.id.dialog_service_image)
-
-        var button = dialog.findViewById<Button>(R.id.dialog_service_button)
+        val imageview = dialog.findViewById<ImageView>(R.id.dialog_service_image)
+        val button = dialog.findViewById<Button>(R.id.dialog_service_button)
 
         when(type){
             "personal" -> imageview.setImageResource(R.drawable.personal)
@@ -372,17 +361,20 @@ class SignupActivity : AppCompatActivity() {
         }
 
     }
-    fun dialogDismiss(dialog: Dialog, close : Boolean){
+    private fun dialogDismiss(dialog: Dialog, close : Boolean){
         if(close){
-            val handler = Handler(Looper.getMainLooper())
-            handler.postDelayed({
+            lifecycleScope.launch {
+                delay(1000)
                 dialog.dismiss()
-                var intent = Intent(this, LoginActivity :: class.java)
+                val intent = Intent(this@SignupActivity, LoginActivity :: class.java)
                 startActivity(intent)
-            }, 1000)
-
-
+            }
         }
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        _binding = null
     }
 }
 

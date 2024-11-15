@@ -14,27 +14,27 @@ import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.example.menupop.mainActivity.foodPreference.FoodPreference
 import com.google.mlkit.vision.common.InputImage
 import com.google.mlkit.vision.text.Text
 import com.zynksoftware.documentscanner.model.ScannerResults
+import kotlinx.coroutines.launch
 import org.json.JSONArray
 
-class CameraViewModel(application: Application) : ViewModel() {
+class CameraViewModel(val application: Application) : ViewModel() {
 
-    val TAG = "CameraViewModel"
+    companion object {
+        const val TAG = "CameraViewModel"
+    }
+
     private val _scannerResult = MutableLiveData<ScannerResults>()
-    val application = application
     val scannerResult: LiveData<ScannerResults>
         get() = _scannerResult
-    val cameraModel = CameraModel()
-
-    private var callbackString: ((String) -> Unit)? = null
-    private var callbackText: ((Text) -> Unit)? = null
+    private val cameraModel = CameraModel()
 
     fun successScanning(scannerResults: ScannerResults) {
         _scannerResult.value = scannerResults
-
     }
 
     private val _failed = MutableLiveData<Boolean>()
@@ -45,53 +45,43 @@ class CameraViewModel(application: Application) : ViewModel() {
 
     private val _image = MutableLiveData<Drawable>()
 
-    lateinit var likesFoodList: ArrayList<String>
-    lateinit var unLikesFoodList: ArrayList<String>
+    private lateinit var likesFoodList: ArrayList<String>
+    private lateinit var unLikesFoodList: ArrayList<String>
     val image: LiveData<Drawable>
         get() = _image
 
 
     fun setFoodPreference(foodPreference: ArrayList<FoodPreference>) {
-        if (foodPreference != null) {
+        if (foodPreference.isNotEmpty()) {
             val (likesFoodList, unLikesFoodList) = splitFoodPreferenceList(foodPreference)
             this.likesFoodList = likesFoodList
             this.unLikesFoodList = unLikesFoodList
-            Log.d(TAG, "setFoodPreference: ${likesFoodList}, ${unLikesFoodList}")
+            Log.d(TAG, "setFoodPreference: $likesFoodList, $unLikesFoodList")
         }
     }
 
 
-    fun getRecognizedText(image: InputImage,country : String) {
-
-        callbackText = { visionText ->
-
-            if (visionText != null) {
+    fun getRecognizedText(image: InputImage, country: String) {
+        viewModelScope.launch {
+            val visionText = cameraModel.recognizedText(image, country)
+            if (visionText.text.isNotEmpty()) {
 
                 val resultText = getText(visionText)
 
-                if(country == "taiwan"){
-
-                    requestTranslation(resultText,"zh-TW")
-
-                }else{
+                if (country == "taiwan") {
+                    requestTranslation(resultText, "zh-TW")
+                } else {
                     checkLanguage(resultText)
                 }
-
-
-
-
-
             } else {
                 _failed.value = true
             }
         }
-
-
-        cameraModel.recognizedText(image,country, callbackText!!)
     }
 
-    fun checkLanguage(text: String) {
-        callbackString = { langCode ->
+    private suspend fun checkLanguage(text: String) {
+        viewModelScope.launch {
+            val langCode = cameraModel.checkLanguage(text)
             if (langCode != "und" && langCode != "failed") {
                 requestTranslation(text, langCode)
                 Log.d(TAG, "checkLanguage: $langCode")
@@ -100,10 +90,9 @@ class CameraViewModel(application: Application) : ViewModel() {
                 _failed.value = true
             }
         }
-        cameraModel.checkLanguage(text, callbackString!!)
     }
 
-    fun splitFoodPreferenceList(foodPreferenceList: List<FoodPreference>): Pair<ArrayList<String>, ArrayList<String>> {
+    private fun splitFoodPreferenceList(foodPreferenceList: List<FoodPreference>): Pair<ArrayList<String>, ArrayList<String>> {
         val likes = ArrayList<String>()
         val dislikes = ArrayList<String>()
 
@@ -121,13 +110,14 @@ class CameraViewModel(application: Application) : ViewModel() {
     }
 
 
-    fun requestTranslation(text: String, langCode: String) {
-        callbackString = {
-            if (it != "failed") {
-                Log.d(TAG, "translated Text: $it")
+    private suspend fun requestTranslation(text: String, langCode: String) {
+        viewModelScope.launch {
+            val result = cameraModel.requestTranslation(text, langCode)
+            if (result != "failed") {
+                Log.d(TAG, "translated Text: $result")
 
-                val jsonArray = JSONArray(it)
-                var decode = jsonArray.getString(0)
+                val jsonArray = JSONArray(result)
+                val decode = jsonArray.getString(0)
 
                 val decodeList = decode.split("__")
 
@@ -137,16 +127,15 @@ class CameraViewModel(application: Application) : ViewModel() {
                     drawTranslatedText(decodeList)
                 }
             } else {
-                Log.d(TAG, "requestTranslation is Failed : $it")
+                Log.d(TAG, "requestTranslation is Failed : $result")
                 _failed.value = true
             }
         }
-        cameraModel.requestTranslation(text, langCode, callbackString!!)
     }
 
-    fun getText(text: Text): String {
-        var positionList = ArrayList<Rect>()
-        var requestText  = ""
+    private fun getText(text: Text): String {
+        val positionList = ArrayList<Rect>()
+        var requestText = ""
 
         for (block in text.textBlocks) {
 
@@ -164,15 +153,15 @@ class CameraViewModel(application: Application) : ViewModel() {
 
         //마지막 '%' 잘라주기
         requestText = requestText
-            .substring(0, requestText.length-2)
+            .substring(0, requestText.length - 2)
             .replace(",", "").replace("|", "")
-        Log.d(TAG, "text : ${requestText}")
+        Log.d(TAG, "text : $requestText")
         Log.d(TAG, "getText position size: ${positionList.size}")
         return requestText
     }
 
 
-    fun drawTranslatedText(textList: List<String>) {
+    private fun drawTranslatedText(textList: List<String>) {
 
         val filePath = scannerResult.value!!.croppedImageFile!!.path
         val bitmap = BitmapFactory.decodeFile(filePath)
@@ -181,14 +170,14 @@ class CameraViewModel(application: Application) : ViewModel() {
         val canvas = Canvas(mutableBitmap)
 
 
-        var paintRect = Paint().apply {
+        val paintRect = Paint().apply {
             color = Color.WHITE
             style = Paint.Style.FILL
         }
 
 
         for (i: Int in textList.indices) {
-            var (paintText, x, y) = getTextSize(_textPosition.value!![i], textList[i])
+            val (paintText, x, y) = getTextSize(_textPosition.value!![i], textList[i])
 
             val left = _textPosition.value!![i].left.toFloat()
             val top = _textPosition.value!![i].top.toFloat()
@@ -219,16 +208,15 @@ class CameraViewModel(application: Application) : ViewModel() {
             canvas.drawText(textList[i], x, y, paintText)
         }
 
-        _image.value = BitmapDrawable(application.applicationContext.resources,mutableBitmap)
+        _image.value = BitmapDrawable(application.applicationContext.resources, mutableBitmap)
 
     }
 
 
-
-    fun getTextSize(rect: Rect, text: String) : Triple<Paint, Float, Float> {
+    private fun getTextSize(rect: Rect, text: String): Triple<Paint, Float, Float> {
 
         var textSize = 50f // 텍스트 크기 초기값 설정 (임의의 크기)
-        var paint = Paint()
+        val paint = Paint()
         paint.textSize = textSize
         paint.typeface = Typeface.DEFAULT_BOLD
         paint.color = Color.BLACK
@@ -247,7 +235,7 @@ class CameraViewModel(application: Application) : ViewModel() {
         val x = rect.left + (rect.width() - bounds.width()) / 2
         val y = rect.top + (rect.height() + bounds.height()) / 2
 
-        return Triple(paint,x.toFloat(),y.toFloat())
+        return Triple(paint, x.toFloat(), y.toFloat())
 
     }
 

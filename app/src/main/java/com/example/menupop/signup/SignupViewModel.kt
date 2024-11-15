@@ -7,37 +7,36 @@ import android.util.Patterns
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import com.example.menupop.SimpleResultDTO
+import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.launch
 import java.util.concurrent.TimeUnit
 
 import java.util.regex.Pattern
 
 
 class SignupViewModel : ViewModel() {
+    companion object{
+        const val TAG = "SignupViewModel"
+    }
 
-    val TAG = "SignupViewModel"
-    var signupModel  = SignupModel()
-    private var callback: ((String) -> Unit) ?= null // 콜백
-    private var callbackList : ((SimpleResultDTO) -> Unit) ?= null
+    private val signupModel  = SignupModel()
 
-
-    private val _idWarning = MutableLiveData<String>()
-    val idWarning : LiveData<String>
+    private val _idWarning = MutableLiveData<String?>()
+    val idWarning : LiveData<String?>
         get() = _idWarning
 
     private val _isValidId = MutableLiveData<Boolean>()
     val isValidId : LiveData<Boolean>
         get() = _isValidId
+
     private var provideChecking : Boolean = false
     private var marketingChecking : Boolean = false
 
-    fun validateId(inputId: String) : Boolean {
+    private fun validateId(inputId: String): Boolean {
 
         val regex = Regex("^[a-zA-Z0-9]{6,12}\$")
 
-        var matcher = regex.matches(inputId)
-
-        return matcher
+        return regex.matches(inputId)
     }
 
     fun onIdTextChanged(id: String) {
@@ -58,31 +57,29 @@ class SignupViewModel : ViewModel() {
 
 
 
-    fun checkUserIdDuplication(id : String) {
-        callbackList = {isDuplicate ->
-            Log.d(TAG, "checkUserIdDuplication: ${isDuplicate}")
-            if(isDuplicate.result == "exist"){
+    suspend fun checkUserIdDuplication(id : String) {
+        viewModelScope.launch {
+            val response = signupModel.requestIdDuplication(id)
+            if(response.result == "exist"){
                 _isIdDuplication.value = true
                 _idWarning.value = "이미 사용 중인 아이디 입니다."
             }else{
                 _isIdDuplication.value = false
                 _idWarning.value = "사용 가능한 아이디 입니다."
             }
-
         }
-        signupModel.requestIdDuplication(id, callbackList!!)
     }
 
 
     /**
      * 비밀번호 경고 문구
      */
-    private val _passwordWarning = MutableLiveData<String>()
-    val passwordWarning : LiveData<String>
+    private val _passwordWarning = MutableLiveData<String?>()
+    val passwordWarning : LiveData<String?>
         get() = _passwordWarning
 
-    private val _confirmPasswordWarning = MutableLiveData<String>()
-    val confirmPasswordWarning : LiveData<String>
+    private val _confirmPasswordWarning = MutableLiveData<String?>()
+    val confirmPasswordWarning : LiveData<String?>
         get() = _confirmPasswordWarning
 
     private val _isValidPassword = MutableLiveData<Boolean>()
@@ -114,7 +111,7 @@ class SignupViewModel : ViewModel() {
         }
     }
 
-    fun validatePassword(password: String): Boolean {
+    private fun validatePassword(password: String): Boolean {
         val digitPattern = ".*\\d.*"
         val letterPattern = ".*[a-zA-Z].*"
         val specialCharPattern = ".*[@#\$%^&+=].*"
@@ -131,7 +128,7 @@ class SignupViewModel : ViewModel() {
         return hasMinimumLength && count >= 2
     }
 
-    fun checkPasswordsMatch(password: String, confirmPassword: String): Boolean {
+    private fun checkPasswordsMatch(password: String, confirmPassword: String): Boolean {
         return password == confirmPassword
     }
 
@@ -144,11 +141,11 @@ class SignupViewModel : ViewModel() {
     val isEmailButton : LiveData<Boolean>
         get() = _isEmailButton
 
-    val _checkEmailForm = MutableLiveData<Boolean>()
+    private val _checkEmailForm = MutableLiveData<Boolean>()
     val checkEmailForm : LiveData<Boolean>
         get() = _checkEmailForm
 
-    val _emailWarning = MutableLiveData<String>()
+    private val _emailWarning = MutableLiveData<String>()
     val emailWarning : LiveData<String>
         get() = _emailWarning
 
@@ -177,19 +174,16 @@ class SignupViewModel : ViewModel() {
 
 
 
-    fun checkEmailExistence(email: String) {
-        Log.d(TAG, "checkEmailExistence")
-        callbackList = {response ->
-            Log.d(TAG, "checkEmailExistence: ${response.result}")
+    suspend fun checkEmailExistence(email: String) {
+        viewModelScope.launch {
+            val response =   signupModel.checkEmailExistence(email)
             if(response.result == "exist"){
                 _isEmailExistence.value = true
                 _emailWarning.value = "해당 이메일로 가입된 계정이 존재합니다."
-
             }else{
                 _isEmailExistence.value = false
             }
         }
-        signupModel.checkEmailExistence(email, callbackList!!)
     }
 
     private var verifyCode : String = ""
@@ -199,15 +193,15 @@ class SignupViewModel : ViewModel() {
 
 
     fun requestEmailAuth(email : String) {
-        callback = { result ->
-            Log.d(TAG, "code: ${result}")
-            verifyCode = result
+        viewModelScope.launch{
+            val response = signupModel.sendVerifyCode(email)
+            Log.d(TAG, "code: $response")
+            verifyCode = response
         }
-        signupModel.sendVerifyCode(email, callback!!)
     }
 
     fun checkVerifyCode(verifyCode : String) {
-        Log.d(TAG, "checkVerifyCode: ${verifyCode} 인증코드 ${this.verifyCode}")
+        Log.d(TAG, "checkVerifyCode: $verifyCode 인증코드 ${this.verifyCode}")
         val result = this.verifyCode == verifyCode
         Log.d(TAG, "result : $result")
         _verifyCompleted.value = result
@@ -253,13 +247,12 @@ class SignupViewModel : ViewModel() {
         timer?.start()
     }
 
-    // 타이머를 중지하는 메서드
+    // 타이머 중지
     fun stopTimer() {
         timer?.cancel()
     }
 
     override fun onCleared() {
-        // ViewModel이 소멸될 때 타이머도 중지
         stopTimer()
         super.onCleared()
     }
@@ -272,14 +265,9 @@ class SignupViewModel : ViewModel() {
         Log.d(TAG, "passwordConfirm: ${_isValidPasswordConfirm.value}")
         Log.d(TAG, "verifyCompleted: ${_verifyCompleted.value}")
 
-        if(_isValidId.value == true && _checkEmailForm.value == true &&
-            _isValidPassword.value == true && _isValidPasswordConfirm.value == true &&
-            _verifyCompleted.value == true){
-
-            return true
-        }else{
-            return false
-        }
+        return _isValidId.value == true && _checkEmailForm.value == true &&
+                _isValidPassword.value == true && _isValidPasswordConfirm.value == true &&
+                _verifyCompleted.value == true
 
     }
     private val _saveResult = MutableLiveData<Boolean>()
@@ -287,15 +275,16 @@ class SignupViewModel : ViewModel() {
         get() = _saveResult
 
 
-    fun sendUserInformation(id : String, password : String, email :String, identifier : Int){
-        callbackList = {response ->
-            Log.d(TAG, "sendUserInformation: ${response.result}")
+    suspend fun sendUserInformation(id : String, password : String, email :String, identifier : Int){
+        viewModelScope.launch{
+            val response =  signupModel.sendUserInformation(id, password, email, identifier)
 
-            _saveResult.value = response.result == "success"
-
+            if(response.result=="success"){
+                _saveResult.value = response.result == "success"
+            }
         }
-        signupModel.sendUserInformation(id, password, email, identifier, callbackList!!)
     }
+
     fun personalCheckBoxChecked(isCheck : Boolean){
         provideChecking = isCheck
     }
@@ -307,9 +296,5 @@ class SignupViewModel : ViewModel() {
         Log.d(TAG, "checkBoxChecked: ${provideChecking && marketingChecking}")
         return provideChecking && marketingChecking
     }
-
-
-
-
 
 }

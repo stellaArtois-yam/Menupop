@@ -7,16 +7,16 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.AdapterView
-import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.widget.addTextChangedListener
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.lifecycleScope
 import com.example.menupop.BuildConfig
 import com.example.menupop.R
 import com.example.menupop.databinding.FragmentExchangeBinding
+import kotlinx.coroutines.launch
 
 
 class ExchangeFragment : Fragment() {
@@ -37,8 +37,8 @@ class ExchangeFragment : Fragment() {
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
-        exchangeViewModel = ViewModelProvider(this).get(ExchangeViewModel::class.java)
+    ): View {
+        exchangeViewModel = ViewModelProvider(this)[ExchangeViewModel::class.java]
         _binding =  DataBindingUtil.inflate(inflater, R.layout.fragment_exchange, container, false)
         binding.exchangeRateViewModel = exchangeViewModel
         binding.lifecycleOwner = this
@@ -63,17 +63,15 @@ class ExchangeFragment : Fragment() {
 
 //        binding.exchangeRateApplicationStatus.isChecked = getStatus()
 
-        exchangeViewModel.isPossible.observe(viewLifecycleOwner, Observer { result ->
-            Log.d(TAG, "init: ${result}")
+        exchangeViewModel.isPossible.observe(viewLifecycleOwner) { result ->
+            Log.d(TAG, "init: $result")
             binding.exchangeSourceEdittext.isFocusable = result
-        })
+        }
         exchangeViewModel.init()
 
     }
-    fun setListener(){
-        /**
-         * 보유 화폐 입력 시
-         */
+    private fun setListener(){
+        // 보유 화폐 입력
         binding.exchangeSourceEdittext.addTextChangedListener {text ->
 
             exchangeViewModel.updateFormattedNumber(text.toString(), "")
@@ -116,7 +114,7 @@ class ExchangeFragment : Fragment() {
 
 
                 if(position!=0){
-                    val unit = currencyUnits.get(position)
+                    val unit = currencyUnits[position]
                     Log.d(TAG, "환전 화폐 선택 unit: $unit")
 
                     exchangeViewModel.setTargetUnit(unit)
@@ -145,13 +143,14 @@ class ExchangeFragment : Fragment() {
                 val apiKey = BuildConfig.BANK_API_KEY
                 if(baseSpinner != "선택") {
                     Log.d(TAG, "onItemSelected: 요청 보냄")
-                    exchangeViewModel.requestExchangeRate(
-                        apiKey,
-                        baseSpinner
-                    )
-                    val unit = currencyUnits.get(position)
+                    lifecycleScope.launch {
+                        exchangeViewModel.requestExchangeRate(
+                            apiKey,
+                            baseSpinner
+                        )
+                    }
+                    val unit = currencyUnits[position]
                     Log.d(TAG, "보유 화폐 선택 unit: $unit")
-
                      exchangeViewModel.setSourceUnit(unit)
 
                 }else{

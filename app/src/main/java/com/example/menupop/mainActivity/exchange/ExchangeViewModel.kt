@@ -5,12 +5,15 @@ import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.launch
 
 class ExchangeViewModel : ViewModel() {
-    val TAG = "ExchangeViewModel"
+    companion object{
+        const val TAG = "ExchangeViewModel"
+    }
 
-    private var callback: ((ExchangeRateResponseDTO) -> Unit)? = null
-    val exchangeModel = ExchangeModel()
+    private val exchangeModel = ExchangeModel()
 
     val isPossible = MutableLiveData<Boolean>()
 
@@ -55,18 +58,31 @@ class ExchangeViewModel : ViewModel() {
     /**
      * 환율 정보 요청
      */
-    fun requestExchangeRate(authKey: String, baseRate: String) {
-        callback = { exchangeDataClassItems ->
-            data = exchangeDataClassItems
-            Log.d(TAG, "requestExchangeRate: ${data}")
-        }
+    suspend fun requestExchangeRate(authKey: String, baseRate: String) {
         val regex = "\\((.*?)\\)".toRegex()
         val baseMatchResult = regex.find(baseRate)
-        val baseCurrencys = baseMatchResult?.groupValues?.get(1)
-        exchangeModel.requestExchangeRate(authKey, baseCurrencys!!, callback!!)
+        val baseCurrencies = baseMatchResult?.groupValues?.get(1)
 
+        viewModelScope.launch {
+            val result = exchangeModel.requestExchangeRate(authKey, baseCurrencies!!)
+            if(result.isSuccess){
+
+                data = result.getOrDefault(ExchangeRateResponseDTO(
+                    baseCode = "",
+                    conversionRates = emptyMap(),
+                    documentation = "",
+                    result = "failed",
+                    termsOfUse = "",
+                    timeLastUpdateUnix = 0,
+                    timeLastUpdateUtc = "",
+                    timeNextUpdateUnix = 0,
+                    timeNextUpdateUtc = ""
+                ))
+
+                Log.d(TAG, "requestExchangeRate: $data")
+            }
+        }
     }
-
 
     /**
      * 고시 환율 변환
@@ -87,19 +103,19 @@ class ExchangeViewModel : ViewModel() {
         val amounts = amount.replace(",", "").toDouble()
         val targetCurrency = targetMatchResult?.groupValues?.get(1)
 
-        Log.d(TAG, "exchange: ${amounts} ${targetCurrency}")
+        Log.d(TAG, "exchange: $amounts, $targetCurrency")
 
         calculateExchange(amounts, targetCurrency!!)
 
     }
 
 
-    fun calculateExchange(amount: Double?, targetCurrency: String) {
-        val targetRate = data.conversionRates.get(targetCurrency)
+    private fun calculateExchange(amount: Double?, targetCurrency: String) {
+        val targetRate = data.conversionRates[targetCurrency]
 
         if (targetRate != null && amount != null) {
             _targetCurrency.value = addCommasToNumber(amount * targetRate.toDouble())
-            var notifiedRate = calculateNotifiedExchangeRate(targetCurrency, targetRate)
+            val notifiedRate = calculateNotifiedExchangeRate(targetCurrency, targetRate)
 
             if(targetCurrency == "JPY" || targetCurrency == "VND"){
                 _notifiedExchangeRate.value = addCommasToNumber(notifiedRate) + "원 (100)"
@@ -110,15 +126,15 @@ class ExchangeViewModel : ViewModel() {
         }
     }
 
-    fun calculateNotifiedExchangeRate(targetCurrency: String, targetRate: Double): Double {
-        if (targetCurrency == "VND" || targetCurrency == "JPY") {
-            var result = 100 / targetRate
+    private fun calculateNotifiedExchangeRate(targetCurrency: String, targetRate: Double): Double {
+        return if (targetCurrency == "VND" || targetCurrency == "JPY") {
+            val result = 100 / targetRate
             Log.d(TAG, "VND/JPY: (100) $result")
-            return result
+            result
         } else {
-            var result = 1 / targetRate
+            val result = 1 / targetRate
             Log.d(TAG, "others: $result")
-            return result
+            result
         }
     }
 
@@ -138,8 +154,7 @@ class ExchangeViewModel : ViewModel() {
 
     }
 
-    fun addCommasToNumber(number: Double): String {
-
+    private fun addCommasToNumber(number: Double): String {
         return String.format("%,.2f", number)
     }
 

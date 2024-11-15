@@ -29,6 +29,7 @@ android {
         buildConfigField("String", "TRANSLATION_SERVER_IP", localProperties.getProperty("TRANSLATION_SERVER_IP"))
         buildConfigField("String", "KAKAOPAY_ADMIN_KEY", localProperties.getProperty("KAKAOPAY_ADMIN_KEY"))
         buildConfigField("String", "KAKAO_NATIVE_APP_KEY", localProperties.getProperty("KAKAO_NATIVE_APP_KEY"))
+        buildConfigField("String", "KAKAO_NATIVE_APP_KEY_STELLA", localProperties.getProperty("KAKAO_NATIVE_APP_KEY_STELLA"))
         buildConfigField("String", "GOOGLE_API_KEY", localProperties.getProperty("GOOGLE_API_KEY"))
         buildConfigField("String", "GOOGLE_LOGIN_KEY", localProperties.getProperty("GOOGLE_LOGIN_KEY"))
         buildConfigField("String", "SOCIAL_LOGIN_INFO_NAVER_CLIENT_ID", localProperties.getProperty("SOCIAL_LOGIN_INFO_NAVER_CLIENT_ID"))

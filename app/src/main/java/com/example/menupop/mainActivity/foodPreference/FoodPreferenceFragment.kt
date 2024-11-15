@@ -80,64 +80,61 @@ class FoodPreferenceFragment : Fragment() {
 
     private fun setAdapters() {
 
-        lifecycleScope.launch {
-            searchAdapter = FoodPreferenceSearchAdapter(object : FoodPreferenceItemClickListener {
-                override fun favoriteItemClick(foodName: String) {
-                    Log.d(TAG, "favoriteItemClick: 좋아하는 음식 $foodName 클릭됨 ")
-                    if (checkTicketEmpty()) {
-                        emptyTicketShowDialog()
-                    } else {
-                        if (mainViewModel.userInformation.value?.freeFoodTicket!! > 0) {
-                            existFreeTicketShowDialog(foodName, "호")
-                        } else {
-                            existTicketShowDialog(foodName, "호")
-                        }
-                    }
-                }
-
-                override fun unFavoriteItemClick(foodName: String) {
-                    Log.d(TAG, "unFavoriteItemClick: 싫어하는 음식 $foodName 클릭됨 ")
-                    if (checkTicketEmpty()) {
-                        emptyTicketShowDialog()
-                    } else if (mainViewModel.userInformation.value?.freeFoodTicket!! > 0) {
+        searchAdapter = FoodPreferenceSearchAdapter(object : FoodPreferenceItemClickListener {
+            override fun favoriteItemClick(foodName: String) {
+                Log.d(TAG, "favoriteItemClick: 좋아하는 음식 $foodName 클릭됨 ")
+                if (checkTicketEmpty()) {
+                    emptyTicketShowDialog()
+                } else {
+                    if (mainViewModel.userInformation.value?.freeFoodTicket!! > 0) {
                         existFreeTicketShowDialog(foodName, "호")
                     } else {
-                        if (mainViewModel.userInformation.value?.freeFoodTicket!! > 0) {
-                            existFreeTicketShowDialog(foodName, "불호")
-                        } else {
-
-                            existTicketShowDialog(foodName, "불호")
-                        }
+                        existTicketShowDialog(foodName, "호")
                     }
                 }
-            })
-
-
-            binding.foodPreferenceSearchRecyclerview.apply {
-                binding.foodPreferenceSearchRecyclerview.adapter = searchAdapter
-                binding.foodPreferenceSearchRecyclerview.layoutManager =
-                    LinearLayoutManager(context)
             }
 
+            override fun unFavoriteItemClick(foodName: String) {
+                Log.d(TAG, "unFavoriteItemClick: 싫어하는 음식 $foodName 클릭됨 ")
+                if (checkTicketEmpty()) {
+                    emptyTicketShowDialog()
+                } else if (mainViewModel.userInformation.value?.freeFoodTicket!! > 0) {
+                    existFreeTicketShowDialog(foodName, "호")
+                } else {
+                    if (mainViewModel.userInformation.value?.freeFoodTicket!! > 0) {
+                        existFreeTicketShowDialog(foodName, "불호")
+                    } else {
 
-            foodPreferenceAdapter = FoodPreferenceAdapter(object : FoodPreferenceClickListener {
-                @RequiresApi(Build.VERSION_CODES.R)
-                override fun deleteBtnClick(foodPreference: FoodPreference, idx: Int) {
-                    deleteFoodPreferenceItem(
-                        foodPreference.foodName,
-                        foodPreference.classification,
-                        idx
-                    )
+                        existTicketShowDialog(foodName, "불호")
+                    }
                 }
-            })
-
-
-            binding.foodPreferenceRecyclerview.apply {
-                layoutManager = LinearLayoutManager(context)
-                adapter = foodPreferenceAdapter
-                Log.d(TAG, "setAdapters foodList: ${mainViewModel.foodPreferenceList.value}")
             }
+        })
 
+
+        binding.foodPreferenceSearchRecyclerview.apply {
+            binding.foodPreferenceSearchRecyclerview.adapter = searchAdapter
+            binding.foodPreferenceSearchRecyclerview.layoutManager =
+                LinearLayoutManager(context)
+        }
+
+
+        foodPreferenceAdapter = FoodPreferenceAdapter(object : FoodPreferenceClickListener {
+            @RequiresApi(Build.VERSION_CODES.R)
+            override fun deleteBtnClick(foodPreference: FoodPreference, idx: Int) {
+                deleteFoodPreferenceItem(
+                    foodPreference.foodName,
+                    foodPreference.classification,
+                    idx
+                )
+            }
+        })
+
+
+        binding.foodPreferenceRecyclerview.apply {
+            layoutManager = LinearLayoutManager(context)
+            adapter = foodPreferenceAdapter
+            Log.d(TAG, "setAdapters foodList: ${mainViewModel.foodPreferenceList.value}")
         }
 
         existBottomSheetDialog = BottomSheetDialog(context)
@@ -160,13 +157,9 @@ class FoodPreferenceFragment : Fragment() {
             false
         )
         val bottomSheetDialog = BottomSheetDialog(context)
-
-        val foodTicket = mainViewModel.userInformation.value?.foodTicket.toString()
-        val translationTicket = mainViewModel.userInformation.value?.translationTicket.toString()
+        bindingDialog.viewModel = mainViewModel
 
         bottomSheetDialog.setContentView(bindingDialog.root)
-        bindingDialog.dialogTicketBottomFoodTicket.text = "음식 티켓 $foodTicket 개"
-        bindingDialog.dialogTicketBottomTranslationTicket.text = "번역 티켓 $translationTicket 개"
 
         bindingDialog.dialogTicketBottomDown.setOnClickListener {
             bottomSheetDialog.dismiss()
@@ -215,6 +208,7 @@ class FoodPreferenceFragment : Fragment() {
             null,
             false
         )
+
         val foodTicket = mainViewModel.userInformation.value?.freeFoodTicket.toString()
         Log.d(TAG, "existFreeTicketShowDialog: 호출")
         existBottomSheetDialog.setContentView(bindingDialog.root)
@@ -232,8 +226,9 @@ class FoodPreferenceFragment : Fragment() {
                 "userInfo",
                 AppCompatActivity.MODE_PRIVATE
             )
-            mainViewModel.foodPreferenceRegister(foodName, classfication)
-
+            lifecycleScope.launch {
+                mainViewModel.foodPreferenceRegister(foodName, classfication)
+            }
         }
 
         existBottomSheetDialog.show()
@@ -246,13 +241,9 @@ class FoodPreferenceFragment : Fragment() {
             null,
             false
         )
-        val foodTicket = mainViewModel.userInformation.value?.foodTicket.toString()
-        val translationTicket = mainViewModel.userInformation.value?.translationTicket.toString()
-
+        bindingDialog.viewModel = mainViewModel
         existBottomSheetDialog.setContentView(bindingDialog.root)
 
-        bindingDialog.dialogTicketBottomFoodTicket.text = "음식 티켓 $foodTicket 개"
-        bindingDialog.dialogTicketBottomTranslationTicket.text = "번역 티켓 $translationTicket 개"
         bindingDialog.dialogTicketBottomButton.text = "등록하기"
 
         bindingDialog.dialogTicketBottomText.text =
@@ -270,8 +261,9 @@ class FoodPreferenceFragment : Fragment() {
                 "userInfo",
                 AppCompatActivity.MODE_PRIVATE
             )
-            mainViewModel.foodPreferenceRegister(foodName, classfication)
-
+            lifecycleScope.launch {
+                mainViewModel.foodPreferenceRegister(foodName, classfication)
+            }
         }
 
         existBottomSheetDialog.show()
@@ -400,21 +392,19 @@ class FoodPreferenceFragment : Fragment() {
             Log.d(TAG, "existTicketShowDialog: $result")
             if (result) {
                 existBottomSheetDialog.dismiss()
-                if (mainViewModel.userInformation.value?.freeFoodTicket!! > 0) {
-                    mainViewModel.updateTicketQuantity("free_food_ticket", "-", 1)
-
-                } else {
-                    mainViewModel.updateTicketQuantity("food_ticket", "-", 1)
-                }
-
-                val imm =
-                    context.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
-                imm.hideSoftInputFromWindow(requireActivity().currentFocus?.windowToken, 0)
-
-                binding.foodPreferenceRecyclerview.visibility = View.VISIBLE
-                binding.foodPreferenceSearchRecyclerview.visibility = View.GONE
-
                 lifecycleScope.launch {
+                    if (mainViewModel.userInformation.value?.freeFoodTicket!! > 0) {
+                        mainViewModel.updateTicketQuantity("free_food_ticket", "-", 1)
+                    } else {
+                        mainViewModel.updateTicketQuantity("food_ticket", "-", 1)
+                    }
+
+                    val imm =
+                        context.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+                    imm.hideSoftInputFromWindow(requireActivity().currentFocus?.windowToken, 0)
+
+                    binding.foodPreferenceRecyclerview.visibility = View.VISIBLE
+                    binding.foodPreferenceSearchRecyclerview.visibility = View.GONE
                     mainViewModel.getFoodPreference()
                 }
 

@@ -52,13 +52,14 @@ class KakaoPayWebView : Fragment() {
 
         val myWebViewClient = MyWebViewClient(ticketPurchaseViewModel)
         webView?.settings?.javaScriptEnabled = true
+
         webView?.webViewClient = myWebViewClient
 
         ticketPurchaseViewModel.paymentReady.observe(viewLifecycleOwner) {
             if (it != null) {
-                val url = it.next_redirect_app_url
+                val url = it.nextRedirectAppUrl
                 Log.d(TAG, "mobile url: $url")
-                webView?.loadUrl(url)
+                webView?.loadUrl(url!!)
             }
         }
 
