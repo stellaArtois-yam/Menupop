@@ -20,8 +20,8 @@ class ResetPasswordViewModel : ViewModel() {
 
     var verifiedEmail = MutableLiveData<Boolean>()
 
-    private var _checkIdResult = MutableLiveData<Boolean>() // 아이디 존재 여부
-    val checkIdResult : LiveData<Boolean> // 아이디 존재 여부
+    private var _checkIdResult = MutableLiveData<Boolean?>() // 아이디 존재 여부
+    val checkIdResult : LiveData<Boolean?> // 아이디 존재 여부
         get() = _checkIdResult
 
     private var _checkEmailForm = MutableLiveData<Boolean>() //이메일 형식
@@ -79,6 +79,10 @@ class ResetPasswordViewModel : ViewModel() {
     override fun onCleared() {
         stopTimer()
         super.onCleared()
+    }
+
+    fun setCheckIdResult(){
+        _checkIdResult.value = null
     }
 
     suspend fun checkId(id : String){

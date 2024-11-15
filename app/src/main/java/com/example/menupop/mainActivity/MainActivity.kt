@@ -56,7 +56,6 @@ class MainActivity : AppCompatActivity() {
                 delay(2000) // 2초 대기
                 doubleBackToExitPressedOnce = false
             }
-
         }
     }
 
@@ -80,10 +79,10 @@ class MainActivity : AppCompatActivity() {
         init()
     }
 
-    private fun setUserData(){
+    private fun setUserData() {
 
         if (identifierByIntent != 0) {
-            lifecycleScope.launch{
+            lifecycleScope.launch {
                 mainActivityViewModel.requestUserInformation(identifierByIntent)
                 mainActivityViewModel.setIdentifier(identifierByIntent)
             }
@@ -93,21 +92,40 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private fun setNavigation(){
+    private fun setNavigation() {
         val navHostFragment = binding.navHostFragment.getFragment() as NavHostFragment
         navController = navHostFragment.navController
         binding.bottomNavigation.setupWithNavController(navController)
 
         setSupportActionBar(binding.toolbar)
         supportActionBar?.setDisplayShowTitleEnabled(false)
+        supportActionBar?.setDisplayHomeAsUpEnabled(false)
 
-        navController.addOnDestinationChangedListener {
-                _, _, _ ->
+        navController.addOnDestinationChangedListener { _, _, _ ->
             binding.toolbarTitle.text = navController.currentDestination?.label.toString()
         }
 
         val appBarConfiguration = AppBarConfiguration(navController.graph)
         setupActionBarWithNavController(navController, appBarConfiguration)
+
+        binding.bottomNavigation.setOnItemSelectedListener { menuItem ->
+            if (menuItem.itemId == navController.currentDestination?.id) {
+                // 이미 선택된 탭인 경우 처리 방지
+                return@setOnItemSelectedListener false
+            }
+            navController.navigate(menuItem.itemId)
+            true
+        }
+
+        // NavController에서 목적지가 변경될 때 ActionBar 상태 업데이트
+        navController.addOnDestinationChangedListener { _, destination, _ ->
+            val isRootDestination = when (destination.id) {
+                R.id.profileFragment, R.id.foodPreferenceFragment, R.id.exchangeFragment, R.id.countrySelectionFragment -> true
+                else -> false
+            }
+            // ActionBar 버튼 상태 설정
+            supportActionBar?.setDisplayHomeAsUpEnabled(!isRootDestination)
+        }
     }
 
 
@@ -131,7 +149,10 @@ class MainActivity : AppCompatActivity() {
 
                         } else {
                             //없으면 ticket을 업데이트 한다
-                            mainActivityViewModel.updateTicketQuantity("translation_ticket", "-", 1)
+                            mainActivityViewModel.updateTicketQuantity(
+                                ticketType = "translation_ticket",
+                                operator = "-",
+                                quantity = 1)
                         }
                     }
                 }
@@ -146,21 +167,7 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
-//        mainActivityViewModel.rewardedAd.observe(this) {
-//
-//            if (it != null) {
-//                it.show(this) { rewardItem ->
-//                    val rewardAmount = rewardItem.amount
-//                    val rewardType = rewardItem.type
-//                    Log.d(TAG, "User earned the reward. $rewardAmount, $rewardType")
-//                    mainActivityViewModel.rewardedSuccess()
-//                }
-//                loadingDialog.dismiss()
-//            }
-//        }
-
         this.onBackPressedDispatcher.addCallback(this, callback)
-
     }
 
     private fun loadDialog(): Dialog {

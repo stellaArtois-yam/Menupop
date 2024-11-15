@@ -20,7 +20,6 @@ import android.view.Window
 import android.view.inputmethod.InputMethodManager
 import android.widget.Toast
 import androidx.annotation.RequiresApi
-import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
@@ -70,8 +69,6 @@ class FoodPreferenceFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
-        (activity as AppCompatActivity).supportActionBar?.setDisplayHomeAsUpEnabled(false)
 
         observeLiveData()
         setAdapters()
@@ -221,11 +218,6 @@ class FoodPreferenceFragment : Fragment() {
             existBottomSheetDialog.dismiss()
         }
         bindingDialog.dialogTicketBottomButton.setOnClickListener {
-            Log.d(TAG, "existTicketShowDialog: 클릭 됨")
-            var sharedPreferences = context.getSharedPreferences(
-                "userInfo",
-                AppCompatActivity.MODE_PRIVATE
-            )
             lifecycleScope.launch {
                 mainViewModel.foodPreferenceRegister(foodName, classfication)
             }
@@ -256,11 +248,6 @@ class FoodPreferenceFragment : Fragment() {
             existBottomSheetDialog.dismiss()
         }
         bindingDialog.dialogTicketBottomButton.setOnClickListener {
-            Log.d(TAG, "existTicketShowDialog: 클릭 됨")
-            var sharedPreferences = context.getSharedPreferences(
-                "userInfo",
-                AppCompatActivity.MODE_PRIVATE
-            )
             lifecycleScope.launch {
                 mainViewModel.foodPreferenceRegister(foodName, classfication)
             }

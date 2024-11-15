@@ -3,51 +3,43 @@ package com.example.menupop.findId
 import android.content.Context
 import android.graphics.Color
 import android.os.Bundle
-import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.AdapterView
-import android.widget.ImageView
-import android.widget.TextView
+import androidx.appcompat.app.AppCompatActivity
 import androidx.core.widget.addTextChangedListener
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
+import androidx.navigation.fragment.findNavController
 import com.example.menupop.R
 import com.example.menupop.databinding.FragmentFindIdBinding
 import kotlinx.coroutines.launch
 
 class FindIdFragment : Fragment() {
-    val TAG = "FindIdFragment"
-    lateinit var binding: FragmentFindIdBinding
+    companion object{
+        const val TAG = "FindIdFragment"
+    }
+
+    private var _binding : FragmentFindIdBinding? = null
+    private val binding get() = _binding!!
     private lateinit var findIdViewModel: FindIdViewModel
-    var event: FindIdFragmentEvent? = null
     private var context: Context? = null
 
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
         this.context = context
-        if (context is FindIdFragmentEvent) {
-            event = context
-            Log.d(TAG, "onAttach: 호출")
-        } else {
-            throw RuntimeException(
-                context.toString()
-                        + "must implement FindIdFragmentEvent"
-            )
-        }
     }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-
         findIdViewModel = ViewModelProvider(requireActivity())[FindIdViewModel::class.java]
-        binding = DataBindingUtil.inflate(inflater, R.layout.fragment_find_id, container, false)
+        _binding = DataBindingUtil.inflate(inflater, R.layout.fragment_find_id, container, false)
         binding.findIdViewModel = findIdViewModel
         binding.lifecycleOwner = this
 
@@ -56,13 +48,11 @@ class FindIdFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
-        init()
+        setObservers()
         setListener()
     }
 
-    fun init() {
-        binding.appbarMenu.findViewById<TextView>(R.id.appbar_status).text = "아이디 찾기"
+    private fun setObservers() {
 
         findIdViewModel.checkEmailForm.observe(viewLifecycleOwner) {
             if (it) {
@@ -73,9 +63,19 @@ class FindIdFragment : Fragment() {
             }
         }
 
+        findIdViewModel.userIdExistence.observe(viewLifecycleOwner) {
+            findNavController().navigate(R.id.findIdResultFragment)
+        }
+
     }
 
     private fun setListener() {
+
+        (activity as AppCompatActivity).supportActionBar?.setDisplayHomeAsUpEnabled(true)
+
+        (activity as FindIdActivity).toolbar!!.setNavigationOnClickListener {
+             requireActivity().finish()
+        }
 
         binding.findIdEmail.addTextChangedListener {
             val domainSelection = binding.findIdEmailSelection.selectedItem.toString()
@@ -105,8 +105,6 @@ class FindIdFragment : Fragment() {
                 }
             }
 
-
-
         binding.findIdComfirmButton.setOnClickListener {
 
             if (findIdViewModel.checkEmailForm.value == true) {
@@ -117,15 +115,10 @@ class FindIdFragment : Fragment() {
                 }
             }
         }
+    }
 
-
-        findIdViewModel.userIdExistence.observe(viewLifecycleOwner) {
-            event?.successFindId()
-
-        }
-
-        binding.appbarMenu.findViewById<ImageView>(R.id.appbar_back).setOnClickListener {
-            event?.backButtonClick()
-        }
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
     }
 }

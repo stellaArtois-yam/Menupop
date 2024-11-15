@@ -8,13 +8,15 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.AdapterView
-import android.widget.ImageView
-import android.widget.TextView
 import android.widget.Toast
+import androidx.appcompat.app.AppCompatActivity
 import androidx.core.widget.addTextChangedListener
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
+import androidx.navigation.findNavController
+import androidx.navigation.fragment.findNavController
+import androidx.navigation.ui.navigateUp
 import com.example.menupop.R
 import com.example.menupop.databinding.FragmentResetPasswordEmailBinding
 import kotlinx.coroutines.launch
@@ -27,21 +29,11 @@ class ResetPasswordEmailFragment : Fragment() {
     private var _binding : FragmentResetPasswordEmailBinding? = null
     private val binding get() = _binding!!
     private lateinit var resetPasswordViewModel: ResetPasswordViewModel
-    private var event: ResetPasswordFragmentEvent? = null
-    private var context : Context?=null
+    private var context : Context ?= null
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
         this.context = context
-        if (context is ResetPasswordFragmentEvent) {
-            event = context
-            Log.d(TAG, "onAttach: 호출됨")
-        } else {
-            throw RuntimeException(
-                context.toString()
-                        + " must implement ResetPasswordFragmentEvent"
-            )
-        }
     }
 
     override fun onCreateView(
@@ -59,12 +51,8 @@ class ResetPasswordEmailFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        binding.appbarMenu.findViewById<TextView>(R.id.appbar_status).text = "비밀번호 재설정"
-
         setObserver()
-
         setListener()
-
     }
 
     private fun setObserver() {
@@ -93,7 +81,8 @@ class ResetPasswordEmailFragment : Fragment() {
                     Toast.makeText(context,"인증 완료.",Toast.LENGTH_SHORT).show()
                     binding.passwordResetEmailCertificationWarningText.visibility = View.GONE
                     binding.lastButton.setOnClickListener{
-                        event?.successVerifyEmail()
+
+                        findNavController().navigate(R.id.resetPasswordConfirmFragment)
                     }
                 }
                 else -> Toast.makeText(context,"인증번호를 확인해주세요.",Toast.LENGTH_SHORT).show()
@@ -123,6 +112,14 @@ class ResetPasswordEmailFragment : Fragment() {
 
     }
     private fun setListener(){
+
+        (activity as AppCompatActivity).supportActionBar?.setDisplayHomeAsUpEnabled(true)
+
+        (activity as ResetPasswordActivity).toolbar!!.setNavigationOnClickListener {
+            findNavController().navigateUp()
+            Log.d(TAG, "setListener: ${findNavController().currentDestination?.label}") // checkIdFragment 위치가 뜸
+        }
+
         binding.passwordResetEmailId.addTextChangedListener{
 
             val selectedItem = binding.passwordResetEmailSelection.selectedItem.toString()
@@ -151,9 +148,6 @@ class ResetPasswordEmailFragment : Fragment() {
             }
 
         }
-        binding.appbarMenu.findViewById<ImageView>(R.id.appbar_back).setOnClickListener {
-            event?.backBtnClick()
-        }
 
         binding.certificationButton.setOnClickListener {
             when(resetPasswordViewModel.checkEmailForm.value){
@@ -172,5 +166,12 @@ class ResetPasswordEmailFragment : Fragment() {
             }
 
         }
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        Log.d(TAG, "onDestroyView: ") //호출
+        _binding = null
+        context = null
     }
 }

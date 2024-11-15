@@ -7,7 +7,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.AdapterView
-import androidx.appcompat.app.AppCompatActivity
 import androidx.core.widget.addTextChangedListener
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
@@ -50,14 +49,9 @@ class ExchangeFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         init()
-
         setListener()
-
-        Log.d(TAG, "array 정보: ${resources.getStringArray(R.array.currencies)}")
-
     }
     fun init() {
-        (activity as AppCompatActivity).supportActionBar?.setDisplayHomeAsUpEnabled(false)
 
         currencyUnits = resources.getStringArray(R.array.currencies)
 

@@ -63,10 +63,8 @@ class ProfileFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        (activity as AppCompatActivity).supportActionBar?.setDisplayHomeAsUpEnabled(false)
         sharedPreferences = context.getSharedPreferences("userInfo", MODE_PRIVATE)
 
-        //프로필 이미지를 먼저 얻음
         viewModel.getProfileImage(sharedPreferences, resources)
 
         setObservers()

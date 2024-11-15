@@ -14,12 +14,6 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-        <include
-            android:id="@+id/appbar_menu"
-            layout="@layout/appbar"/>
-
-
-
         <TextView
             android:id="@+id/find_id_info_text"
             android:layout_width="match_parent"
@@ -36,7 +30,7 @@
 
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/appbar_menu" />
+            app:layout_constraintTop_toTopOf="parent" />
 
         <LinearLayout
             android:id="@+id/find_id_linear"

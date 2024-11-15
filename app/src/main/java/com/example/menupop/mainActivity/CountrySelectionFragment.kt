@@ -45,8 +45,6 @@ class CountrySelectionFragment  : Fragment(){
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        (activity as AppCompatActivity).supportActionBar?.setDisplayHomeAsUpEnabled(false)
-
         mainViewModel.countrySelection.observe(viewLifecycleOwner){
             val intent = Intent(context, CameraActivity::class.java)
             intent.putExtra("foodPreference",mainViewModel.foodPreferenceList.value?.foodList)

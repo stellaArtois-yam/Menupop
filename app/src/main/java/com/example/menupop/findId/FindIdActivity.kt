@@ -1,60 +1,39 @@
 package com.example.menupop.findId
 
 import android.os.Bundle
+import android.widget.TextView
+import androidx.appcompat.widget.Toolbar
 import androidx.appcompat.app.AppCompatActivity
-import androidx.databinding.DataBindingUtil
-import androidx.lifecycle.ViewModelProvider
+import androidx.navigation.fragment.NavHostFragment
+import androidx.navigation.ui.AppBarConfiguration
+import androidx.navigation.ui.setupActionBarWithNavController
 import com.example.menupop.R
-import com.example.menupop.databinding.ActivityFindIdBinding
 
-class FindIdActivity : AppCompatActivity(), FindIdFragmentEvent {
+class FindIdActivity : AppCompatActivity() {
     companion object{
         const val TAG = "FindIdActivity"
     }
 
-    private lateinit var findIdViewModel : FindIdViewModel
-    private var _binding: ActivityFindIdBinding? = null
-    private val binding get() = _binding!!
-    private lateinit var findIdFragment: FindIdFragment
-    private lateinit var findIdResultFragment: FindIdResultFragment
+    var toolbar : Toolbar? = null
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        init()
-    }
+        setContentView(R.layout.activity_find_id)
 
-    fun init(){
+        val navHostFragment = supportFragmentManager.findFragmentById(R.id.find_id_container) as NavHostFragment
+        val navController = navHostFragment.navController
 
-        findIdFragment = FindIdFragment()
-        findIdResultFragment = FindIdResultFragment()
+        toolbar  = findViewById(R.id.toolbar)
+        setSupportActionBar(toolbar)
+        supportActionBar?.setDisplayShowTitleEnabled(false)
 
-        _binding = DataBindingUtil.setContentView(this, R.layout.activity_find_id)
-        findIdViewModel = ViewModelProvider(this)[FindIdViewModel::class.java]
-        binding.findIdViewModel = findIdViewModel
-        binding.lifecycleOwner = this
-
-        supportFragmentManager.beginTransaction().apply {
-            replace(R.id.find_id_frame_layout, findIdFragment)
-            commit()
+        navController.addOnDestinationChangedListener {
+                _, _, _ ->
+            findViewById<TextView>(R.id.toolbar_title).text = navController.currentDestination?.label.toString()
         }
+
+        val appBarConfiguration = AppBarConfiguration(navController.graph)
+        setupActionBarWithNavController(navController, appBarConfiguration)
+
     }
 
-    override fun successFindId() {
-        supportFragmentManager.beginTransaction().apply {
-            replace(R.id.find_id_frame_layout, findIdResultFragment)
-            commit()
-        }
-    }
-
-    override fun finishFindId() {
-        finish()
-    }
-
-    override fun backButtonClick() {
-        finish()
-    }
-
-    override fun onDestroy() {
-        super.onDestroy()
-        _binding = null
-    }
 }
