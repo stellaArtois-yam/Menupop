@@ -27,14 +27,8 @@ class ProfileSelectionFragment : Fragment() {
     private val binding get() = _binding!!
 
     private lateinit var mainViewModel : MainActivityViewModel
-    private lateinit var context: Context
     private lateinit var profileAdapter : ProfileAdapter
     private lateinit var sharedPreferences : SharedPreferences
-
-    override fun onAttach(context: Context) {
-        super.onAttach(context)
-        this.context = context
-    }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -65,7 +59,7 @@ class ProfileSelectionFragment : Fragment() {
 
                 val imageName = resources.getStringArray(R.array.profile)[position]
 
-                sharedPreferences = context.getSharedPreferences("userInfo", AppCompatActivity.MODE_PRIVATE)
+                sharedPreferences = requireActivity().getSharedPreferences("userInfo", AppCompatActivity.MODE_PRIVATE)
                 mainViewModel.saveSelectedProfile(imageName, sharedPreferences, resources)
             }
         })
@@ -77,7 +71,7 @@ class ProfileSelectionFragment : Fragment() {
         }
 
         binding.profileSelectionRecyclerview.adapter = profileAdapter
-        binding.profileSelectionRecyclerview.layoutManager = GridLayoutManager(context, 2)
+        binding.profileSelectionRecyclerview.layoutManager = GridLayoutManager(requireContext(), 2)
 
         if(imageList.isNotEmpty()){
             profileAdapter.setProfileSelection(imageList)

@@ -1,7 +1,6 @@
 package com.example.menupop.mainActivity.profile
 
 import android.app.Dialog
-import android.content.Context
 import android.os.Build
 import android.os.Bundle
 import android.util.Log
@@ -33,12 +32,6 @@ class TicketPurchaseFragment : Fragment() {
     private var _binding: FragmentTicketPurchaseBinding? = null
     private val binding get() = _binding!!
     private lateinit var ticketPurchaseViewModel: MainActivityViewModel
-    private lateinit var context: Context
-
-    override fun onAttach(context: Context) {
-        super.onAttach(context)
-        this.context = context
-    }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -101,10 +94,10 @@ class TicketPurchaseFragment : Fragment() {
 
     @RequiresApi(Build.VERSION_CODES.O)
     fun paymentTypeDialog() {
-        val dialog = Dialog(context)
+        val dialog = Dialog(requireContext())
 
         val dialogBinding: DialogSelectPaymentTypeBinding = DataBindingUtil.inflate(
-            LayoutInflater.from(context),
+            LayoutInflater.from(requireContext()),
             R.layout.dialog_select_payment_type,
             null,
             false
@@ -141,7 +134,7 @@ class TicketPurchaseFragment : Fragment() {
     fun paymentRegularDialog() {
 
         val dataBindingRegular: DialogPaymentRegularBinding = DataBindingUtil.inflate(
-            LayoutInflater.from(context),
+            LayoutInflater.from(requireContext()),
             R.layout.dialog_payment_regular,
             null,
             false
@@ -150,7 +143,7 @@ class TicketPurchaseFragment : Fragment() {
         dataBindingRegular.ticketPurchaseViewModel = ticketPurchaseViewModel
         dataBindingRegular.lifecycleOwner = this
 
-        val dialogRegular = Dialog(context)
+        val dialogRegular = Dialog(requireContext())
         dialogRegular.requestWindowFeature(Window.FEATURE_NO_TITLE)
         dialogRegular.setContentView(dataBindingRegular.root)
         dialogRegular.show()
@@ -188,10 +181,10 @@ class TicketPurchaseFragment : Fragment() {
     @RequiresApi(Build.VERSION_CODES.O)
     fun paymentRewardDialog() {
         Log.d(TAG, "paymentRewardDialog start");
-        val dialogReward = Dialog(this.context)
+        val dialogReward = Dialog(requireContext())
 
         val dataBindingReward: DialogPaymentRewardBinding = DataBindingUtil.inflate(
-            LayoutInflater.from(context),
+            LayoutInflater.from(requireContext()),
             R.layout.dialog_payment_reward,
             null,
             false

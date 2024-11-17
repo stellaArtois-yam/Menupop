@@ -13,193 +13,176 @@
     <ScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:visibility="visible">
+        tools:context=".mainActivity.exchange.ExchangeFragment">
 
-        <FrameLayout
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            tools:context=".mainActivity.exchange.ExchangeFragment">
+            android:layout_marginTop="12dp"
+            android:gravity="center"
+            android:orientation="vertical">
 
             <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:gravity="center"
-                android:orientation="vertical"
-                android:layout_marginTop="20dp">
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
 
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal">
-
-                    <ImageView
-                        android:layout_width="60dp"
-                        android:layout_height="60dp"
-                        android:layout_gravity="center"
-                        android:layout_marginStart="20dp"
-                        android:background="@drawable/exclamation" />
-
-                    <TextView
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:padding="15dp"
-                        android:text="@string/exchange_warning"
-                        android:textColor="@color/black"
-                        android:textSize="18sp" />
-
-
-                </LinearLayout>
+                <ImageView
+                    android:layout_width="60dp"
+                    android:layout_height="55dp"
+                    android:layout_gravity="center"
+                    android:layout_marginStart="20dp"
+                    android:background="@drawable/exclamation" />
 
                 <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-
-                    android:layout_gravity="start"
-                    android:layout_marginStart="@dimen/basic_margin"
-                    android:layout_marginTop="@dimen/basic_margin"
-                    android:text="기준 화폐"
-                    android:textColor="@color/light_gray"
-
-                    android:textSize="20sp"
-                    android:textStyle="bold" />
-
-                <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    android:layout_marginEnd="@dimen/basic_margin"
-                    android:layout_marginStart="@dimen/basic_margin">
+                    android:padding="15dp"
+                    android:text="@string/exchange_warning"
+                    android:textColor="@color/black"
+                    android:textSize="18sp" />
+            </LinearLayout>
 
-                    <EditText
-                        android:id="@+id/exchange_source_edittext"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_marginEnd="30dp"
-                        android:layout_weight="1"
-                        android:maxLength="10"
-                        android:text="@{exchangeRateViewModel.sourceCurrency}"
-                        android:textColor="@color/black"
-                        android:textSize="30sp"
-                        android:textStyle="bold" />
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
 
-                    <Spinner
-                        android:id="@+id/exchange_source_spinner"
-                        android:layout_width="0dp"
-                        android:layout_height="@dimen/standard_height"
-                        android:layout_weight="0.5"
-                        android:background="@drawable/profile_button"
-                        android:backgroundTint="@color/button_gray"
+                android:layout_gravity="start"
+                android:layout_marginStart="@dimen/basic_margin"
+                android:layout_marginTop="@dimen/basic_margin"
+                android:text="기준 화폐"
+                android:textColor="@color/light_gray"
 
-                        android:entries="@array/country"
-                        android:textAlignment="center" />
-                </LinearLayout>
+                android:textSize="20sp"
+                android:textStyle="bold" />
 
-                <TextView
-                    android:id="@+id/exchange_source_textview"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-
-                    android:layout_margin="@dimen/basic_margin"
-
-                    android:textColor="@color/light_gray"
-                    android:textSize="20sp"
-                    android:paddingStart="10dp"
-
-                    android:text="@{exchangeRateViewModel.sourceCurrency + exchangeRateViewModel.sourceCurrencyUnit}"/>
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-
-                    android:layout_gravity="start"
-                    android:layout_marginStart="@dimen/basic_margin"
-                    android:text="환전 화폐"
-                    android:textColor="@color/light_gray"
-
-                    android:textSize="20sp"
-                    android:textStyle="bold" />
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="@dimen/basic_margin"
-                    android:layout_marginEnd="@dimen/basic_margin"
-                    android:orientation="horizontal">
-
-                    <EditText
-                        android:id="@+id/exchange_target_edittext"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-
-                        android:layout_marginEnd="30dp"
-                        android:layout_weight="1"
-                        android:enabled="false"
-                        android:text="@{exchangeRateViewModel.targetCurrency}"
-                        android:textColor="@color/black"
-                        android:textSize="30sp"
-                        android:textStyle="bold"/>
-
-                    <Spinner
-                        android:id="@+id/exchange_target_spinner"
-                        android:layout_width="0dp"
-                        android:layout_height="@dimen/standard_height"
-                        android:layout_weight="0.5"
-                        android:background="@drawable/profile_button"
-                        android:backgroundTint="@color/button_gray"
-
-                        android:entries="@array/country"
-
-                        android:textAlignment="center" />
-                </LinearLayout>
-
-
-                <TextView
-                    android:id="@+id/exchange_target_textview"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-
-                    android:layout_margin="@dimen/basic_margin"
-                    android:paddingStart="10dp"
-
-                    android:textColor="@color/light_gray"
-                    android:textSize="20sp"
-                    android:text="@{exchangeRateViewModel.targetCurrency + exchangeRateViewModel.targetCurrencyUnit}"/>
-
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-
-                    android:layout_gravity="start"
-                    android:layout_marginStart="@dimen/basic_margin"
-                    android:text="고시 환율"
-                    android:textColor="@color/light_gray"
-
-                    android:textSize="20sp"
-                    android:textStyle="bold" />
-
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/basic_margin"
+                android:layout_marginEnd="@dimen/basic_margin"
+                android:orientation="horizontal">
 
                 <EditText
-                    android:id="@+id/exchange_standard"
-                    android:layout_width="match_parent"
+                    android:id="@+id/exchange_source_edittext"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:layout_gravity="start"
-                    android:layout_marginStart="@dimen/basic_margin"
-                    android:layout_marginEnd="@dimen/basic_margin"
+                    android:layout_marginEnd="30dp"
+                    android:layout_weight="1"
+                    android:maxLength="10"
+                    android:singleLine="true"
+                    android:maxLines="1"
 
-                    android:enabled="false"
-                    android:text="@{exchangeRateViewModel.notifiedExchangeRate}"
+                    android:inputType="number"
+                    android:text="@{exchangeRateViewModel.sourceCurrency}"
                     android:textColor="@color/black"
-                    android:textSize="30sp"
-                    android:textStyle="bold"/>
+                    android:textSize="20sp"
+                    android:textStyle="bold" />
 
+                <Spinner
+                    android:id="@+id/exchange_source_spinner"
+                    android:layout_width="0dp"
+                    android:layout_height="@dimen/standard_height"
+                    android:layout_weight="0.5"
+                    android:background="@drawable/profile_button"
+                    android:backgroundTint="@color/button_gray"
 
+                    android:entries="@array/country"
+                    android:textAlignment="center" />
+            </LinearLayout>
 
+            <TextView
+                android:id="@+id/exchange_source_textview"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+
+                android:layout_marginStart="@dimen/basic_margin"
+                android:layout_marginEnd="@dimen/basic_margin"
+
+                android:padding="4dp"
+                android:text="@{exchangeRateViewModel.sourceCurrency + exchangeRateViewModel.sourceCurrencyUnit}"
+                android:textColor="@color/light_gray"
+
+                android:textSize="18sp" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+
+                android:layout_gravity="start"
+                android:layout_marginStart="20dp"
+                android:layout_marginTop="@dimen/basic_margin"
+                android:text="환전 화폐"
+                android:textColor="@color/light_gray"
+
+                android:textSize="20sp"
+                android:textStyle="bold" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/basic_margin"
+                android:layout_marginEnd="@dimen/basic_margin"
+                android:orientation="horizontal">
+
+                <EditText
+                    android:id="@+id/exchange_target_edittext"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:text="@{exchangeRateViewModel.targetCurrency}"
+
+                    android:layout_marginEnd="30dp"
+                    android:layout_weight="1"
+                    android:enabled="false"
+                    android:textColor="@color/black"
+                    android:textSize="20sp"
+                    android:textStyle="bold" />
+
+                <Spinner
+                    android:id="@+id/exchange_target_spinner"
+                    android:layout_width="0dp"
+                    android:layout_height="@dimen/standard_height"
+                    android:layout_weight="0.5"
+                    android:background="@drawable/profile_button"
+                    android:backgroundTint="@color/button_gray"
+
+                    android:entries="@array/country"
+
+                    android:textAlignment="center" />
             </LinearLayout>
 
 
-        </FrameLayout>
+            <TextView
+                android:id="@+id/exchange_update_date"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
 
+                android:layout_gravity="start"
+                android:layout_marginStart="@dimen/basic_margin"
+                android:layout_marginTop="@dimen/basic_margin"
+                android:layout_marginBottom="12dp"
+                android:text="@{exchangeRateViewModel.today}"
+                android:textColor="@color/green"
+
+                android:textSize="20sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/exchange_standard"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+
+                android:layout_gravity="start"
+                android:layout_marginStart="@dimen/basic_margin"
+                android:layout_marginEnd="@dimen/basic_margin"
+                android:enabled="false"
+
+                android:paddingStart="4dp"
+                android:text="@{exchangeRateViewModel.notifiedExchangeRate}"
+                android:textColor="@color/black"
+                android:textSize="18sp"
+                android:textStyle="bold" />
+        </LinearLayout>
 
     </ScrollView>
 

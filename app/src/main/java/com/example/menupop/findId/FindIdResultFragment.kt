@@ -1,6 +1,5 @@
 package com.example.menupop.findId
 
-import android.content.Context
 import android.os.Bundle
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
@@ -19,12 +18,6 @@ class FindIdResultFragment : Fragment() {
     private var _binding : FragmentFindIdResultBinding? = null
     private val binding get() = _binding!!
     private lateinit var findIdViewModel: FindIdViewModel
-    private lateinit var context : Context
-
-    override fun onAttach(context: Context) {
-        super.onAttach(context)
-        this.context = context
-    }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,

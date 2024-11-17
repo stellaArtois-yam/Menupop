@@ -1,8 +1,7 @@
 package com.example.menupop.mainActivity.foodPreference
 
 interface FoodPreferenceItemClickListener {
-    fun favoriteItemClick(foodName : String)
-    fun unFavoriteItemClick(foodName:  String)
+    fun itemClick(foodName : String, isFavorite : Boolean)
 }
 interface FoodPreferenceClickListener {
     fun deleteBtnClick(foodPreference: FoodPreference,idx:Int)

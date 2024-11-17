@@ -1,6 +1,5 @@
 package com.example.menupop.resetPassword
 
-import android.content.Context
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -20,18 +19,11 @@ class ResetPasswordCheckIdFragment : Fragment() {
     private var _binding : FragmentResetPasswordCheckIdBinding? = null
     private val binding get() = _binding!!
     private lateinit var resetPasswordViewModel: ResetPasswordViewModel
-    private var context : Context ?= null
-
-    override fun onAttach(context: Context) {
-        super.onAttach(context)
-        this.context = context
-    }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-
         resetPasswordViewModel = ViewModelProvider(requireActivity())[ResetPasswordViewModel::class.java]
         _binding =  DataBindingUtil.inflate(inflater, R.layout.fragment_reset_password_check_id, container, false)
         binding.resetPasswordViewModel = resetPasswordViewModel
@@ -44,12 +36,8 @@ class ResetPasswordCheckIdFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         resetPasswordViewModel.checkIdResult.observe(viewLifecycleOwner) { result ->
-            when(result){
-                true ->  {
-                    findNavController().navigate(R.id.resetPasswordEmailFragment)
-                }
-                false -> binding.passwordResetCheckIdWarning.visibility = View.VISIBLE
-                else -> binding.passwordResetCheckIdWarning.visibility = View.GONE
+            if(result == true){
+                findNavController().navigate(R.id.resetPasswordEmailFragment)
             }
         }
 
@@ -61,7 +49,7 @@ class ResetPasswordCheckIdFragment : Fragment() {
             val id = binding.passwordResetIdCheckEdittext.text.toString().trim()
 
             when(id.isEmpty()){
-                true -> Toast.makeText(context,"아이디를 입력해주세요.",Toast.LENGTH_SHORT).show()
+                true -> Toast.makeText(requireContext(),R.string.id_empty,Toast.LENGTH_SHORT).show()
                 else ->  {
                     lifecycleScope.launch{
                         resetPasswordViewModel.checkId(id)
@@ -75,15 +63,13 @@ class ResetPasswordCheckIdFragment : Fragment() {
         }
 
         binding.passwordResetIdCheckEdittext.addTextChangedListener{
-            binding.passwordResetCheckIdWarning.visibility = View.GONE
+            binding.passwordResetCheckIdWarning.visibility = View.INVISIBLE
         }
     }
 
     override fun onDestroyView() {
         super.onDestroyView()
         resetPasswordViewModel.setCheckIdResult()
-        
         _binding = null
-        context = null
     }
 }

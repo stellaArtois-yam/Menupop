@@ -324,14 +324,15 @@ class SignupActivity : AppCompatActivity() {
         dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
         dialog.setContentView(R.layout.dialog_warning)
 
-        val titleTextView : TextView = dialog.findViewById(R.id.dialog_title)
-        val contentTextView : TextView = dialog.findViewById(R.id.dialog_content)
+        val titleTextView : TextView = dialog.findViewById(R.id.title)
+        val contentTextView : TextView = dialog.findViewById(R.id.content)
 
         titleTextView.text = title
         contentTextView.text = content
 
         if(success){
-            dialogDismiss(dialog, success)
+            dialog.dismiss()
+//            dialogDismiss(dialog, success)
         }
 
         dialog.show()

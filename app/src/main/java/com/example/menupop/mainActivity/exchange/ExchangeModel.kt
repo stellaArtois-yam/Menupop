@@ -1,7 +1,5 @@
 package com.example.menupop.mainActivity.exchange
 
-import android.content.SharedPreferences
-import android.util.Log
 import com.example.menupop.RetrofitService
 import com.google.gson.Gson
 import com.google.gson.GsonBuilder
@@ -35,7 +33,6 @@ class ExchangeModel {
             try{
                 val response = service.requestExchangeRates(authKey,baseRate)
                 if(response.isSuccessful && response.body() != null){
-                    Log.d(TAG, "exchange rate: ${response.body()}")
                     Result.success(response.body()!!)
                 }else{
                     Result.failure(Exception("API 호출 실패: ${response.message()}"))
@@ -44,10 +41,5 @@ class ExchangeModel {
                 Result.failure(e)
             }
         }
-    }
-    fun exchangeRateApplicationStatus(sharedPreferences: SharedPreferences, status : Boolean){
-        var editor = sharedPreferences.edit()
-        editor.putBoolean("exchangeRateApplicationStatus",status)
-        editor.apply()
     }
 }

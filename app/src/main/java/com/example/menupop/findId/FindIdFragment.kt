@@ -1,13 +1,12 @@
 package com.example.menupop.findId
 
-import android.content.Context
-import android.graphics.Color
 import android.os.Bundle
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.AdapterView
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.widget.addTextChangedListener
 import androidx.databinding.DataBindingUtil
@@ -19,20 +18,10 @@ import com.example.menupop.databinding.FragmentFindIdBinding
 import kotlinx.coroutines.launch
 
 class FindIdFragment : Fragment() {
-    companion object{
-        const val TAG = "FindIdFragment"
-    }
 
     private var _binding : FragmentFindIdBinding? = null
     private val binding get() = _binding!!
     private lateinit var findIdViewModel: FindIdViewModel
-    private var context: Context? = null
-
-
-    override fun onAttach(context: Context) {
-        super.onAttach(context)
-        this.context = context
-    }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -53,15 +42,6 @@ class FindIdFragment : Fragment() {
     }
 
     private fun setObservers() {
-
-        findIdViewModel.checkEmailForm.observe(viewLifecycleOwner) {
-            if (it) {
-                binding.findIdEmailWarning.visibility = View.GONE
-            } else {
-                binding.findIdEmailWarning.visibility = View.VISIBLE
-                binding.findIdEmailWarning.setTextColor(Color.RED)
-            }
-        }
 
         findIdViewModel.userIdExistence.observe(viewLifecycleOwner) {
             findNavController().navigate(R.id.findIdResultFragment)
@@ -105,7 +85,7 @@ class FindIdFragment : Fragment() {
                 }
             }
 
-        binding.findIdComfirmButton.setOnClickListener {
+        binding.findIdConfirmButton.setOnClickListener {
 
             if (findIdViewModel.checkEmailForm.value == true) {
                 val emailId = binding.findIdEmail.text.toString()
@@ -113,6 +93,8 @@ class FindIdFragment : Fragment() {
                 lifecycleScope.launch {
                     findIdViewModel.checkUserId(emailId, domainSelection)
                 }
+            }else{
+                Toast.makeText(requireContext(), R.string.email_rule_warning, Toast.LENGTH_SHORT).show()
             }
         }
     }

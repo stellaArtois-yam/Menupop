@@ -16,7 +16,7 @@ class   FindIdViewModel :ViewModel() {
 
     private val findIdModel = FindIdModel()
 
-    private val _checkEmailForm = MutableLiveData<Boolean>()
+    private val _checkEmailForm = MutableLiveData(true)
     val checkEmailForm : LiveData<Boolean>
         get() = _checkEmailForm
 
@@ -40,7 +40,6 @@ class   FindIdViewModel :ViewModel() {
         _checkEmailForm.value = pattern.matcher(email).matches()
 
         when(_checkEmailForm.value){
-            true -> _emailWarning.value = null
             else -> _emailWarning.value = "올바른 이메일 형식이 아닙니다."
         }
     }

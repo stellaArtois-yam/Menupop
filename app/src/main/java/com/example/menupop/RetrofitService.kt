@@ -59,7 +59,7 @@ interface RetrofitService {
     @FormUrlEncoded
     suspend fun sendEmailVerifyCode(@Field("email") email: String): Response<String>
 
-    @POST("checkEmail.php")
+    @POST("CheckEmail.php")
     @FormUrlEncoded
     suspend fun checkEmail(
         @Field("email") email: String,

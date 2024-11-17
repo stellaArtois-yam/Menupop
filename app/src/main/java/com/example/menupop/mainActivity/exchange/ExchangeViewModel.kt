@@ -1,63 +1,65 @@
 package com.example.menupop.mainActivity.exchange
 
-import android.content.SharedPreferences
-import android.util.Log
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.launch
+import java.time.LocalDate
+import java.time.format.DateTimeFormatter
 
 class ExchangeViewModel : ViewModel() {
-    companion object{
+    companion object {
         const val TAG = "ExchangeViewModel"
     }
 
     private val exchangeModel = ExchangeModel()
 
-    val isPossible = MutableLiveData<Boolean>()
+    private var _exchangeData = MutableLiveData<ExchangeRateResponseDTO>() //data 갱신 시 감지
+    val exchangeData : LiveData<ExchangeRateResponseDTO>
+        get() = _exchangeData
 
-    lateinit var data: ExchangeRateResponseDTO
+    var today: String = ""
 
-    private var _targetCurrency = MutableLiveData<String>()
+    private var _targetCurrency = MutableLiveData("")
     val targetCurrency: LiveData<String>
         get() = _targetCurrency
 
-    private var _sourceCurrency = MutableLiveData<String>()
+    private var _sourceCurrency = MutableLiveData("")
     val sourceCurrency: LiveData<String>
         get() = _sourceCurrency
 
-    private var _targetCurrencyUnit = MutableLiveData<String>()
-    val targetCurrencyUnit : LiveData<String>
-        get() = _targetCurrencyUnit
+    private val _notifiedExchangeRate = MutableLiveData("")
+    val notifiedExchangeRate: LiveData<String>
+        get() = _notifiedExchangeRate
 
-    private var _sourceCurrencyUnit = MutableLiveData<String>()
+    private var _targetCurrencyUnit = MutableLiveData("")
+
+    private var _sourceCurrencyUnit = MutableLiveData("")
     val sourceCurrencyUnit : LiveData<String>
         get() = _sourceCurrencyUnit
 
-    fun setSourceUnit(unit : String){
-        _sourceCurrencyUnit.value= unit
+    fun setSourceUnit(unit: String) {
+        _sourceCurrencyUnit.value = unit
+        if(_sourceCurrency.value == ""){
+            _sourceCurrency.value = "1"
+        }
+        updateFormattedNumber(_sourceCurrency.value!!)
     }
 
-    fun setTargetUnit(unit : String){
+    fun setTargetUnit(unit: String) {
         _targetCurrencyUnit.value = unit
     }
 
-    fun checkedSetCurrency() : Boolean {
-        return _targetCurrency.value != null && _sourceCurrency.value != null
-    }
-
+    @RequiresApi(Build.VERSION_CODES.O)
     fun init() {
-        _targetCurrency.value = "0"
-        _sourceCurrency.value = "0"
-        _notifiedExchangeRate.value = "0"
-        _sourceCurrencyUnit.value = ""
-        _targetCurrencyUnit.value = ""
+        val formatter = DateTimeFormatter.ofPattern("yyyy년 MM월 dd일 기준 환율")
+        today = LocalDate.now().format(formatter)
     }
 
-    /**
-     * 환율 정보 요청
-     */
+    // 기준 화폐로 환율 요청
     suspend fun requestExchangeRate(authKey: String, baseRate: String) {
         val regex = "\\((.*?)\\)".toRegex()
         val baseMatchResult = regex.find(baseRate)
@@ -65,83 +67,56 @@ class ExchangeViewModel : ViewModel() {
 
         viewModelScope.launch {
             val result = exchangeModel.requestExchangeRate(authKey, baseCurrencies!!)
-            if(result.isSuccess){
-
-                data = result.getOrDefault(ExchangeRateResponseDTO(
-                    baseCode = "",
-                    conversionRates = emptyMap(),
-                    documentation = "",
-                    result = "failed",
-                    termsOfUse = "",
-                    timeLastUpdateUnix = 0,
-                    timeLastUpdateUtc = "",
-                    timeNextUpdateUnix = 0,
-                    timeNextUpdateUtc = ""
-                ))
-
-                Log.d(TAG, "requestExchangeRate: $data")
+            if (result.isSuccess) {
+                _exchangeData.value = result.getOrDefault(
+                    ExchangeRateResponseDTO(
+                        baseCode = "",
+                        conversionRates = emptyMap(),
+                        documentation = "",
+                        result = "failed",
+                        termsOfUse = "",
+                        timeLastUpdateUnix = 0,
+                        timeLastUpdateUtc = "",
+                        timeNextUpdateUnix = 0,
+                        timeNextUpdateUtc = ""
+                    )
+                )
             }
         }
     }
 
-    /**
-     * 고시 환율 변환
-     */
-    private val _notifiedExchangeRate = MutableLiveData<String>()
-    val notifiedExchangeRate: LiveData<String>
-        get() = _notifiedExchangeRate
-
-    fun exchange(amount: String, targetCurrency: String) {
-        if (amount.isEmpty()) {
-            return
-        } else if (targetCurrency == "선택") {
-            return
-        }
+    fun exchange(amount: String, targetCurrencyUnit: String) {
+        if (targetCurrencyUnit == "선택") return
+        val sanitizedAmount = amount.ifEmpty { "1" }
 
         val regex = "\\((.*?)\\)".toRegex()
-        val targetMatchResult = regex.find(targetCurrency)
-        val amounts = amount.replace(",", "").toDouble()
+        val targetMatchResult = regex.find(targetCurrencyUnit)
+        val amounts = sanitizedAmount.replace(",", "").toDouble()
         val targetCurrency = targetMatchResult?.groupValues?.get(1)
 
-        Log.d(TAG, "exchange: $amounts, $targetCurrency")
-
         calculateExchange(amounts, targetCurrency!!)
-
     }
 
 
     private fun calculateExchange(amount: Double?, targetCurrency: String) {
-        val targetRate = data.conversionRates[targetCurrency]
+        val targetRate = _exchangeData.value!!.conversionRates[targetCurrency]
 
         if (targetRate != null && amount != null) {
-            _targetCurrency.value = addCommasToNumber(amount * targetRate.toDouble())
-            val notifiedRate = calculateNotifiedExchangeRate(targetCurrency, targetRate)
-
-            if(targetCurrency == "JPY" || targetCurrency == "VND"){
-                _notifiedExchangeRate.value = addCommasToNumber(notifiedRate) + "원 (100)"
-            }else{
-                _notifiedExchangeRate.value =  addCommasToNumber(notifiedRate) + "원"
-            }
-
+            _targetCurrency.value = addCommasToNumber(amount * targetRate.toDouble()) + _targetCurrencyUnit.value
+            val notifiedRate = calculateNotifiedExchangeRate(targetRate)
+            _notifiedExchangeRate.value =
+                addCommasToNumber(notifiedRate) + _sourceCurrencyUnit.value + " = 1" + _targetCurrencyUnit.value
         }
     }
 
-    private fun calculateNotifiedExchangeRate(targetCurrency: String, targetRate: Double): Double {
-        return if (targetCurrency == "VND" || targetCurrency == "JPY") {
-            val result = 100 / targetRate
-            Log.d(TAG, "VND/JPY: (100) $result")
-            result
-        } else {
-            val result = 1 / targetRate
-            Log.d(TAG, "others: $result")
-            result
-        }
+    private fun calculateNotifiedExchangeRate(targetRate: Double): Double {
+        return 1 /targetRate
     }
 
-    fun updateFormattedNumber(input: String, unit : String?) {
+    fun updateFormattedNumber(input: String) {
         val number = input.replace(",", "")
         val formattedText = formatNumberWithCommas(number)
-        _sourceCurrency .value = formattedText + unit
+        _sourceCurrency.value = formattedText
     }
 
     private fun formatNumberWithCommas(number: String): String {
@@ -149,14 +124,8 @@ class ExchangeViewModel : ViewModel() {
         return number.replace(regex, "$1,")
     }
 
-    fun exchangeRateApplicationStatus(sharedPreferences: SharedPreferences, status: Boolean) {
-        exchangeModel.exchangeRateApplicationStatus(sharedPreferences, status)
-
-    }
-
     private fun addCommasToNumber(number: Double): String {
         return String.format("%,.2f", number)
     }
-
 
 }

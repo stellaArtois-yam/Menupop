@@ -1,12 +1,10 @@
 package com.example.menupop.mainActivity
 
-import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
@@ -17,25 +15,24 @@ import com.example.menupop.databinding.FragmentCountrySelectionBinding
 import com.example.menupop.mainActivity.translation.CameraActivity
 import com.google.android.material.bottomsheet.BottomSheetDialog
 
-class CountrySelectionFragment  : Fragment(){
-    companion object {
-        const val TAG = "CountrySelectionFragment"
-    }
-    private lateinit var context : Context
-    private var _binding : FragmentCountrySelectionBinding? = null
+
+class CountrySelectionFragment : Fragment() {
+
+    private var _binding: FragmentCountrySelectionBinding? = null
     private val binding get() = _binding!!
-    private lateinit var mainViewModel : MainActivityViewModel
-    override fun onAttach(context: Context) {
-        super.onAttach(context)
-        this.context = context
-    }
+    private lateinit var mainViewModel: MainActivityViewModel
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
         mainViewModel = ViewModelProvider(requireActivity())[MainActivityViewModel::class.java]
-        _binding =  DataBindingUtil.inflate(inflater, R.layout.fragment_country_selection, container, false)
+        _binding = DataBindingUtil.inflate(
+            inflater,
+            R.layout.fragment_country_selection,
+            container,
+            false
+        )
         binding.mainActivityViewModel = mainViewModel
         binding.lifecycleOwner = this
 
@@ -45,16 +42,17 @@ class CountrySelectionFragment  : Fragment(){
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        mainViewModel.countrySelection.observe(viewLifecycleOwner){
-            val intent = Intent(context, CameraActivity::class.java)
-            intent.putExtra("foodPreference",mainViewModel.foodPreferenceList.value?.foodList)
-            intent.putExtra("country",it)
+        mainViewModel.countrySelection.observe(viewLifecycleOwner) {
+            val intent = Intent(requireContext(), CameraActivity::class.java)
+            intent.putExtra("foodPreference", mainViewModel.foodPreferenceList.value?.foodList)
+            intent.putExtra("country", it)
             startActivity(intent)
         }
         setListener()
         observeData()
     }
-    private fun setListener(){
+
+    private fun setListener() {
         binding.countrySelectionAmerica.setOnClickListener {
             mainViewModel.selectionCountry(binding.countrySelectionAmerica)
         }
@@ -75,21 +73,21 @@ class CountrySelectionFragment  : Fragment(){
         }
     }
 
-    private fun observeData(){
-        if(!mainViewModel.checkingTranslationTicket()){
+    private fun observeData() {
+        if (!mainViewModel.checkingTranslationTicket()) {
             emptyTicketShowDialog()
         }
     }
 
     private fun emptyTicketShowDialog() {
         val bindingDialog: DialogTicketBottomBinding = DataBindingUtil.inflate(
-            LayoutInflater.from(context),
+            LayoutInflater.from(requireContext()),
             R.layout.dialog_ticket_bottom,
             null,
             false
         )
         bindingDialog.viewModel = mainViewModel
-        val bottomSheetDialog = BottomSheetDialog(context)
+        val bottomSheetDialog = BottomSheetDialog(requireContext())
         bottomSheetDialog.setContentView(bindingDialog.root)
 
         bindingDialog.dialogTicketBottomDown.setOnClickListener {
@@ -103,5 +101,10 @@ class CountrySelectionFragment  : Fragment(){
         }
 
         bottomSheetDialog.show()
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
     }
 }

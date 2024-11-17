@@ -4,7 +4,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <data>
-
+        <import type="android.view.View"/>
         <variable
             name="findIdViewModel"
             type="com.example.menupop.findId.FindIdViewModel" />
@@ -53,7 +53,7 @@
                 android:hint="이메일"
                 android:paddingStart="10dp"
                 android:textColorHint="@color/light_gray"
-                android:textSize="16sp"/>
+                android:textSize="15sp"/>
 
             <TextView
                 android:id="@+id/find_id_at"
@@ -76,9 +76,6 @@
 
         </LinearLayout>
 
-
-
-
         <TextView
             android:id="@+id/find_id_email_warning"
             android:layout_width="match_parent"
@@ -88,17 +85,18 @@
             android:paddingStart="10dp"
             android:text="@{findIdViewModel.emailWarning}"
             android:textColor="@color/red"
-            android:textSize="15.5sp"
-            android:visibility="gone"
+            android:textSize="15sp"
+            android:visibility="@{findIdViewModel.checkEmailForm == false ? View.VISIBLE : View.INVISIBLE}"
 
-            android:layout_margin="@dimen/basic_margin"
+            android:layout_marginStart="@dimen/basic_margin"
+            android:layout_marginEnd="@dimen/basic_margin"
 
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/find_id_linear" />
 
         <androidx.appcompat.widget.AppCompatButton
-            android:id="@+id/find_id_comfirm_button"
+            android:id="@+id/find_id_confirm_button"
             android:layout_width="match_parent"
             android:layout_height="@dimen/standard_height"
             android:background="@drawable/button_round"
@@ -109,7 +107,6 @@
             android:textSize="18sp"
             android:textStyle="bold"
 
-            android:layout_marginTop="@dimen/button_bottom_margin"
             android:layout_marginStart="@dimen/basic_margin"
             android:layout_marginEnd="@dimen/basic_margin"
 

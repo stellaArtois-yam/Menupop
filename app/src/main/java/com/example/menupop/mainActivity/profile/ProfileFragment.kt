@@ -2,11 +2,11 @@ package com.example.menupop.mainActivity.profile
 
 import android.annotation.SuppressLint
 import android.app.Dialog
-import android.content.Context
 import android.content.Context.MODE_PRIVATE
 import android.content.Intent
 import android.content.SharedPreferences
 import android.graphics.Color
+import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
 import android.util.Log
 import androidx.fragment.app.Fragment
@@ -14,7 +14,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.Window
-import android.view.WindowManager
 import android.widget.Button
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
@@ -38,15 +37,7 @@ class ProfileFragment : Fragment() {
     private var _binding: FragmentProfileBinding? = null
     private val binding get() = _binding!!
     private lateinit var viewModel: MainActivityViewModel
-    private lateinit var context: Context
     private lateinit var sharedPreferences: SharedPreferences
-
-
-    override fun onAttach(context: Context) {
-        super.onAttach(context)
-        this.context = context
-    }
-
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -63,7 +54,7 @@ class ProfileFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        sharedPreferences = context.getSharedPreferences("userInfo", MODE_PRIVATE)
+        sharedPreferences = requireActivity().getSharedPreferences("userInfo", MODE_PRIVATE)
 
         viewModel.getProfileImage(sharedPreferences, resources)
 
@@ -123,7 +114,7 @@ class ProfileFragment : Fragment() {
             binding.profileAdButton.isClickable = false
             Log.d(TAG, "setClick: 광고 보러가기 클릭됨")
             if (viewModel.userInformation.value!!.dailyReward == 0) {
-                Toast.makeText(context, "하루에 받을 수 있는 리워드를 초과했습니다.", Toast.LENGTH_SHORT).show()
+                Toast.makeText(requireContext(), "하루에 받을 수 있는 리워드를 초과했습니다.", Toast.LENGTH_SHORT).show()
             } else {
                 val key = BuildConfig.GOOGLE_AD_ID
                 Log.d(MainActivity.TAG, "key: $key")
@@ -133,12 +124,12 @@ class ProfileFragment : Fragment() {
             }
         }
 
-        // 로그아웃하면 다이얼로그 뜨고
+        // 로그아웃 다이얼로그
         binding.profileLogoutButton.setOnClickListener {
             showLogoutDialog()
         }
 
-        // 회원탈퇴 누르면 프래그먼트 이동
+        // 회원탈퇴 프래그먼트 이동
         binding.profileWithdrawalButton.setOnClickListener {
             findNavController().navigate(R.id.withdrawalFragment)
         }
@@ -146,24 +137,23 @@ class ProfileFragment : Fragment() {
 
 
     private fun showLogoutDialog() {
-        val dialog = Dialog(context)
+        val dialog = Dialog(requireContext())
 
         dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
         dialog.setContentView(R.layout.dialog_two_button)
-        dialog.window!!.setLayout(
-            WindowManager.LayoutParams.MATCH_PARENT,
-            WindowManager.LayoutParams.WRAP_CONTENT
-        )
+        dialog.window!!.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+        val size = viewModel.getDisplaySize(0.9f, 0.3f)
+        dialog.window!!.setLayout(size.first, size.second)
         dialog.show()
 
         dialog.findViewById<Button>(R.id.dialog_two_button_agree).setOnClickListener {
             dialog.dismiss()
 
             val sharedPreferences =
-                context.getSharedPreferences("userInfo", AppCompatActivity.MODE_PRIVATE)
+                requireActivity().getSharedPreferences("userInfo", AppCompatActivity.MODE_PRIVATE)
             viewModel.logout(sharedPreferences!!)
 
-            val intent = Intent(context, LoginActivity::class.java)
+            val intent = Intent(requireContext(), LoginActivity::class.java)
             startActivity(intent)
         }
 

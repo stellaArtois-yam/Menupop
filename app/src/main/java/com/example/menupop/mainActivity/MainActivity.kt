@@ -31,8 +31,9 @@ class MainActivity : AppCompatActivity() {
         const val TAG = "mainActivityTAG"
     }
 
-    lateinit var mainActivityViewModel: MainActivityViewModel
-    lateinit var binding: ActivityMainBinding
+    private lateinit var mainActivityViewModel: MainActivityViewModel
+    private var _binding: ActivityMainBinding? = null
+    val binding get() = _binding!!
     private lateinit var navController: NavController
     private var checkingTranslation: Boolean = false
 
@@ -64,7 +65,7 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
 
         mainActivityViewModel = ViewModelProvider(this)[MainActivityViewModel::class.java]
-        binding = DataBindingUtil.setContentView(this, R.layout.activity_main)
+        _binding = DataBindingUtil.setContentView(this, R.layout.activity_main)
         binding.mainActivityViewModel = mainActivityViewModel
         binding.lifecycleOwner = this
 
@@ -184,6 +185,11 @@ class MainActivity : AppCompatActivity() {
 
         Log.d(TAG, "loadingDialog: 실행")
         return dialog
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        _binding = null
     }
 
 }

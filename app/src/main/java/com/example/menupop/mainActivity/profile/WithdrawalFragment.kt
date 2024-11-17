@@ -1,7 +1,6 @@
 package com.example.menupop.mainActivity.profile
 
 import android.app.Dialog
-import android.content.Context
 import android.content.Intent
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
@@ -36,12 +35,6 @@ class WithdrawalFragment : Fragment() {
     private var _binding : FragmentWithdrawalBinding? = null
     private val binding get() = _binding!!
     private lateinit var mainViewModel: MainActivityViewModel
-    private lateinit var context: Context
-
-    override fun onAttach(context: Context) {
-        super.onAttach(context)
-        this.context = context
-    }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -71,7 +64,7 @@ class WithdrawalFragment : Fragment() {
             if(binding.withdrawalCheckBox.isChecked){
                 showDialog()
             }else{
-                Toast.makeText(context,"주의 사항에 동의해주세요", Toast.LENGTH_LONG).show()
+                Toast.makeText(requireContext(),"주의 사항에 동의해주세요", Toast.LENGTH_LONG).show()
             }
         }
 
@@ -81,7 +74,7 @@ class WithdrawalFragment : Fragment() {
     }
 
     private fun showDialog(){
-        val dialog = Dialog(context)
+        val dialog = Dialog(requireContext())
 
         dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
         dialog.setContentView(R.layout.dialog_two_button)
@@ -100,7 +93,7 @@ class WithdrawalFragment : Fragment() {
         agreeButton.setOnClickListener{
             dialog.dismiss()
             //회원 탈퇴
-            val sharedPreferences = context.getSharedPreferences("userInfo", AppCompatActivity.MODE_PRIVATE)
+            val sharedPreferences = requireActivity().getSharedPreferences("userInfo", AppCompatActivity.MODE_PRIVATE)
             lifecycleScope.launch {
                 mainViewModel.withdrawal(sharedPreferences)
             }

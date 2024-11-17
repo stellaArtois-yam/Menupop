@@ -57,34 +57,19 @@ class MainActivityViewModel(private val application: Application) : AndroidViewM
     val accountWithdrawal: LiveData<String>
         get() = _accountWithdrawal
 
-    // 받은 리워드
-    private val _todayRewarded = MutableLiveData<Int>()
-
+    private val _todayRewarded = MutableLiveData<Int>() // 받은 리워드
     val todayRewarded: LiveData<Int>
         get() = _todayRewarded
 
     private val _countrySelection = MutableLiveData<String>()
-
     val countrySelection: LiveData<String> get() = _countrySelection
 
-    fun getProfileList(resources: Resources): ArrayList<ProfileSelectionDTO> {
-        val imageNames = resources.getStringArray(R.array.profile)
-        val imageList: ArrayList<ProfileSelectionDTO> = ArrayList()
-
-        for (name in imageNames) {
-            val imageName = resources.getIdentifier(name, "drawable", application.packageName)
-            val image = ResourcesCompat.getDrawable(resources, imageName, null)
-            imageList.add(ProfileSelectionDTO(image!!))
-        }
-
-        return imageList
-    }
+    private var _isFreeTicket = MutableLiveData<Boolean>(false) // dialog 티켓 상태 결정
+    val isFreeTicket : LiveData<Boolean>
+        get() = _isFreeTicket
 
 
-    /**
-     * 메인
-     */
-    private val _isLoaded = MutableLiveData<String>()
+    private val _isLoaded = MutableLiveData<String>() //유저 정보 로드
         .apply { value = "yet" }
     val isLoaded: LiveData<String>
         get() = _isLoaded
@@ -101,6 +86,18 @@ class MainActivityViewModel(private val application: Application) : AndroidViewM
     val profileImage: MutableLiveData<Drawable?>
         get() = _profileImage
 
+    fun getProfileList(resources: Resources): ArrayList<ProfileSelectionDTO> {
+        val imageNames = resources.getStringArray(R.array.profile)
+        val imageList: ArrayList<ProfileSelectionDTO> = ArrayList()
+
+        for (name in imageNames) {
+            val imageName = resources.getIdentifier(name, "drawable", application.packageName)
+            val image = ResourcesCompat.getDrawable(resources, imageName, null)
+            imageList.add(ProfileSelectionDTO(image!!))
+        }
+
+        return imageList
+    }
 
     suspend fun updateTicketQuantity(ticketType: String, operator: String, quantity: Int) {
         viewModelScope.launch {
@@ -139,6 +136,17 @@ class MainActivityViewModel(private val application: Application) : AndroidViewM
         _userInformation.value!!.translationTicket =
             _userInformation.value!!.translationTicket + _rewardTranslationAmount.value!!
 
+    }
+
+    fun checkFoodTicketEmpty(): Boolean {
+        if (userInformation.value?.foodTicket!! > 0 || userInformation.value?.freeFoodTicket!! > 0) {
+            return false
+        }
+        return true
+    }
+
+    fun setTicketStatus(boolean: Boolean) {
+        _isFreeTicket.value = boolean
     }
 
     suspend fun foodPreferenceRegister(foodName: String, classification: String) {
