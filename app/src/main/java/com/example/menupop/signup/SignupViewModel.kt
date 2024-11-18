@@ -1,6 +1,5 @@
 package com.example.menupop.signup
 
-
 import android.os.CountDownTimer
 import android.util.Log
 import android.util.Patterns
@@ -21,41 +20,51 @@ class SignupViewModel : ViewModel() {
 
     private val signupModel  = SignupModel()
 
-    private val _idWarning = MutableLiveData<String?>()
-    val idWarning : LiveData<String?>
+    private val _idWarning = MutableLiveData<String>()
+    val idWarning : LiveData<String>
         get() = _idWarning
 
-    private val _isValidId = MutableLiveData<Boolean>()
-    val isValidId : LiveData<Boolean>
+    private val _isValidId = MutableLiveData<Boolean?>(null)
+    val isValidId : LiveData<Boolean?>
         get() = _isValidId
+
+
+    private val _isIdDuplication = MutableLiveData<Boolean?>(null)
+    val isIdDuplication : LiveData<Boolean?>
+        get() = _isIdDuplication
+
+    private val _isValidPassword = MutableLiveData<Boolean?>(null) // 비밀 번호 유효성
+    val isValidPassword : LiveData<Boolean?>
+        get() = _isValidPassword
+
+    private val _isValidPasswordConfirm = MutableLiveData<Boolean?>(null) // 비밀 번호 확인 일치
+    val isValidPasswordConfirm : LiveData<Boolean?>
+        get() = _isValidPasswordConfirm
+
+    private val _checkEmailForm = MutableLiveData<Boolean?>(null) // 이메일 형식 체크
+    val checkEmailForm : LiveData<Boolean?>
+        get() = _checkEmailForm
+
+    private val _emailWarning = MutableLiveData<String>() // 이메일 경고 메세지(중복, 형식 불일치)
+    val emailWarning : LiveData<String>
+        get() = _emailWarning
 
     private var provideChecking : Boolean = false
     private var marketingChecking : Boolean = false
 
-    private fun validateId(inputId: String): Boolean {
-
+    private fun checkValidateId(inputId: String) : Boolean{
         val regex = Regex("^[a-zA-Z0-9]{6,12}\$")
-
-        return regex.matches(inputId)
+        return regex.matches(inputId) && inputId.length > 5 && inputId.length < 13
     }
 
-    fun onIdTextChanged(id: String) {
-        if (validateId(id)) {
-            _idWarning.value = null
+    fun onIdTextChanged(id : String){
+        if(checkValidateId(id)){
             _isValidId.value = true
-        } else {
+        }else{
             _idWarning.value = "아이디는 6-12자 이내, 영문, 숫자 사용 가능"
             _isValidId.value = false
         }
     }
-
-
-
-    private val _isIdDuplication = MutableLiveData<Boolean>()
-    val isIdDuplication : LiveData<Boolean>
-        get() = _isIdDuplication
-
-
 
     suspend fun checkUserIdDuplication(id : String) {
         viewModelScope.launch {
@@ -70,45 +79,16 @@ class SignupViewModel : ViewModel() {
         }
     }
 
-
-    /**
-     * 비밀번호 경고 문구
-     */
-    private val _passwordWarning = MutableLiveData<String?>()
-    val passwordWarning : LiveData<String?>
-        get() = _passwordWarning
-
-    private val _confirmPasswordWarning = MutableLiveData<String?>()
-    val confirmPasswordWarning : LiveData<String?>
-        get() = _confirmPasswordWarning
-
-    private val _isValidPassword = MutableLiveData<Boolean>()
-    val isValidPassword : LiveData<Boolean>
-        get() = _isValidPassword
-
-    private val _isValidPasswordConfirm = MutableLiveData<Boolean>()
-    val isValidPasswordConfirm : LiveData<Boolean>
-        get() = _isValidPasswordConfirm
+    fun setIsIdDuplication(boolean: Boolean?){
+        _isIdDuplication.value = boolean
+    }
 
     fun onPasswordTextChanged(password: String) {
-        if (validatePassword(password)) {
-            _passwordWarning.value = null
-            _isValidPassword.value = true
-        } else {
-            _passwordWarning.value = "비밀번호는 최소 8자에 영문, 숫자, 특수문자 중 2가지 이상을 사용해야 합니다."
-            _isValidPassword.value = false
-        }
+        _isValidPassword.value = validatePassword(password)
     }
 
     fun onConfirmPasswordTextChanged(password: String, confirmPassword: String) {
-        if (checkPasswordsMatch(password, confirmPassword)) {
-            _confirmPasswordWarning.value = null
-            _isValidPasswordConfirm.value = true
-
-        } else {
-            _confirmPasswordWarning.value = "비밀번호가 일치하지 않습니다."
-            _isValidPasswordConfirm.value = false
-        }
+        _isValidPasswordConfirm.value = checkPasswordsMatch(password, confirmPassword)
     }
 
     private fun validatePassword(password: String): Boolean {
@@ -123,8 +103,6 @@ class SignupViewModel : ViewModel() {
 
         val count = listOf(hasDigit, hasLetter, hasSpecialChar).count { it }
 
-        Log.d(TAG, "validatePassword: $hasMinimumLength && $count")
-
         return hasMinimumLength && count >= 2
     }
 
@@ -132,46 +110,25 @@ class SignupViewModel : ViewModel() {
         return password == confirmPassword
     }
 
-
-    /**
-     * 이메일
-     */
-
-    private val _isEmailButton = MutableLiveData<Boolean>()
-    val isEmailButton : LiveData<Boolean>
-        get() = _isEmailButton
-
-    private val _checkEmailForm = MutableLiveData<Boolean>()
-    val checkEmailForm : LiveData<Boolean>
-        get() = _checkEmailForm
-
-    private val _emailWarning = MutableLiveData<String>()
-    val emailWarning : LiveData<String>
-        get() = _emailWarning
-
-    fun checkEmailForm(email : String, domain : String){
+    fun checkEmailForm(emailId : String, domain : String){
 
         val pattern : Pattern = Patterns.EMAIL_ADDRESS
-        val email = "${email}@${domain}"
+        val email = "${emailId}@${domain}"
 
         _checkEmailForm.value = pattern.matcher(email).matches()
 
         if(_checkEmailForm.value == false){
-
-            _isEmailButton.value = false
             _emailWarning.value = "올바른 이메일 형식이 아닙니다."
-            Log.d(TAG, "emailButton: ${_isEmailButton.value}")
-
-        }else{
-            _isEmailButton.value = true
-            Log.d(TAG, "emailButton: ${_isEmailButton.value}")
         }
+    }
+
+    fun setCheckEmailForm(boolean: Boolean){
+        _checkEmailForm.value = boolean
     }
 
     private val _isEmailExistence = MutableLiveData<Boolean>()
     val isEmailExistence : LiveData<Boolean>
         get() = _isEmailExistence
-
 
 
     suspend fun checkEmailExistence(email: String) {
@@ -195,35 +152,31 @@ class SignupViewModel : ViewModel() {
     fun requestEmailAuth(email : String) {
         viewModelScope.launch{
             val response = signupModel.sendVerifyCode(email)
-            Log.d(TAG, "code: $response")
             verifyCode = response
         }
     }
 
     fun checkVerifyCode(verifyCode : String) {
-        Log.d(TAG, "checkVerifyCode: $verifyCode 인증코드 ${this.verifyCode}")
         val result = this.verifyCode == verifyCode
-        Log.d(TAG, "result : $result")
         _verifyCompleted.value = result
 
         if(_verifyCompleted.value == true){
-            _certificationWarning.value = "인증 완료"
+            _certificationTimer.value = "인증 완료"
         }
-
     }
 
 
-    private val _certificationWarning = MutableLiveData<String>()
-    val certificationWarning : LiveData<String>
-        get() = _certificationWarning
+    private val _certificationTimer = MutableLiveData<String>()
+    val certificationTimer : LiveData<String>
+        get() = _certificationTimer
 
-    private val _isTimeExpired = MutableLiveData<Boolean>()
+    private val _isTimeExpired = MutableLiveData(false)
     val isTimeExpired : LiveData<Boolean>
         get() = _isTimeExpired
 
     private var timer: CountDownTimer? = null // 타이머 객체
 
-    // 타이머를 시작하는 메서드
+    // 타이머 시작
     fun startTimer() {
         // 3분(180초)으로 초기화
         val initialTime = TimeUnit.MINUTES.toMillis(3)
@@ -232,18 +185,15 @@ class SignupViewModel : ViewModel() {
                 // 남은 시간을 LiveData에 업데이트
                 val minutes = TimeUnit.MILLISECONDS.toMinutes(millisUntilFinished)
                 val seconds = TimeUnit.MILLISECONDS.toSeconds(millisUntilFinished) % 60
-                _certificationWarning.value = "시간 제한 : " + String.format("%02d:%02d", minutes, seconds)
-                _isTimeExpired.value = false
+                _certificationTimer.value = "시간 제한 : " + String.format("%02d:%02d", minutes, seconds)
             }
 
             override fun onFinish() {
                 // 타이머가 종료되면 인증번호 만료
                 _isTimeExpired.value = true
-                _certificationWarning.value = "인증번호가 만료되었습니다."
-
+                _certificationTimer.value = "인증번호가 만료되었습니다."
             }
         }
-
         timer?.start()
     }
 
@@ -259,29 +209,19 @@ class SignupViewModel : ViewModel() {
 
 
     fun checkUserInformation() : Boolean{
-        Log.d(TAG, "isValidId: ${_isValidId.value}")
-        Log.d(TAG, "checkEmailForm: ${_checkEmailForm.value}")
-        Log.d(TAG, "password: ${_isValidPassword.value}")
-        Log.d(TAG, "passwordConfirm: ${_isValidPasswordConfirm.value}")
-        Log.d(TAG, "verifyCompleted: ${_verifyCompleted.value}")
-
-        return _isValidId.value == true && _checkEmailForm.value == true &&
+        return _isIdDuplication.value == false && _checkEmailForm.value == true &&
                 _isValidPassword.value == true && _isValidPasswordConfirm.value == true &&
                 _verifyCompleted.value == true
-
     }
+
     private val _saveResult = MutableLiveData<Boolean>()
     val saveResult : LiveData<Boolean>
         get() = _saveResult
 
-
     suspend fun sendUserInformation(id : String, password : String, email :String, identifier : Int){
         viewModelScope.launch{
             val response =  signupModel.sendUserInformation(id, password, email, identifier)
-
-            if(response.result=="success"){
-                _saveResult.value = response.result == "success"
-            }
+            _saveResult.value = response.result == "success"
         }
     }
 

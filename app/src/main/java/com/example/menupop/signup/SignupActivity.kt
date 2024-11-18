@@ -3,6 +3,7 @@ package com.example.menupop.signup
 import android.app.Dialog
 import android.content.Intent
 import android.graphics.Color
+import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
 import android.util.Log
 import android.view.View
@@ -26,7 +27,7 @@ import kotlinx.coroutines.launch
 
 class SignupActivity : AppCompatActivity() {
     companion object{
-        const val TAG = "SignupActivity"
+        const val TAG = "SignupActivityTAG"
     }
 
     private lateinit var signupViewModel: SignupViewModel
@@ -46,21 +47,110 @@ class SignupActivity : AppCompatActivity() {
         binding.appbarMenu.findViewById<ImageView>(R.id.appbar_back).setOnClickListener {
             finish()
         }
+        setObservers()
+        setListeners()
+    }
 
-
-        binding.signupIdEdittext.addTextChangedListener {
-            Log.d(TAG, "it: ${it.toString()}")
-            signupViewModel.onIdTextChanged(it.toString())
+    private fun setIdViewsStatus(boolean: Boolean){
+        binding.signupIdEdittext.isEnabled = boolean
+        binding.signupIdEdittext.isClickable = boolean
+        if(boolean){
+            binding.signupIdDuplicationButton.text = "중복확인"
+        }else{
+            binding.signupIdDuplicationButton.text = "재입력"
         }
+    }
 
+    private fun setEmailViewsStatus(boolean: Boolean){
+        binding.signupEmailIdEdittext.isEnabled = boolean
+        binding.signupEmailSelection.isEnabled = boolean
+    }
 
+    private fun setObservers(){
+        //아이디 유효성 검사
         signupViewModel.isValidId.observe(this){ idValidate ->
-            if (idValidate == false) {
+
+            if (idValidate == null || idValidate) {
+                binding.signupIdWarning.visibility = View.GONE
+            } else{
                 binding.signupIdWarning.visibility = View.VISIBLE
                 binding.signupIdWarning.setTextColor(Color.RED)
-            } else {
-                binding.signupIdWarning.visibility = View.GONE
             }
+        }
+
+        //아이디 중복 여부
+        signupViewModel.isIdDuplication.observe(this) { isDuplicate ->
+
+            when (isDuplicate) {
+                true -> {
+                    binding.signupIdWarning.visibility = View.VISIBLE
+                    binding.signupIdWarning.setTextColor(Color.RED)
+
+                }
+                false -> {
+                    binding.signupIdWarning.visibility = View.VISIBLE
+                    binding.signupIdWarning.setTextColor(Color.BLUE)
+                    setIdViewsStatus(false)
+                }
+                else -> {
+                    binding.signupIdWarning.visibility = View.GONE
+                }
+            }
+        }
+
+        // 이메일 중복 여부
+        signupViewModel.isEmailExistence.observe(this) {exist ->
+            if(!exist){
+                binding.signupCertificationEdittext.isEnabled = true // 인증 번호 입력란 사용 가능
+                binding.signupEmailWarning.visibility = View.GONE // 이메일 경고창
+                setEmailViewsStatus(false)
+
+                val emailId = binding.signupEmailIdEdittext.text.toString().trim()
+                val domainSelection = binding.signupEmailSelection.selectedItem.toString()
+                val fullEmail = "${emailId}@${domainSelection}"
+
+                signupViewModel.requestEmailAuth(fullEmail) //이메일 인증
+
+                binding.signupCertificationButton.text = "확인"
+                signupViewModel.startTimer() //타이머 시작
+                binding.signupCertificationTimer.visibility = View.VISIBLE //시간초
+
+            }else{
+                binding.signupEmailWarning.visibility = View.VISIBLE // 가입된 아이디 존재 문구창
+                binding.signupEmailWarning.setTextColor(Color.RED)
+            }
+        }
+
+        //인증 번호 만료
+        signupViewModel.isTimeExpired.observe(this) {
+            if (it) {
+                binding.signupCertificationButton.text = "재인증"
+                setEmailViewsStatus(true)
+            }
+        }
+
+        signupViewModel.verifyCompleted.observe(this) { result ->
+            if (result) {
+                signupViewModel.stopTimer()
+                binding.signupCertificationEdittext.isEnabled = false // 인증 번호 입력 불가
+                binding.signupCertificationButton.isEnabled = false // 인증 번호 버튼 사용 불가
+                binding.signupCertificationTimer.setTextColor(Color.BLUE)
+
+            }else{
+                customDialog("인증번호 불일치", "인증번호가 일치하지 않습니다. \n다시 입력해주세요.", false)
+            }
+        }
+
+        signupViewModel.saveResult.observe(this) {result->
+            when(result){
+                true -> customDialog("회원가입 완료", "반갑습니다 :) \n로그인 후 이용해주세요", true)
+                else -> customDialog("회원가입 실패", resources.getString(R.string.network_error), false)
+            } }
+    }
+
+    private fun setListeners(){
+        binding.signupIdEdittext.addTextChangedListener {
+            signupViewModel.onIdTextChanged(it.toString())
         }
 
         binding.signupPersonalCheckbox.setOnCheckedChangeListener { _, isCheck ->
@@ -70,9 +160,7 @@ class SignupActivity : AppCompatActivity() {
             signupViewModel.marketingCheckBoxChecked(isCheck)
         }
 
-        /**
-         * 3. 아이디 중복검사 버튼을 누르면
-         */
+        //아이디 중복검사
         binding.signupIdDuplicationButton.setOnClickListener {
             //중복확인을 안한 상태
             if (binding.signupIdDuplicationButton.text.equals("중복확인")) {
@@ -93,37 +181,11 @@ class SignupActivity : AppCompatActivity() {
                     }
                 }
             } else {
-                binding.signupIdWarning.visibility = View.GONE
-
-                binding.signupIdEdittext.isEnabled = true
-                binding.signupIdEdittext.isClickable = true
-                binding.signupIdDuplicationButton.text = "중복확인"
+                setIdViewsStatus(true)
+                signupViewModel.setIsIdDuplication(null)
             }
         }
 
-
-        /**
-         * 중복검사 조회
-         */
-        signupViewModel.isIdDuplication.observe(this) { isDuplicate ->
-
-            if (isDuplicate) {
-                binding.signupIdWarning.visibility = View.VISIBLE
-                binding.signupIdWarning.setTextColor(Color.RED)
-
-            } else {
-                binding.signupIdWarning.visibility = View.VISIBLE
-                binding.signupIdWarning.setTextColor(Color.BLUE)
-
-                binding.signupIdEdittext.isEnabled = false
-                binding.signupIdEdittext.isClickable = false
-                binding.signupIdDuplicationButton.text = "재입력"
-            }
-        }
-
-        /**
-         * 1. 비밀번호 입력 감지
-         */
         binding.signupPasswordEdittext.addTextChangedListener {
             signupViewModel.onPasswordTextChanged(it.toString())
         }
@@ -132,47 +194,21 @@ class SignupActivity : AppCompatActivity() {
         binding.signupPasswordConfirmEdittext.addTextChangedListener {
             val password = binding.signupPasswordEdittext.text.toString()
             val confirmPassword = it.toString()
-            signupViewModel.onConfirmPasswordTextChanged(password, confirmPassword)
-        }
 
-        /**
-         * 2. 비밀번호 유효성 관찰
-         */
-        signupViewModel.isValidPassword.observe(this) { valid ->
-            if (valid) {
-                binding.signupPasswordWarning.visibility = View.GONE
-            } else {
-                binding.signupPasswordWarning.visibility = View.VISIBLE
-
+            if(password.isNotEmpty() && confirmPassword.isNotEmpty()){
+                signupViewModel.onConfirmPasswordTextChanged(password, confirmPassword)
             }
-        }
-        /**
-         * 3. 비밀번호, 비밀번호 확인 일치 관찰
-         */
-        signupViewModel.isValidPasswordConfirm.observe(this) { valid ->
-            if (valid) {
-                binding.signupPasswordConfirmWarning.visibility = View.GONE
-            } else {
-                binding.signupPasswordConfirmWarning.visibility = View.VISIBLE
-            }
+
         }
 
-
-        /**
-         * 1. 이메일 입력 감지
-         */
-        binding.signupEmailWarning.visibility = View.GONE
 
         binding.signupEmailIdEdittext.addTextChangedListener {
             val domainSelection = binding.signupEmailSelection.selectedItem.toString()
             val emailId = binding.signupEmailIdEdittext.text.toString()
             signupViewModel.checkEmailForm(emailId, domainSelection)
-
         }
 
-        /**
-         * 2. 도메인 선택 감지
-         */
+        // 이메일 도메인
         binding.signupEmailSelection.onItemSelectedListener =
             object : AdapterView.OnItemSelectedListener {
                 override fun onItemSelected(
@@ -184,8 +220,11 @@ class SignupActivity : AppCompatActivity() {
                     val domainSelection = parent?.getItemAtPosition(position).toString()
                     val emailId = binding.signupEmailIdEdittext.text.toString()
 
-                    if(domainSelection != "선택"){
+                    if(position != 0){
                         signupViewModel.checkEmailForm(emailId, domainSelection)
+
+                    }else if(emailId.isNotEmpty()){
+                        signupViewModel.setCheckEmailForm(false)
                     }
                 }
 
@@ -193,38 +232,17 @@ class SignupActivity : AppCompatActivity() {
                 }
             }
 
-
-        /**
-         * 3. 이메일 유효성 관찰
-         */
-        signupViewModel.checkEmailForm.observe(this) {valid->
-
-            if (valid) {
-                binding.signupEmailWarning.visibility = View.GONE
-
-            } else {
-                binding.signupEmailWarning.setTextColor(Color.RED)
-                binding.signupEmailWarning.visibility = View.VISIBLE
-            }
-        }
-
         binding.signupCheckProvideInformation.setOnClickListener {
-            showInformationDialog("personal")
-            Log.d(TAG, "personal")
+            informationDialog("personal")
         }
         binding.signupCheckMarketingInformation.setOnClickListener {
-            showInformationDialog("marketing")
-            Log.d(TAG, "click marketing")
+            informationDialog("marketing")
         }
 
 
-        /**
-         * 이메일을 명확히 입력하면 인증번호 버튼이 활성화
-         */
+        // 인증 번호 전송 버튼
         binding.signupCertificationButton.setOnClickListener {
-            if (binding.signupCertificationButton.text.equals("인증번호") ||
-                binding.signupCertificationButton.text.equals("재인증")
-            ) {
+            if (binding.signupCertificationButton.text == "인증번호" || binding.signupCertificationButton.text == "재인증") {
 
                 val emailId = binding.signupEmailIdEdittext.text.toString().trim()
                 val domainSelection = binding.signupEmailSelection.selectedItem.toString()
@@ -232,96 +250,50 @@ class SignupActivity : AppCompatActivity() {
 
                 lifecycleScope.launch {
                     signupViewModel.checkEmailExistence(fullEmail)
-
                 }
 
-            } else if (binding.signupCertificationButton.text.equals("확인")) {
+            } else if (binding.signupCertificationButton.text == "확인") {
                 val authCode = binding.signupCertificationEdittext.text.toString().trim()
                 Log.d(TAG, "authCode: $authCode")
-                signupViewModel.checkVerifyCode(authCode)
-            }
+                if(authCode.isNotEmpty()){
+                    signupViewModel.checkVerifyCode(authCode)
+                }else{
+                    Toast.makeText(this, "인증번호를 입력해주세요", Toast.LENGTH_LONG).show()
+                }
 
-        }
-
-        signupViewModel.isEmailExistence.observe(this) {exist ->
-            if(!exist){
-                binding.signupEmailWarning.visibility = View.GONE
-
-                val emailId = binding.signupEmailIdEdittext.text.toString().trim()
-                val domainSelection = binding.signupEmailSelection.selectedItem.toString()
-                val fullEmail = "${emailId}@${domainSelection}"
-
-                signupViewModel.requestEmailAuth(fullEmail)
-
-                binding.signupCertificationButton.text = "확인"
-                signupViewModel.startTimer() //타이머 시작
-                binding.signupCertificationWarning.visibility = View.VISIBLE
-
-            }else{
-                binding.signupEmailWarning.visibility = View.VISIBLE
-                binding.signupEmailWarning.setTextColor(Color.RED)
+            }else if(signupViewModel.checkEmailForm.value != true){
+                Toast.makeText(this, "이메일 형식을 올바르게 입력해주세요", Toast.LENGTH_LONG).show()
             }
         }
 
-        signupViewModel.isTimeExpired.observe(this) {
-            if (it) {
-                Log.d(TAG, "timer 종료")
-                binding.signupCertificationButton.text = "재인증"
-                binding.signupSubmitButton.isEnabled = false
-            }
-        }
-
-
-        signupViewModel.verifyCompleted.observe(this) { result ->
-            if (result) {
-                signupViewModel.stopTimer()
-                binding.signupCertificationEdittext.isEnabled = false
-                binding.signupCertificationButton.isEnabled = false
-                binding.signupCertificationWarning.setTextColor(Color.BLUE)
-
-            }else{
-                showCustomDialog("인증번호 불일치", "인증번호가 일치하지 않습니다. \n다시 입력해주세요.", false)
-            }
-        }
-
-        // 가입 버튼 리스너 설정
+        // 가입 버튼
         binding.signupSubmitButton.setOnClickListener {
 
             if(signupViewModel.checkUserInformation()){
-                Log.d(TAG, "checkUserInfo true")
 
                 val id = binding.signupIdEdittext.text.toString().trim()
                 val password = binding.signupPasswordEdittext.text.toString().trim().hashCode().toString()
-                Log.d(TAG, "password: $password")
                 val email = "${binding.signupEmailIdEdittext.text.toString().trim()}@${binding.signupEmailSelection.selectedItem}"
                 val identifier = id.hashCode()
-                if(signupViewModel.checkBoxChecked()){
 
+                if(signupViewModel.checkBoxChecked()){
                     lifecycleScope.launch{
                         signupViewModel.sendUserInformation(id, password, email, identifier)
                     }
-
                 }else{
                     Toast.makeText(this, "약관에 동의 해주세요.",Toast.LENGTH_LONG).show()
                 }
 
-            }else{
-                Log.d(TAG, "checkUserInfo false")
-
-                Toast.makeText(this, "입력하지 않은 항목이 있습니다.",Toast.LENGTH_LONG).show()
-            }
-        }
-
-        signupViewModel.saveResult.observe(this) {result->
-            when(result){
-                true -> showCustomDialog("회원가입 완료", "반갑습니다 :)", true)
-                else -> showCustomDialog("회원가입 실패", "다시 시도해주세요 :(", false)
+            }else {
+                Toast.makeText(this, resources.getString(R.string.signup_warning),Toast.LENGTH_LONG).show()
             }
         }
     }
-    private fun showCustomDialog(title : String, content : String, success : Boolean) {
+
+    private fun customDialog(title : String, content : String, success : Boolean) {
         val dialog = Dialog(this)
         dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
+        dialog.window!!.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
         dialog.setContentView(R.layout.dialog_warning)
 
         val titleTextView : TextView = dialog.findViewById(R.id.title)
@@ -331,21 +303,24 @@ class SignupActivity : AppCompatActivity() {
         contentTextView.text = content
 
         if(success){
-            dialog.dismiss()
-//            dialogDismiss(dialog, success)
+            lifecycleScope.launch {
+                delay(1000)
+                dialog.dismiss()
+                val intent = Intent(this@SignupActivity, LoginActivity :: class.java)
+                startActivity(intent)
+            }
         }
 
         dialog.show()
     }
 
-    private fun showInformationDialog(type : String){
+    private fun informationDialog(type : String){
         val dialog = Dialog(this)
-
         dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
         dialog.setContentView(R.layout.dialog_terms_of_service)
+        val height = (resources.displayMetrics.heightPixels * 0.9).toInt()
 
-
-        dialog.window!!.setLayout(WindowManager.LayoutParams.MATCH_PARENT, WindowManager.LayoutParams.MATCH_PARENT)
+        dialog.window!!.setLayout(WindowManager.LayoutParams.WRAP_CONTENT, height)
 
         val imageview = dialog.findViewById<ImageView>(R.id.dialog_service_image)
         val button = dialog.findViewById<Button>(R.id.dialog_service_button)
@@ -362,28 +337,9 @@ class SignupActivity : AppCompatActivity() {
         }
 
     }
-    private fun dialogDismiss(dialog: Dialog, close : Boolean){
-        if(close){
-            lifecycleScope.launch {
-                delay(1000)
-                dialog.dismiss()
-                val intent = Intent(this@SignupActivity, LoginActivity :: class.java)
-                startActivity(intent)
-            }
-        }
-    }
 
     override fun onDestroy() {
         super.onDestroy()
         _binding = null
     }
 }
-
-
-
-
-
-
-
-
-

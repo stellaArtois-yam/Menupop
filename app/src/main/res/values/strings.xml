@@ -18,12 +18,15 @@
     <string name="password_rule_warning">비밀번호는 최소 8자, 영문, 숫자, 기호 중 2가지 이상 사용</string>
     <string name="password_confirm_warning">비밀번호가 일치하지 않습니다</string>
     <string name="email_rule_warning">이메일 형식이 일치하지 않습니다</string>
+    <string name="signup_warning">모든 항목을 올바르게 입력했는지 확인해주세요. 입력하지 않았거나 형식이 맞지 않은 항목이 있습니다.</string>
 
     <string name="exchange_warning">기준 화폐를 선택한 후 환전 화폐를 선택해주세요.</string>
     <string name="payment_type">사용할 수 있는 리워드가 있습니다.\n리워드로 티켓을 구매할까요?</string>
 
     <string name="login_failed_warning">입력하신 아이디, 비밀번호와 일치하는 회원정보가 존재하지 않습니다.\n아이디, 비밀번호를 확인해주세요.</string>
     <string name="dialog_delete_warning">삭제하시면 다시 복구되지 않습니다.\n신중하게 선택해주세요 :)</string>
+
+    <string name="network_error">네트워크에 문제가 발생했습니다.\n잠시 후 다시 시도해주세요 :(</string>
 
     <string-array name="spinner_items">
         <item>선택</item>
