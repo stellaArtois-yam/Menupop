@@ -7,6 +7,7 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
+import com.example.menupop.Encryption
 import com.navercorp.nid.NaverIdLoginSDK
 import com.navercorp.nid.oauth.NidOAuthLogin
 import com.navercorp.nid.oauth.OAuthLoginCallback
@@ -19,7 +20,7 @@ class LoginViewModel(application: Application) :  AndroidViewModel(application) 
         const val TAG = "LoginViewModel"
     }
 
-    private val loginInformation = MutableLiveData<LoginResponseModel>()
+
     private var loginModel = LoginModel(application)
 
     private val _mergeAccount = MutableLiveData<LoginResponseModel>()
@@ -27,18 +28,37 @@ class LoginViewModel(application: Application) :  AndroidViewModel(application) 
         get() = _mergeAccount
 
     lateinit var naverProfileCallback : NidProfileCallback<NidProfileResponse>
-    lateinit var naverOauthLoginCallback : OAuthLoginCallback
+    private lateinit var naverOauthLoginCallback : OAuthLoginCallback
 
+    private val _loginResult = MutableLiveData<LoginResponseModel>()
     val loginResult: LiveData<LoginResponseModel>
-        get() = loginInformation
+        get() = _loginResult
 
     private val _socialLoginResult = MutableLiveData<LoginResponseModel>()
     val socialLoginResult : LiveData<LoginResponseModel>
         get() = _socialLoginResult
-    suspend fun requestLogin(id : String, password : String) {
+
+    suspend fun getSalt(id : String, password: String){
+        viewModelScope.launch {
+            val response = loginModel.getSalt(id)
+            when(response.result){
+                "success" -> {
+                    val encryption = Encryption()
+                    val salt = encryption.stringToSalt(response.salt)
+                    val encryptedPassword = encryption.hashWithSalt(password, salt)
+                    requestLogin(id, encryptedPassword)
+                }
+                else -> {
+                    _loginResult.value = LoginResponseModel(0, 0, response.result)
+                }
+            }
+        }
+    }
+    private suspend fun requestLogin(id : String, password : String) {
         viewModelScope.launch {
             val response = loginModel.requestLogin(id, password)
-            loginInformation.value = response
+            Log.d(TAG, "requestLogin: ${response.result}")
+            _loginResult.value = response
         }
     }
 

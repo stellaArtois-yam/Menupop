@@ -28,7 +28,4 @@
         android:textStyle="bold"
         android:gravity="center"/>
 
-
-
-
 </LinearLayout>

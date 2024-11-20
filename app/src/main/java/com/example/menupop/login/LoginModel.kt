@@ -5,6 +5,7 @@ import android.content.SharedPreferences
 import android.util.Log
 import com.example.menupop.BuildConfig
 import com.example.menupop.RetrofitService
+import com.example.menupop.SaltDTO
 import com.google.gson.Gson
 import com.google.gson.GsonBuilder
 import com.navercorp.nid.NaverIdLoginSDK
@@ -35,9 +36,31 @@ class LoginModel(val application: Application) {
         return withContext(Dispatchers.IO) {
             try {
                 val response = service.requestLogin(id, password)
-                response
+                Log.d(TAG, "requestLogin: $response")
+                if(response.isSuccessful){
+                    response.body()!!
+                }else{
+                    LoginResponseModel(0, 0, response.code().toString())
+                }
             } catch (e: Exception) {
-                LoginResponseModel(0, 0, "failed")
+                LoginResponseModel(0, 0, e.message!!)
+            }
+        }
+    }
+
+    suspend fun getSalt(id: String) : SaltDTO {
+        return withContext(Dispatchers.IO){
+            try{
+                val response = service.getSalt(id)
+                Log.d(TAG, "getSalt response message: ${response.message()}")
+                if(response.isSuccessful){
+                    response.body()!!
+                }else {
+                    SaltDTO(response.message(), "")
+                }
+
+            }catch (e : Exception){
+                SaltDTO(e.message!!, "")
             }
         }
     }

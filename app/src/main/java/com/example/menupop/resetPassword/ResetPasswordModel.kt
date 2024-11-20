@@ -75,10 +75,10 @@ class ResetPasswordModel {
         }
     }
 
-    suspend fun resetPassword(id:String,password:String) :String{
+    suspend fun resetPassword(id:String, password:String, salt : String) :String{
         return withContext(Dispatchers.IO){
             try {
-                val response = service.resetPassword(id, password)
+                val response = service.resetPassword(id, password, salt)
                 Log.d(TAG, "resetPassword: ${response.body()}")
                 if(response.isSuccessful){
                     response.body()!!

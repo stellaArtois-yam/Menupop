@@ -7,6 +7,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.menupop.Encryption
 import kotlinx.coroutines.launch
 import java.util.concurrent.TimeUnit
 
@@ -14,72 +15,73 @@ import java.util.regex.Pattern
 
 
 class SignupViewModel : ViewModel() {
-    companion object{
+    companion object {
         const val TAG = "SignupViewModel"
     }
 
-    private val signupModel  = SignupModel()
+    private val signupModel = SignupModel()
 
     private val _idWarning = MutableLiveData<String>()
-    val idWarning : LiveData<String>
+    val idWarning: LiveData<String>
         get() = _idWarning
 
     private val _isValidId = MutableLiveData<Boolean?>(null)
-    val isValidId : LiveData<Boolean?>
+    val isValidId: LiveData<Boolean?>
         get() = _isValidId
 
 
     private val _isIdDuplication = MutableLiveData<Boolean?>(null)
-    val isIdDuplication : LiveData<Boolean?>
+    val isIdDuplication: LiveData<Boolean?>
         get() = _isIdDuplication
 
     private val _isValidPassword = MutableLiveData<Boolean?>(null) // 비밀 번호 유효성
-    val isValidPassword : LiveData<Boolean?>
+    val isValidPassword: LiveData<Boolean?>
         get() = _isValidPassword
 
     private val _isValidPasswordConfirm = MutableLiveData<Boolean?>(null) // 비밀 번호 확인 일치
-    val isValidPasswordConfirm : LiveData<Boolean?>
+    val isValidPasswordConfirm: LiveData<Boolean?>
         get() = _isValidPasswordConfirm
 
     private val _checkEmailForm = MutableLiveData<Boolean?>(null) // 이메일 형식 체크
-    val checkEmailForm : LiveData<Boolean?>
+    val checkEmailForm: LiveData<Boolean?>
         get() = _checkEmailForm
 
     private val _emailWarning = MutableLiveData<String>() // 이메일 경고 메세지(중복, 형식 불일치)
-    val emailWarning : LiveData<String>
+    val emailWarning: LiveData<String>
         get() = _emailWarning
 
-    private var provideChecking : Boolean = false
-    private var marketingChecking : Boolean = false
+    private var provideChecking: Boolean = false
+    private var marketingChecking: Boolean = false
+    private lateinit var encryption : Encryption
 
-    private fun checkValidateId(inputId: String) : Boolean{
+    private fun checkValidateId(inputId: String): Boolean {
         val regex = Regex("^[a-zA-Z0-9]{6,12}\$")
         return regex.matches(inputId) && inputId.length > 5 && inputId.length < 13
     }
 
-    fun onIdTextChanged(id : String){
-        if(checkValidateId(id)){
+    fun onIdTextChanged(id: String) {
+        if (checkValidateId(id)) {
             _isValidId.value = true
-        }else{
+        } else {
             _idWarning.value = "아이디는 6-12자 이내, 영문, 숫자 사용 가능"
             _isValidId.value = false
         }
     }
 
-    suspend fun checkUserIdDuplication(id : String) {
+    suspend fun checkUserIdDuplication(id: String) {
         viewModelScope.launch {
             val response = signupModel.requestIdDuplication(id)
-            if(response.result == "exist"){
+            if (response.result == "exist") {
                 _isIdDuplication.value = true
                 _idWarning.value = "이미 사용 중인 아이디 입니다."
-            }else{
+            } else {
                 _isIdDuplication.value = false
                 _idWarning.value = "사용 가능한 아이디 입니다."
             }
         }
     }
 
-    fun setIsIdDuplication(boolean: Boolean?){
+    fun setIsIdDuplication(boolean: Boolean?) {
         _isIdDuplication.value = boolean
     }
 
@@ -110,68 +112,68 @@ class SignupViewModel : ViewModel() {
         return password == confirmPassword
     }
 
-    fun checkEmailForm(emailId : String, domain : String){
+    fun checkEmailForm(emailId: String, domain: String) {
 
-        val pattern : Pattern = Patterns.EMAIL_ADDRESS
+        val pattern: Pattern = Patterns.EMAIL_ADDRESS
         val email = "${emailId}@${domain}"
 
         _checkEmailForm.value = pattern.matcher(email).matches()
 
-        if(_checkEmailForm.value == false){
+        if (_checkEmailForm.value == false) {
             _emailWarning.value = "올바른 이메일 형식이 아닙니다."
         }
     }
 
-    fun setCheckEmailForm(boolean: Boolean){
+    fun setCheckEmailForm(boolean: Boolean) {
         _checkEmailForm.value = boolean
     }
 
     private val _isEmailExistence = MutableLiveData<Boolean>()
-    val isEmailExistence : LiveData<Boolean>
+    val isEmailExistence: LiveData<Boolean>
         get() = _isEmailExistence
 
 
     suspend fun checkEmailExistence(email: String) {
         viewModelScope.launch {
-            val response =   signupModel.checkEmailExistence(email)
-            if(response.result == "exist"){
+            val response = signupModel.checkEmailExistence(email)
+            if (response.result == "exist") {
                 _isEmailExistence.value = true
                 _emailWarning.value = "해당 이메일로 가입된 계정이 존재합니다."
-            }else{
+            } else {
                 _isEmailExistence.value = false
             }
         }
     }
 
-    private var verifyCode : String = ""
+    private var verifyCode: String = ""
     private val _verifyCompleted = MutableLiveData<Boolean>()
-    val verifyCompleted : LiveData<Boolean>
+    val verifyCompleted: LiveData<Boolean>
         get() = _verifyCompleted
 
 
-    fun requestEmailAuth(email : String) {
-        viewModelScope.launch{
+    fun requestEmailAuth(email: String) {
+        viewModelScope.launch {
             val response = signupModel.sendVerifyCode(email)
             verifyCode = response
         }
     }
 
-    fun checkVerifyCode(verifyCode : String) {
+    fun checkVerifyCode(verifyCode: String) {
         val result = this.verifyCode == verifyCode
         _verifyCompleted.value = result
 
-        if(_verifyCompleted.value == true){
+        if (_verifyCompleted.value == true) {
             _certificationTimer.value = "인증 완료"
         }
     }
 
 
     private val _certificationTimer = MutableLiveData<String>()
-    val certificationTimer : LiveData<String>
+    val certificationTimer: LiveData<String>
         get() = _certificationTimer
 
     private val _isTimeExpired = MutableLiveData(false)
-    val isTimeExpired : LiveData<Boolean>
+    val isTimeExpired: LiveData<Boolean>
         get() = _isTimeExpired
 
     private var timer: CountDownTimer? = null // 타이머 객체
@@ -185,7 +187,8 @@ class SignupViewModel : ViewModel() {
                 // 남은 시간을 LiveData에 업데이트
                 val minutes = TimeUnit.MILLISECONDS.toMinutes(millisUntilFinished)
                 val seconds = TimeUnit.MILLISECONDS.toSeconds(millisUntilFinished) % 60
-                _certificationTimer.value = "시간 제한 : " + String.format("%02d:%02d", minutes, seconds)
+                _certificationTimer.value =
+                    "시간 제한 : " + String.format("%02d:%02d", minutes, seconds)
             }
 
             override fun onFinish() {
@@ -208,31 +211,42 @@ class SignupViewModel : ViewModel() {
     }
 
 
-    fun checkUserInformation() : Boolean{
+    fun checkUserInformation(): Boolean {
         return _isIdDuplication.value == false && _checkEmailForm.value == true &&
                 _isValidPassword.value == true && _isValidPasswordConfirm.value == true &&
                 _verifyCompleted.value == true
     }
 
     private val _saveResult = MutableLiveData<Boolean>()
-    val saveResult : LiveData<Boolean>
+    val saveResult: LiveData<Boolean>
         get() = _saveResult
 
-    suspend fun sendUserInformation(id : String, password : String, email :String, identifier : Int){
-        viewModelScope.launch{
-            val response =  signupModel.sendUserInformation(id, password, email, identifier)
+    suspend fun sendUserInformation(id: String, password: String, email: String, identifier: Int) {
+        viewModelScope.launch {
+            encryption = Encryption()
+            val salt = encryption.generateSalt()
+            val encryptedPassword = encryption.hashWithSalt(password, salt)
+
+            val response = signupModel.sendUserInformation(
+                id,
+                encryptedPassword,
+                encryption.saltToString(salt),
+                email,
+                identifier
+            )
             _saveResult.value = response.result == "success"
         }
     }
 
-    fun personalCheckBoxChecked(isCheck : Boolean){
+    fun personalCheckBoxChecked(isCheck: Boolean) {
         provideChecking = isCheck
     }
-    fun marketingCheckBoxChecked(isCheck : Boolean){
+
+    fun marketingCheckBoxChecked(isCheck: Boolean) {
         marketingChecking = isCheck
     }
 
-    fun checkBoxChecked():Boolean{
+    fun checkBoxChecked(): Boolean {
         Log.d(TAG, "checkBoxChecked: ${provideChecking && marketingChecking}")
         return provideChecking && marketingChecking
     }

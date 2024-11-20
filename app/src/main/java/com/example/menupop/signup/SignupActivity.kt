@@ -12,6 +12,7 @@ import android.view.WindowManager
 import android.widget.AdapterView
 import android.widget.Button
 import android.widget.ImageView
+import android.widget.ProgressBar
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
@@ -33,6 +34,7 @@ class SignupActivity : AppCompatActivity() {
     private lateinit var signupViewModel: SignupViewModel
     private var _binding : ActivitySignupBinding? = null
     private val binding get() = _binding!!
+    private var progressbar : Dialog? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -137,14 +139,15 @@ class SignupActivity : AppCompatActivity() {
                 binding.signupCertificationTimer.setTextColor(Color.BLUE)
 
             }else{
-                customDialog("인증번호 불일치", "인증번호가 일치하지 않습니다. \n다시 입력해주세요.", false)
+                customDialog("인증번호 불일치", "인증번호가 일치하지 않습니다. \n다시 입력해주세요.", false).show()
             }
         }
 
         signupViewModel.saveResult.observe(this) {result->
+            progressbar!!.dismiss()
             when(result){
-                true -> customDialog("회원가입 완료", "반갑습니다 :) \n로그인 후 이용해주세요", true)
-                else -> customDialog("회원가입 실패", resources.getString(R.string.network_error), false)
+                true -> customDialog("회원가입 완료", "반갑습니다 :) \n로그인 후 이용해주세요", false).show()
+                else -> customDialog("회원가입 실패", resources.getString(R.string.network_error), false).show()
             } }
     }
 
@@ -272,13 +275,15 @@ class SignupActivity : AppCompatActivity() {
             if(signupViewModel.checkUserInformation()){
 
                 val id = binding.signupIdEdittext.text.toString().trim()
-                val password = binding.signupPasswordEdittext.text.toString().trim().hashCode().toString()
+                val password = binding.signupPasswordEdittext.text.toString().trim()
                 val email = "${binding.signupEmailIdEdittext.text.toString().trim()}@${binding.signupEmailSelection.selectedItem}"
                 val identifier = id.hashCode()
 
                 if(signupViewModel.checkBoxChecked()){
                     lifecycleScope.launch{
                         signupViewModel.sendUserInformation(id, password, email, identifier)
+                        progressbar = customDialog(null, null, true)
+                        progressbar!!.show()
                     }
                 }else{
                     Toast.makeText(this, "약관에 동의 해주세요.",Toast.LENGTH_LONG).show()
@@ -290,19 +295,24 @@ class SignupActivity : AppCompatActivity() {
         }
     }
 
-    private fun customDialog(title : String, content : String, success : Boolean) {
+    private fun customDialog(title : String?, content : String?, isProgress : Boolean) : Dialog {
         val dialog = Dialog(this)
         dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
         dialog.window!!.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
-        dialog.setContentView(R.layout.dialog_warning)
 
-        val titleTextView : TextView = dialog.findViewById(R.id.title)
-        val contentTextView : TextView = dialog.findViewById(R.id.content)
+        if(isProgress){
+            dialog.setContentView(R.layout.progressbar)
+            dialog.findViewById<TextView>(R.id.progress_text).visibility = View.GONE
+            dialog.findViewById<ImageView>(R.id.progress_image).visibility = View.GONE
+            dialog.findViewById<ProgressBar>(R.id.progress_bar).visibility = View.VISIBLE
+            dialog.setCancelable(false)
+        }else{
+            dialog.setContentView(R.layout.dialog_warning)
+            val titleTextView : TextView = dialog.findViewById(R.id.title)
+            val contentTextView : TextView = dialog.findViewById(R.id.content)
+            titleTextView.text = title
+            contentTextView.text = content
 
-        titleTextView.text = title
-        contentTextView.text = content
-
-        if(success){
             lifecycleScope.launch {
                 delay(1000)
                 dialog.dismiss()
@@ -310,8 +320,7 @@ class SignupActivity : AppCompatActivity() {
                 startActivity(intent)
             }
         }
-
-        dialog.show()
+        return dialog
     }
 
     private fun informationDialog(type : String){
@@ -341,5 +350,6 @@ class SignupActivity : AppCompatActivity() {
     override fun onDestroy() {
         super.onDestroy()
         _binding = null
+        progressbar = null
     }
 }

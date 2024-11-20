@@ -43,10 +43,14 @@ class SignupModel {
         }
     }
 
-    suspend fun sendUserInformation(id : String, password : String, email :String, identifier : Int) : SimpleResultDTO{
+    suspend fun sendUserInformation(id : String,
+                                    password : String,
+                                    salt : String,
+                                    email :String,
+                                    identifier : Int) : SimpleResultDTO{
         return withContext(Dispatchers.IO){
             try{
-                val response = service.saveUserInformation(id, password, email, identifier)
+                val response = service.saveUserInformation(id, password, salt, email, identifier)
                 if(response.isSuccessful){
                     response.body()!!
                 }else{

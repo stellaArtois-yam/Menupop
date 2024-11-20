@@ -31,6 +31,7 @@ interface RetrofitService {
     suspend fun saveUserInformation(
         @Field("id") id: String,
         @Field("password") password: String,
+        @Field("salt") salt : String,
         @Field("email") email: String,
         @Field("identifier") identifier: Int
     ): Response<SimpleResultDTO>
@@ -48,12 +49,17 @@ interface RetrofitService {
     @FormUrlEncoded
     suspend fun checkEmailExistence(@Field("email") email: String): Response<SimpleResultDTO>
 
-    @POST("login.php")
+    @POST("Login.php")
     @FormUrlEncoded
     suspend fun requestLogin(
         @Field("id") id: String,
         @Field("password") password: String
-    ): LoginResponseModel
+    ): Response<LoginResponseModel>
+    @POST("GetSalt.php")
+    @FormUrlEncoded
+    suspend fun getSalt(
+        @Field("id") id : String
+    ) : Response<SaltDTO>
 
     @POST("SendEmailVerifyCode.php")
     @FormUrlEncoded
@@ -70,7 +76,8 @@ interface RetrofitService {
     @FormUrlEncoded
     suspend fun resetPassword(
         @Field("id") id: String,
-        @Field("password") password: String
+        @Field("password") password: String,
+        @Field("salt") salt : String
     ): Response<String>
 
 

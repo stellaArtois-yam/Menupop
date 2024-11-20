@@ -6,6 +6,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.menupop.Encryption
 import kotlinx.coroutines.launch
 import java.util.concurrent.TimeUnit
 import java.util.regex.Pattern
@@ -60,13 +61,15 @@ class ResetPasswordViewModel : ViewModel() {
     val certificateStatus : LiveData<String>
         get() = _certificateStatus
 
+    private lateinit var encryption : Encryption
+
     fun setIsEmailMatchIdInit(){
         _isEmailMatchId.value = null
     }
 
     fun startTimer() {
 
-        val initialTime = TimeUnit.MINUTES.toMillis(1)
+        val initialTime = TimeUnit.MINUTES.toMillis(3)
         _certificateStatus.value = "확인"
 
         timer = object : CountDownTimer(initialTime, 1000) {
@@ -189,9 +192,13 @@ class ResetPasswordViewModel : ViewModel() {
         return password.isNotEmpty() && confirmPassword.isNotEmpty() && password == confirmPassword
     }
 
-    fun resetPassword(password : String){
+    suspend fun resetPassword(password : String){
         viewModelScope.launch {
-            when(resetPasswordModel.resetPassword(_id.value.toString(),password)){
+            encryption = Encryption()
+            val salt = encryption.generateSalt()
+            val encryptedPassword = encryption.hashWithSalt(password, salt)
+            val savedSalt = encryption.saltToString(salt)
+            when(resetPasswordModel.resetPassword(_id.value.toString(),encryptedPassword, savedSalt)){
                 "success" -> _isResetPassword.value = true
                 else -> _isResetPassword.value = false
             }

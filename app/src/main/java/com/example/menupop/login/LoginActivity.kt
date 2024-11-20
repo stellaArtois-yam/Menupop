@@ -7,8 +7,12 @@ import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
 import android.util.Log
+import android.view.View
 import android.view.Window
 import android.widget.Button
+import android.widget.ImageView
+import android.widget.ProgressBar
+import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
@@ -33,7 +37,6 @@ import com.google.android.gms.tasks.Task
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.GoogleAuthProvider
 import com.kakao.sdk.common.KakaoSdk
-import com.kakao.sdk.common.util.Utility
 import com.kakao.sdk.user.UserApiClient
 import com.navercorp.nid.NaverIdLoginSDK
 import kotlinx.coroutines.launch
@@ -52,6 +55,7 @@ class LoginActivity : AppCompatActivity() {
     private val googleSignInClient: GoogleSignInClient by lazy { getGoogleClient() }
     private var mGoogleSignInClient: GoogleSignInClient? = null
     private var mAuth: FirebaseAuth? = null
+    private var progressbar : Dialog? = null
 
 
     private val googleAuthLauncher =
@@ -88,12 +92,18 @@ class LoginActivity : AppCompatActivity() {
         }
 
         loginViewModel.loginResult.observe(this) {
-            Log.d(TAG, "onCreate: ${it.isNewUser} ${it.identifier} ${it.result}")
-            if (it.result == "failed") {
-                showCustomDialog()
-            } else {
-                loginViewModel.saveIdentifier(sharedPreferences!!, it.identifier)
-                isNewUserCheck(it.isNewUser, it.identifier)
+            progressbar!!.dismiss()
+            when(it.result){
+                "success" -> {
+                    loginViewModel.saveIdentifier(sharedPreferences!!, it.identifier)
+                    isNewUserCheck(it.isNewUser, it.identifier)
+                }
+                "failed" -> {
+                    showCustomDialog(false).show()
+                }
+                else -> {
+                    Toast.makeText(this, resources.getString(R.string.network_error), Toast.LENGTH_SHORT).show()
+                }
             }
         }
 
@@ -121,15 +131,13 @@ class LoginActivity : AppCompatActivity() {
     }
 
     private fun isNewUserCheck(isNewUser: Int, identifier: Int) {
-//        if (isNewUser == 1) {
-//            val intent = Intent(this, MainActivity::class.java)
-//            startActivity(intent)
-//            return
-//        }
         val intent = Intent(this, MainActivity::class.java)
-        intent.putExtra("identifier", identifier)
-        startActivity(intent)
-        finish()
+        if (isNewUser == 0) {
+            intent.putExtra("identifier", identifier)
+        }
+            startActivity(intent)
+            finish()
+
     }
 
     private fun identitySaveCheck() {
@@ -145,13 +153,14 @@ class LoginActivity : AppCompatActivity() {
     private fun setListeners() {
         binding.loginButton.setOnClickListener {
             val id = binding.loginIdEditText.text.toString().trim()
-            val password =
-                binding.loginPasswordEditText.text.toString().trim().hashCode().toString()
+            val password = binding.loginPasswordEditText.text.toString().trim()
             if (id.isEmpty() || password.isEmpty()) {
                 Toast.makeText(this, "아이디 또는 비밀번호를 입력해주세요.", Toast.LENGTH_SHORT).show()
             } else {
                 lifecycleScope.launch {
-                    loginViewModel.requestLogin(id, password)
+                    loginViewModel.getSalt(id, password)
+                    progressbar = showCustomDialog(true)
+                    progressbar!!.show()
                 }
             }
         }
@@ -180,13 +189,13 @@ class LoginActivity : AppCompatActivity() {
 
         binding.kakaoLoginButton.setOnClickListener {
             kakaoLoginRequest()
-            getHash()
+//            getHash()
         }
     }
 
-    private fun getHash() {
-        val keyHash = Utility.getKeyHash(this)
-    }
+//    private fun getHash() {
+//        val keyHash = Utility.getKeyHash(this)
+//    }
 
     private fun kakaoLoginRequest() {
         val apiKey = BuildConfig.KAKAO_NATIVE_APP_KEY_STELLA
@@ -196,15 +205,13 @@ class LoginActivity : AppCompatActivity() {
             val response = socialLoginManager!!.requestKakaoSocialLogin()
 
             if(response.accessToken.isNotEmpty()){
-                Log.d(TAG, "kakaoLoginRequest: ${response.accessToken}")
                 UserApiClient.instance.accessTokenInfo { _, _ ->
                     UserApiClient.instance.me { user, _ ->
-                        Log.d(TAG, "kakaoLoginRequest nickName: ${user?.kakaoAccount?.profile?.nickname}")
                         loginViewModel.socialLoginRequest(user?.kakaoAccount?.email.toString())
                     }
                 }
             }else{
-                Log.d(LoginViewModel.TAG, "requestKakaoSocialLogin token is Empty")
+                Toast.makeText(this@LoginActivity, "카카오 로그인에 실패하였습니다.", Toast.LENGTH_SHORT).show()
             }
         }
     }
@@ -223,12 +230,22 @@ class LoginActivity : AppCompatActivity() {
         }
     }
 
-    private fun showCustomDialog() {
+    private fun showCustomDialog(isProgress: Boolean) : Dialog{
         val dialog = Dialog(this)
         dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
         dialog.window!!.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
-        dialog.setContentView(R.layout.dialog_warning)
-        dialog.show()
+
+        if(isProgress){
+            dialog.setContentView(R.layout.progressbar)
+            dialog.findViewById<TextView>(R.id.progress_text).visibility = View.GONE
+            dialog.findViewById<ImageView>(R.id.progress_image).visibility = View.GONE
+            dialog.findViewById<ProgressBar>(R.id.progress_bar).visibility = View.VISIBLE
+            dialog.setCancelable(false)
+        }else{
+            dialog.setContentView(R.layout.dialog_warning)
+        }
+
+        return dialog
     }
 
     private fun getGoogleClient(): GoogleSignInClient {
@@ -284,8 +301,10 @@ class LoginActivity : AppCompatActivity() {
     override fun onDestroy() {
         super.onDestroy()
         _binding = null
+        progressbar = null
         sharedPreferences = null
         socialLoginManager = null
     }
+
 }
 
