@@ -1,133 +1,218 @@
 <?xml version="1.0" encoding="utf-8"?>
-<layout xmlns:app="http://schemas.android.com/apk/res-auto">
 
+<layout>
     <data>
-
         <variable
             name="ticketPurchaseViewModel"
             type="com.example.menupop.mainActivity.MainActivityViewModel" />
     </data>
 
-
-    <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
-        xmlns:tools="http://schemas.android.com/tools"
+    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        tools:context=".mainActivity.profile.TicketPurchaseFragment">
+        android:gravity="center"
+        android:orientation="vertical">
 
         <LinearLayout
+            android:id="@+id/regular_translation_ticket_box"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:orientation="vertical"
-            android:gravity="center">
+            android:layout_height="200dp"
+            android:layout_marginStart="@dimen/basic_margin"
+            android:layout_marginEnd="@dimen/basic_margin"
+            android:background="@drawable/food_ticket_frame"
+            android:gravity="center"
+            android:orientation="vertical">
+
+            <ImageView
+                android:layout_width="20dp"
+                android:layout_height="20dp"
+                android:background="@drawable/circle_yellow"
+                android:layout_marginStart="20dp"
+                android:layout_gravity="start"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="번역 티켓"
+                android:textColor="@color/black"
+                android:textSize="20sp"
+                android:textStyle="bold"/>
 
             <LinearLayout
-                android:id="@+id/translation_ticket_box"
                 android:layout_width="match_parent"
-                android:layout_height="220dp"
-                android:orientation="vertical"
-
-                android:layout_marginStart="@dimen/basic_margin"
-                android:layout_marginEnd="@dimen/basic_margin"
-
-                android:background="@drawable/food_ticket_frame"
-                android:gravity="center">
-
-                <ImageView
-                    android:layout_width="20dp"
-                    android:layout_height="20dp"
-                    android:background="@drawable/circle_yellow"
-                    android:layout_marginStart="20dp"
-                    android:layout_gravity="start"/>
+                android:layout_height="wrap_content"
+                android:layout_marginTop="20dp"
+                android:gravity="center"
+                android:orientation="horizontal">
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="번역 티켓"
+                    android:text="구매 개수"
                     android:textColor="@color/black"
-                    android:textStyle="bold"
-                    android:textSize="20sp"/>
-                
-                <TextView
-                    android:id="@+id/translation_ticket_count"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="10dp"
-                    android:layout_marginBottom="10dp"
-                    android:textColor="@color/black"
-                    android:text='@{"보유티켓: " + Integer.toString(ticketPurchaseViewModel.userInformation.translationTicket) + "개"}'
-                    android:textSize="20sp"/>
-
-                <androidx.appcompat.widget.AppCompatButton
-                    android:id="@+id/translation_ticket_purchase_button"
-                    android:layout_width="100dp"
-                    android:layout_height="wrap_content"
-                    android:background="@drawable/radius_30_stroke_light_gray"
-                    android:backgroundTint="@color/yellow"
-
-                    android:text="구매하기"
-                    android:textStyle="bold"
-                    android:textColor="@color/white"
-                    android:textSize="18sp"/>
-
-
-            </LinearLayout>
-
-            <LinearLayout
-                android:id="@+id/food_ticket_box"
-                android:layout_width="match_parent"
-                android:layout_height="220dp"
-                android:orientation="vertical"
-                android:layout_marginTop="40dp"
-                android:layout_marginStart="@dimen/basic_margin"
-                android:layout_marginEnd="@dimen/basic_margin"
-                android:background="@drawable/translation_ticket_frame"
-                android:gravity="center">
-
-                <ImageView
-                    android:layout_width="20dp"
-                    android:layout_height="20dp"
-                    android:background="@drawable/circle_orange"
-                    android:layout_marginStart="20dp"
-                    android:layout_gravity="start"/>
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="음식 티켓"
-                    android:textColor="@color/black"
-                    android:textStyle="bold"
-                    android:textSize="20sp"/>
-
-                <TextView
-                    android:id="@+id/food_ticket_count"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="10dp"
-                    android:layout_marginBottom="10dp"
-                    android:text='@{"보유티켓: " + Integer.toString(ticketPurchaseViewModel.userInformation.foodTicket) + "개"}'
-                    android:textColor="@color/black"
-                    android:textSize="20sp"/>
-
-                <androidx.appcompat.widget.AppCompatButton
-                    android:id="@+id/food_ticket_purchase_button"
-                    android:layout_width="100dp"
-                    android:layout_height="wrap_content"
-                    android:background="@drawable/radius_30_stroke_light_gray"
-                    android:backgroundTint="@color/orange"
-
-                    android:text="구매하기"
-                    android:textSize="18sp"
-                    android:textColor="@color/white"
+                    android:textSize="20sp"
                     android:textStyle="bold"/>
 
+                <ImageView
+                    android:id="@+id/translation_ticket_minus_button"
+                    android:layout_width="30dp"
+                    android:layout_height="30dp"
+                    android:layout_marginStart="50dp"
+                    android:layout_marginEnd="20dp"
+                    android:background="@drawable/remove_circle_24"
+                    android:backgroundTint="@color/yellow"/>
+
+                <TextView
+                    android:id="@+id/translation_ticket_amount"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+
+                    android:text="@{ticketPurchaseViewModel.translationAmount.toString()}"
+                    android:textColor="@color/black"
+                    android:textSize="20sp"
+                    android:textStyle="bold" />
 
 
+                <ImageView
+                    android:id="@+id/translation_ticket_plus_button"
+                    android:layout_width="30dp"
+                    android:layout_height="30dp"
+                    android:layout_marginStart="20dp"
+                    android:layout_marginEnd="20dp"
+                    android:background="@drawable/add_circle_24"
+                    android:backgroundTint="@color/yellow"/>
 
             </LinearLayout>
+
+            <TextView
+                android:id="@+id/translation_ticket_price"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="end"
+                android:layout_marginTop="10dp"
+                android:layout_marginEnd="55dp"
+                android:text="@{ticketPurchaseViewModel.translationPrice}"
+                android:textColor="@color/black"
+                android:textSize="20sp"
+                android:textStyle="bold" />
+
 
         </LinearLayout>
 
-    </FrameLayout>
+        <LinearLayout
+            android:id="@+id/food_ticket_box"
+            android:layout_width="match_parent"
+            android:layout_height="200dp"
+            android:layout_marginTop="40dp"
+            android:layout_marginBottom="30dp"
+            android:layout_marginStart="@dimen/basic_margin"
+            android:layout_marginEnd="@dimen/basic_margin"
+
+            android:background="@drawable/translation_ticket_frame"
+            android:gravity="center"
+            android:orientation="vertical">
+
+            <ImageView
+                android:layout_width="20dp"
+                android:layout_height="20dp"
+                android:background="@drawable/circle_orange"
+                android:layout_marginStart="20dp"
+                android:layout_gravity="start"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="음식 티켓"
+                android:textColor="@color/black"
+                android:textSize="20sp"
+                android:textStyle="bold"/>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="20dp"
+                android:gravity="center"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="구매 개수"
+                    android:textColor="@color/black"
+                    android:textSize="20sp"
+                    android:textStyle="bold"/>
+
+                <ImageView
+                    android:id="@+id/food_ticket_minus_button"
+                    android:layout_width="30dp"
+                    android:layout_height="30dp"
+                    android:layout_marginStart="50dp"
+                    android:layout_marginEnd="20dp"
+                    android:background="@drawable/remove_circle_24"
+                    android:backgroundTint="@color/orange"/>
+
+
+                <TextView
+                    android:id="@+id/food_ticket_amount"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@{ticketPurchaseViewModel.foodAmount.toString()}"
+                    android:textColor="@color/black"
+                    android:textSize="20sp" />
+
+
+
+                <ImageView
+                    android:id="@+id/food_ticket_plus_button"
+                    android:layout_width="30dp"
+                    android:layout_height="30dp"
+                    android:layout_marginStart="20dp"
+                    android:layout_marginEnd="20dp"
+                    android:background="@drawable/add_circle_24"
+                    android:backgroundTint="@color/orange"/>
+
+            </LinearLayout>
+
+            <TextView
+                android:id="@+id/food_ticket_price"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="end"
+                android:layout_marginTop="10dp"
+                android:layout_marginEnd="55dp"
+                android:text="@{ticketPurchaseViewModel.foodPrice}"
+                android:textColor="@color/black"
+                android:textSize="20sp"
+                android:textStyle="bold" />
+
+
+        </LinearLayout>
+
+        <TextView
+            android:id="@+id/ticket_total_price"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@{ticketPurchaseViewModel.totalPrice}"
+            android:textColor="@color/black"
+            android:textSize="20sp"
+            android:textStyle="bold" />
+
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/ticket_purchase_button"
+            android:layout_width="300dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="30dp"
+            android:layout_marginBottom="30dp"
+
+            android:background="@drawable/radius_30_stroke_light_gray"
+            android:backgroundTint="@color/orange"
+
+            android:text="카카오 페이 결제"
+            android:textColor="@color/white"
+            android:textSize="20sp"
+            android:textStyle="bold" />
+
+
+    </LinearLayout>
 
 </layout>

@@ -1,6 +1,5 @@
 package com.example.menupop.mainActivity.profile
 
-import android.content.Context
 import android.content.Intent
 import android.os.Build
 import android.os.Bundle
@@ -21,24 +20,18 @@ import com.example.menupop.mainActivity.MainActivityViewModel
 import java.net.URISyntaxException
 
 class KakaoPayWebView : Fragment() {
-    companion object{
+    companion object {
         const val TAG = "WebViewFragment"
     }
+
     private var webView: WebView? = null
     private lateinit var ticketPurchaseViewModel: MainActivityViewModel
-    private lateinit var context: Context
-
-    override fun onAttach(context: Context) {
-        super.onAttach(context)
-        this.context = context
-    }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
         val view = inflater.inflate(R.layout.webview, container, false)
-
         webView = view.findViewById(R.id.webview)
 
         return view
@@ -56,19 +49,37 @@ class KakaoPayWebView : Fragment() {
         webView?.webViewClient = myWebViewClient
 
         ticketPurchaseViewModel.paymentReady.observe(viewLifecycleOwner) {
-            if (it != null) {
-                val url = it.nextRedirectAppUrl
+            val url = it?.nextRedirectAppUrl
+            if (url != null) {
                 Log.d(TAG, "mobile url: $url")
-                webView?.loadUrl(url!!)
+                webView?.loadUrl(url)
             }
         }
 
+        //티켓 구매 실패(결제 x)
+        ticketPurchaseViewModel.isFailedToBuyTicket.observe(viewLifecycleOwner){
+            if(it == true){
+                completePayment()
+                Toast.makeText(requireContext(), resources.getString(R.string.network_error), Toast.LENGTH_LONG).show()
+            }else if(it == false){
+                completePayment()
+            }
+        }
 
+        ticketPurchaseViewModel.cancelBuyTicket.observe(viewLifecycleOwner) {
+            if (it == true) {
+                Toast.makeText(requireContext(), "시스템 오류로 결제가 취소되었습니다 :(", Toast.LENGTH_LONG).show()
+                completePayment()
+            }else if(it == false){
+                Toast.makeText(requireContext(), "결제가 완료되었으나 시스템 오류가 발생했습니다. 관리자에게 문의해 주세요.", Toast.LENGTH_LONG).show()
+                completePayment()
+            }
+        }
     }
 
     inner class MyWebViewClient(val viewModel: MainActivityViewModel) : WebViewClient() {
 
-        val TAG = "MyWebViewClient"
+        val TAG = "WebViewFragment"
 
         private var pgToken: String? = null
 
@@ -78,22 +89,20 @@ class KakaoPayWebView : Fragment() {
             request: WebResourceRequest?
         ): Boolean {
 
-
             val url = request!!.url.toString()
             Log.d(TAG, "urlLoading: $url")
 
-
             if (url.startsWith("intent://")) {
-
                 try {
                     val intent = Intent.parseUri(url, Intent.URI_INTENT_SCHEME)
                     intent?.let {
                         view?.context?.startActivity(it)
-                        Log.d(TAG, "?")
                         return true
                     }
                 } catch (e: URISyntaxException) {
                     Log.d(TAG, "exception: ${e.message}")
+                    Toast.makeText(requireContext(), resources.getString(R.string.network_error), Toast.LENGTH_LONG).show()
+                    findNavController().navigate(R.id.profileFragment)
                 }
 
             }
@@ -102,42 +111,24 @@ class KakaoPayWebView : Fragment() {
             Log.d(TAG, "pgToken: $pgToken")
 
             if (pgToken != null) {
-                viewModel.updatePgToken(pgToken!!)
+                viewModel.updatePgToken(pgToken!!) // 결제 요청
             }
 
-
-            if (url.contains("KakaoPayApprove")) {
-                //여기서 결제 완료 observe해서 update 되면 이동
-                viewModel.changeTicket.observe(viewLifecycleOwner) {
-                    Log.d(TAG, "changeTicket: $it")
-                    if (it == "success") {
-                        completePayment()
-                    } else if (it == "failed") {
-                        Toast.makeText(requireContext(), "결제 실패로 결제가 취소되었습니다 :(", Toast.LENGTH_LONG)
-                            .show()
-                        completePayment()
-                    }
-                }
-
-                Log.d(TAG, "webView Clear")
-
-            } else if (url.contains("KakaoPayCancel")) {
-                viewModel.setPaymentResponse()
-                completePayment()
-
-            } else if (url.contains("KakaoPayFail")) {
-                viewModel.setPaymentResponse()
-                completePayment()
-            }
-
-            view!!.loadUrl(url)
             return false
         }
     }
 
-    private fun completePayment(){
-        ticketPurchaseViewModel.setChangeTicket()
+    private fun completePayment() {
+        Log.d(MainActivityViewModel.TAG, "completePayment: 호출")
+        ticketPurchaseViewModel.initializeKakaoPayVariables()
         findNavController().navigate(R.id.profileFragment)
+
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        webView?.destroy()
+        webView = null
     }
 
 

@@ -194,7 +194,7 @@ class MainActivityModel(val application: Application) {
         .build()
 
     private val kakaoPayService = kakaopay.create(RetrofitService::class.java)
-    val cid = "TC0ONETIME"
+    private val cid = "TC0ONETIME"
     private val apiKey = "KakaoAK " + BuildConfig.KAKAOPAY_ADMIN_KEY
     private val approvalUrl = BuildConfig.SERVER_IP + "KakaoPayApprove"
     private val cancelUrl = BuildConfig.SERVER_IP + "KakaoPayCancel"
@@ -222,7 +222,7 @@ class MainActivityModel(val application: Application) {
                 } else {
                     KakaoPayCancelResponseDTO(
                         "null", "null", "null",
-                        "FAILED", "null", "null",
+                        response.message(), "null", "null",
                         "null", KakaoPayPriceDTO("0"), "null"
                     )
                 }

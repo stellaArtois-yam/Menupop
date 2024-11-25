@@ -134,7 +134,6 @@ class MainActivity : AppCompatActivity() {
         mainActivityViewModel.scheduleMidnightWork(application)
 
         mainActivityViewModel.isLoaded.observe(this) {
-            Log.d(TAG, "init isLoaded: $it")
             if (it.equals("success")) {
                 //번역에 성공해서 번역 티켓을 사용해야한다
                 if (checkingTranslation) {
@@ -183,7 +182,6 @@ class MainActivity : AppCompatActivity() {
 
         dialog.show()
 
-        Log.d(TAG, "loadingDialog: 실행")
         return dialog
     }
 

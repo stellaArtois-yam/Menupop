@@ -3,7 +3,7 @@ package com.example.menupop.mainActivity.profile
 import com.google.gson.annotations.SerializedName
 
 data class KakaoPayReadyResponseDTO(
-    var tid: String = "",
+    var tid: String = "N/A",
     @SerializedName("next_redirect_app_url") var nextRedirectAppUrl: String? = null,
     @SerializedName("next_redirect_mobile_url") var nextRedirectMobileUrl: String? = null,
     @SerializedName("next_redirect_pc_url") var nextRedirectPcUrl: String? = null,

@@ -1,15 +1,15 @@
 package com.example.menupop.mainActivity.profile
 
 import android.app.Dialog
+import android.graphics.Color
+import android.graphics.drawable.ColorDrawable
 import android.os.Build
 import android.os.Bundle
-import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.Window
-import android.view.WindowManager
 import android.widget.Toast
 import androidx.annotation.RequiresApi
 
@@ -17,9 +17,7 @@ import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import com.example.menupop.R
-import com.example.menupop.databinding.DialogPaymentRegularBinding
-import com.example.menupop.databinding.DialogPaymentRewardBinding
-import com.example.menupop.databinding.DialogSelectPaymentTypeBinding
+import com.example.menupop.databinding.DialogAvailableRewardBinding
 import com.example.menupop.databinding.FragmentTicketPurchaseBinding
 import com.example.menupop.mainActivity.MainActivity
 import com.example.menupop.mainActivity.MainActivityViewModel
@@ -31,18 +29,16 @@ class TicketPurchaseFragment : Fragment() {
 
     private var _binding: FragmentTicketPurchaseBinding? = null
     private val binding get() = _binding!!
-    private lateinit var ticketPurchaseViewModel: MainActivityViewModel
+    private lateinit var mainViewModel: MainActivityViewModel
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        ticketPurchaseViewModel =
-            ViewModelProvider(requireActivity())[MainActivityViewModel::class.java]
-
+        mainViewModel = ViewModelProvider(requireActivity())[MainActivityViewModel::class.java]
         _binding =
             DataBindingUtil.inflate(inflater, R.layout.fragment_ticket_purchase, container, false)
-        binding.ticketPurchaseViewModel = ticketPurchaseViewModel
+        binding.ticketPurchaseViewModel = mainViewModel
         binding.lifecycleOwner = this
 
         return binding.root
@@ -51,17 +47,28 @@ class TicketPurchaseFragment : Fragment() {
     @RequiresApi(Build.VERSION_CODES.O)
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
         init()
         clickListener()
-
     }
 
     fun init() {
 
-        ticketPurchaseViewModel.paymentReady.observe(viewLifecycleOwner) {
-            if (it != null) {
+        mainViewModel.paymentReady.observe(viewLifecycleOwner) {
+            if (it!!.tid != "N/A") {
                 findNavController().navigate(R.id.kakaoPayWebView)
+            }
+        }
+
+        mainViewModel.isUseRewards.observe(viewLifecycleOwner) {
+            if(it == false){
+                Toast.makeText(requireContext(), "리워드 사용에 실패하였습니다. 다시 시도해주세요 :(", Toast.LENGTH_LONG)
+                    .show()
+                findNavController().navigate(R.id.profileFragment)
+            }else if(it == true){
+                Toast.makeText(requireContext(), "티켓 구매가 완료되었습니다 :)", Toast.LENGTH_LONG)
+                    .show()
+                findNavController().navigate(R.id.profileFragment)
+                mainViewModel.initializeIsUseRewards()
             }
         }
     }
@@ -70,186 +77,67 @@ class TicketPurchaseFragment : Fragment() {
     fun clickListener() {
 
         (activity as MainActivity).binding.toolbar.setNavigationOnClickListener {
-            findNavController().navigateUp()  // 뒤로 가기
+            mainViewModel.initializeKakaoPayVariables()
+            findNavController().navigate(R.id.profileFragment)  // 뒤로 가기
+        }
+        binding.translationTicketPlusButton.setOnClickListener{
+            mainViewModel.adjustTicketQuantity("translation", "+")
         }
 
-        binding.foodTicketPurchaseButton.setOnClickListener {
-            Log.d(TAG, "haveRewarded: ${ticketPurchaseViewModel.userInformation.value!!.haveRewarded}")
-            if(ticketPurchaseViewModel.userInformation.value!!.haveRewarded > 0){
-                paymentTypeDialog()
-            }else{
-                paymentRegularDialog()
-            }
+        binding.translationTicketMinusButton.setOnClickListener{
+            mainViewModel.adjustTicketQuantity("translation", "-")
         }
 
-        binding.translationTicketPurchaseButton.setOnClickListener {
-            Log.d(TAG, "haveRewarded: ${ticketPurchaseViewModel.userInformation.value!!.haveRewarded}")
-            if(ticketPurchaseViewModel.userInformation.value!!.haveRewarded > 0){
-                paymentTypeDialog()
+        binding.foodTicketPlusButton.setOnClickListener{
+            mainViewModel.adjustTicketQuantity("food", "+")
+        }
+
+        binding.foodTicketMinusButton.setOnClickListener{
+            mainViewModel.adjustTicketQuantity("food", "-")
+        }
+
+        binding.ticketPurchaseButton.setOnClickListener {
+            if(mainViewModel.userInformation.value?.availableReward!! > 0){
+                existAvailableRewardDialog()
             }else{
-                paymentRegularDialog()
+                mainViewModel.updatePaymentType("kakao")
+                mainViewModel.createPaymentRequest() //카카오페이 결제 요청
             }
         }
     }
 
     @RequiresApi(Build.VERSION_CODES.O)
-    fun paymentTypeDialog() {
+    fun existAvailableRewardDialog() {
         val dialog = Dialog(requireContext())
 
-        val dialogBinding: DialogSelectPaymentTypeBinding = DataBindingUtil.inflate(
+        val dialogBinding: DialogAvailableRewardBinding = DataBindingUtil.inflate(
             LayoutInflater.from(requireContext()),
-            R.layout.dialog_select_payment_type,
+            R.layout.dialog_available_reward,
             null,
             false
         )
 
+        dialogBinding.ticketPurchaseViewModel = mainViewModel
+        dialog.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
         dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
         dialog.setContentView(dialogBinding.root)
-        dialog.window!!.setLayout(WindowManager.LayoutParams.MATCH_PARENT, WindowManager.LayoutParams.WRAP_CONTENT)
+        val size = mainViewModel.getDisplaySize(0.9f, 0.35f)
+        dialog.window!!.setLayout(size.first, size.second)
         dialog.show()
-
 
         dialogBinding.paymentTypeCancel.setOnClickListener {
             dialog.dismiss()
         }
 
-        dialogBinding.paymentTypeRegular.setOnClickListener {
-            Log.d(TAG, "regular click")
+        dialogBinding.paymentRegular.setOnClickListener {
             dialog.dismiss()
-            ticketPurchaseViewModel.updatePaymentType("regular")
-            paymentRegularDialog()
+            mainViewModel.updatePaymentType("kakao")
+            mainViewModel.createPaymentRequest() // 그냥 결제 요청
         }
 
-        dialogBinding.paymentTypeReward.setOnClickListener {
-            Log.d(TAG, "reward click")
-            ticketPurchaseViewModel.updatePaymentType("reward")
+        dialogBinding.paymentReward.setOnClickListener {
             dialog.dismiss()
-            Log.d(TAG, "reward click?")
-            paymentRewardDialog()
-        }
-
-    }
-
-    @RequiresApi(Build.VERSION_CODES.O)
-    fun paymentRegularDialog() {
-
-        val dataBindingRegular: DialogPaymentRegularBinding = DataBindingUtil.inflate(
-            LayoutInflater.from(requireContext()),
-            R.layout.dialog_payment_regular,
-            null,
-            false
-        )
-
-        dataBindingRegular.ticketPurchaseViewModel = ticketPurchaseViewModel
-        dataBindingRegular.lifecycleOwner = this
-
-        val dialogRegular = Dialog(requireContext())
-        dialogRegular.requestWindowFeature(Window.FEATURE_NO_TITLE)
-        dialogRegular.setContentView(dataBindingRegular.root)
-        dialogRegular.show()
-
-        ticketPurchaseViewModel.updatePaymentType("regular")
-
-        dataBindingRegular.paymentRegularCancel.setOnClickListener{
-            dialogRegular.dismiss()
-        }
-
-        dataBindingRegular.regularTranslationTicketPurchasePlusButton.setOnClickListener{
-            ticketPurchaseViewModel.adjustRegularTicketQuantity("translation", "+")
-        }
-
-        dataBindingRegular.regularTranslationTicketPurchaseMinusButton.setOnClickListener{
-            ticketPurchaseViewModel.adjustRegularTicketQuantity("translation", "-")
-        }
-
-        dataBindingRegular.regularFoodTicketPurchasePlusButton.setOnClickListener{
-            ticketPurchaseViewModel.adjustRegularTicketQuantity("food", "+")
-        }
-
-        dataBindingRegular.regularFoodTicketPurchaseMinusButton.setOnClickListener{
-            ticketPurchaseViewModel.adjustRegularTicketQuantity("food", "-")
-        }
-
-        dataBindingRegular.regularTicketPurchaseButton.setOnClickListener {
-            //카카오페이 결제 요청
-            dialogRegular.dismiss()
-            ticketPurchaseViewModel.createPaymentRequest()
-
-        }
-    }
-
-    @RequiresApi(Build.VERSION_CODES.O)
-    fun paymentRewardDialog() {
-        Log.d(TAG, "paymentRewardDialog start");
-        val dialogReward = Dialog(requireContext())
-
-        val dataBindingReward: DialogPaymentRewardBinding = DataBindingUtil.inflate(
-            LayoutInflater.from(requireContext()),
-            R.layout.dialog_payment_reward,
-            null,
-            false
-        )
-
-        dataBindingReward.ticketPurchaseViewModel = ticketPurchaseViewModel
-        dataBindingReward.lifecycleOwner = this
-
-
-        dialogReward.requestWindowFeature(Window.FEATURE_NO_TITLE)
-        dialogReward.setContentView(dataBindingReward.root)
-        dialogReward.show()
-
-        ticketPurchaseViewModel.isRewardExceeded.observe(viewLifecycleOwner) {
-            if (it) {
-                dataBindingReward.rewardTicketPurchaseWarning.visibility = View.VISIBLE
-            } else {
-                dataBindingReward.rewardTicketPurchaseWarning.visibility = View.GONE
-            }
-
-        }
-
-        ticketPurchaseViewModel.changeTicket.observe(viewLifecycleOwner) {
-            if (it == "success") {
-                dialogReward.dismiss()
-                ticketPurchaseViewModel.setChangeTicket()
-                findNavController().navigate(R.id.profileFragment)
-
-            } else if (it == "failed") {
-                dialogReward.dismiss()
-                ticketPurchaseViewModel.setChangeTicket()
-                findNavController().navigate(R.id.profileFragment)
-                Toast.makeText(requireContext(), "결제가 실패하였습니다. 다시 시도해주세요 :(", Toast.LENGTH_LONG)
-                    .show()
-            }
-        }
-
-
-        dataBindingReward.paymentRewardCancel.setOnClickListener {
-            dialogReward.dismiss()
-        }
-
-        dataBindingReward.rewardTranslationTicketPurchasePlusButton.setOnClickListener{
-            Log.d(TAG, "reward translation plus: ${ticketPurchaseViewModel.rewardTranslationAmount.value}")
-            ticketPurchaseViewModel.adjustRewardTicketQuantity("translation", "+")
-        }
-
-        dataBindingReward.rewardTranslationTicketPurchaseMinusButton.setOnClickListener{
-            Log.d(TAG, "reward translation minus: ${ticketPurchaseViewModel.rewardTranslationAmount.value}")
-            ticketPurchaseViewModel.adjustRewardTicketQuantity("translation", "-")
-        }
-
-        dataBindingReward.rewardFoodTicketPurchasePlusButton.setOnClickListener{
-            Log.d(TAG, "reward food plus: ${ticketPurchaseViewModel.rewardFoodAmount.value}")
-            ticketPurchaseViewModel.adjustRewardTicketQuantity("food", "+")
-        }
-
-        dataBindingReward.rewardFoodTicketPurchaseMinusButton.setOnClickListener{
-            Log.d(TAG, "reward food minus: ${ticketPurchaseViewModel.rewardFoodAmount.value}")
-            ticketPurchaseViewModel.adjustRewardTicketQuantity("food", "-")
-        }
-
-        dataBindingReward.rewardTicketPurchaseButton.setOnClickListener {
-            ticketPurchaseViewModel.rewardPayment()
-
+            mainViewModel.useRewards()
         }
     }
 }

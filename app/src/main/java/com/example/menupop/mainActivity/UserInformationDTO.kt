@@ -11,8 +11,8 @@ data class UserInformationDTO(
     var translationTicket : Int,
     var freeTranslationTicket : Int,
     var freeFoodTicket : Int,
-    var dailyReward : Int,
-    var haveRewarded : Int
+    var dailyReward : Int, //받을 수 있는 리워드
+    var availableReward : Int // 보유 리워드
 )
 
 

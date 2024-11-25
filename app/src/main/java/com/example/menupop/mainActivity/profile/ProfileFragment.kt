@@ -106,13 +106,13 @@ class ProfileFragment : Fragment() {
 
         //티켓 구매를 누르면 티켓 프래그먼트로 이동
         binding.profileBuyTicketButton.setOnClickListener {
+            Log.d(TAG, "티켓 구매")
             findNavController().navigate(R.id.ticketPurchaseFragment)
         }
 
         // 광고보러 가기 누르면 광고 프래그먼트로 이동
         binding.profileAdButton.setOnClickListener {
             binding.profileAdButton.isClickable = false
-            Log.d(TAG, "setClick: 광고 보러가기 클릭됨")
             if (viewModel.userInformation.value!!.dailyReward == 0) {
                 Toast.makeText(requireContext(), "하루에 받을 수 있는 리워드를 초과했습니다.", Toast.LENGTH_SHORT).show()
             } else {
