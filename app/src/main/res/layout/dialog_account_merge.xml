@@ -3,8 +3,7 @@
     android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_marginStart="@dimen/basic_margin"
-    android:layout_marginEnd="@dimen/basic_margin"
+    android:background="@drawable/dialog_background"
     android:gravity="center_horizontal">
 
     <TextView

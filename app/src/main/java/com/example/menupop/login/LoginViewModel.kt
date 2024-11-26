@@ -49,7 +49,7 @@ class LoginViewModel(application: Application) :  AndroidViewModel(application) 
                     requestLogin(id, encryptedPassword)
                 }
                 else -> {
-                    _loginResult.value = LoginResponseModel(0, 0, response.result)
+                    _loginResult.value = LoginResponseModel(response.result,0)
                 }
             }
         }
@@ -63,7 +63,7 @@ class LoginViewModel(application: Application) :  AndroidViewModel(application) 
     }
 
     fun saveIdentifier(sharedPreferences: SharedPreferences,identifier : Int){
-        loginModel.saveUserIdentifier(sharedPreferences,identifier)
+        loginModel.saveUserIdentifier(sharedPreferences, identifier)
     }
     fun socialLoginRequest(email:String){
         viewModelScope.launch{

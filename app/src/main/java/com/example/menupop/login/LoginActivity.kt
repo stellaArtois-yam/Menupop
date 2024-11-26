@@ -1,14 +1,18 @@
 package com.example.menupop.login
 
 import android.app.Dialog
+import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
 import android.graphics.Color
+import android.graphics.Point
 import android.graphics.drawable.ColorDrawable
+import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import android.view.View
 import android.view.Window
+import android.view.WindowManager
 import android.widget.Button
 import android.widget.ImageView
 import android.widget.ProgressBar
@@ -77,7 +81,7 @@ class LoginActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         init()
-        identitySaveCheck()
+        identitySaveCheck() // 로그인 정보 저장 되어 있는지 확인
         setObservers()
         setListeners()
     }
@@ -87,7 +91,9 @@ class LoginActivity : AppCompatActivity() {
             Log.d(TAG, "mergeAccount: $result")
             if (result.result == "success") {
                 loginViewModel.saveIdentifier(sharedPreferences!!, result.identifier)
-                isNewUserCheck(result.isNewUser, result.identifier)
+                moveToMain( result.identifier)
+            }else{
+                Toast.makeText(this, resources.getString(R.string.network_error), Toast.LENGTH_SHORT).show()
             }
         }
 
@@ -96,7 +102,7 @@ class LoginActivity : AppCompatActivity() {
             when(it.result){
                 "success" -> {
                     loginViewModel.saveIdentifier(sharedPreferences!!, it.identifier)
-                    isNewUserCheck(it.isNewUser, it.identifier)
+                    moveToMain(it.identifier)
                 }
                 "failed" -> {
                     showCustomDialog(false).show()
@@ -107,14 +113,14 @@ class LoginActivity : AppCompatActivity() {
             }
         }
 
-        loginViewModel.socialLoginResult.observe(this) { result ->
-            Log.d(TAG, "socialLoginResult: ${result.isNewUser} ${result.identifier} ${result.result}")
-            when (result.result) {
-                "local_login" -> showSocialWarningDialog(result.identifier)
+        loginViewModel.socialLoginResult.observe(this) {
+            Log.d(TAG, "socialLoginResult: $it")
+            when (it.result) {
+                "local_login" -> showSocialWarningDialog(it.identifier)
                 "failed" -> Toast.makeText(this, "잠시 후 다시 시도해주세요.", Toast.LENGTH_SHORT).show()
                 else -> {
-                    loginViewModel.saveIdentifier(sharedPreferences!!, result.identifier)
-                    isNewUserCheck(result.isNewUser, result.identifier)
+                    loginViewModel.saveIdentifier(sharedPreferences!!, it.identifier)
+                    moveToMain(it.identifier)
                 }
             }
         }
@@ -130,14 +136,11 @@ class LoginActivity : AppCompatActivity() {
         socialLoginManager = SocialLoginManager(this)
     }
 
-    private fun isNewUserCheck(isNewUser: Int, identifier: Int) {
-        val intent = Intent(this, MainActivity::class.java)
-        if (isNewUser == 0) {
-            intent.putExtra("identifier", identifier)
-        }
-            startActivity(intent)
-            finish()
-
+    private fun moveToMain(identifier: Int) {
+        val intent = Intent(this, MainActivity :: class.java)
+        intent.putExtra("identifier", identifier)
+        startActivity(intent)
+        finish()
     }
 
     private fun identitySaveCheck() {
@@ -221,7 +224,12 @@ class LoginActivity : AppCompatActivity() {
         dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
         dialog.window!!.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
         dialog.setContentView(R.layout.dialog_account_merge)
+
+        val size = getDisplaySize(0.95f, 0.35f)
+        dialog.window?.setLayout(size.first, size.second)
+
         dialog.show()
+
         dialog.findViewById<Button>(R.id.account_merge_agree).setOnClickListener {
             loginViewModel.socialAccountMergeLocalAccount(identifier)
         }
@@ -296,6 +304,24 @@ class LoginActivity : AppCompatActivity() {
         NaverIdLoginSDK.initialize(this, naverClientId, naverClientSecret, naverClientName)
 
         loginViewModel.requestNaverSocialLogin()
+    }
+
+    private fun getDisplaySize(width: Float, height: Float): Pair<Int, Int> {
+        val windowManager = getSystemService(Context.WINDOW_SERVICE) as WindowManager
+        val x: Int
+        val y: Int
+        if (Build.VERSION.SDK_INT < 30) {
+            val size = Point()
+            x = (size.x * width).toInt()
+            y = (size.y * height).toInt()
+
+        } else {
+            val rect = windowManager.currentWindowMetrics.bounds
+
+            x = (rect.width() * width).toInt()
+            y = (rect.height() * height).toInt()
+        }
+        return Pair(x, y)
     }
 
     override fun onDestroy() {

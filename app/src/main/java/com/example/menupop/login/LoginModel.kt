@@ -40,10 +40,10 @@ class LoginModel(val application: Application) {
                 if(response.isSuccessful){
                     response.body()!!
                 }else{
-                    LoginResponseModel(0, 0, response.code().toString())
+                    LoginResponseModel(response.code().toString(), 0)
                 }
             } catch (e: Exception) {
-                LoginResponseModel(0, 0, e.message!!)
+                LoginResponseModel(e.message!!, 0)
             }
         }
     }
@@ -73,10 +73,10 @@ class LoginModel(val application: Application) {
                 if(response.isSuccessful){
                     response.body()!!
                 }else{
-                    LoginResponseModel(0, 0, "failed")
+                    LoginResponseModel("failed", 0)
                 }
             }catch (e: Exception){
-                LoginResponseModel(0, 0, "failed")
+                LoginResponseModel("failed", 0)
             }
         }
     }
@@ -94,10 +94,10 @@ class LoginModel(val application: Application) {
                 if(response.isSuccessful){
                     response.body()!!
                 }else{
-                    LoginResponseModel(0, 0, "failed")
+                    LoginResponseModel( "failed", 0)
                 }
             }catch (e: Exception){
-                LoginResponseModel(0, 0, "failed")
+                LoginResponseModel( "failed", 0)
             }
         }
     }
