@@ -7,6 +7,7 @@ import android.os.Bundle
 import android.util.Log
 import android.view.View
 import android.view.Window
+import android.widget.Button
 import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
@@ -134,36 +135,36 @@ class MainActivity : AppCompatActivity() {
         mainActivityViewModel.scheduleMidnightWork(application)
 
         mainActivityViewModel.isLoaded.observe(this) {
-            if (it.equals("success")) {
-                //번역에 성공해서 번역 티켓을 사용해야한다
-                if (checkingTranslation) {
-                    //사용자에게 무료 번역 티켓이 존재
-                    lifecycleScope.launch {
-                        if (mainActivityViewModel.userInformation.value!!.freeTranslationTicket > 0) {
-                            //"free_transaltion_ticket" 타입의 티켓을 업데이트 한다
-                            mainActivityViewModel.updateTicketQuantity(
-                                ticketType = "free_translation_ticket",
-                                operator = "-",
-                                quantity = 1
-                            )
+            Log.d(TAG, "isLoaded: $it")
+            when(it){
+                "success" ->{
+                    //번역에 성공해서 번역 티켓을 사용해야한다
+                    if (checkingTranslation) {
+                        //사용자에게 무료 번역 티켓이 존재
+                        lifecycleScope.launch {
+                            if (mainActivityViewModel.userInformation.value!!.freeTranslationTicket > 0) {
+                                //"free_transaltion_ticket" 타입의 티켓을 업데이트 한다
+                                mainActivityViewModel.updateTicketQuantity(
+                                    ticketType = "free_translation_ticket",
+                                    operator = "-",
+                                    quantity = 1
+                                )
 
-                        } else {
-                            //없으면 ticket을 업데이트 한다
-                            mainActivityViewModel.updateTicketQuantity(
-                                ticketType = "translation_ticket",
-                                operator = "-",
-                                quantity = 1)
+                            } else {
+                                //없으면 ticket을 업데이트 한다
+                                mainActivityViewModel.updateTicketQuantity(
+                                    ticketType = "translation_ticket",
+                                    operator = "-",
+                                    quantity = 1)
+                            }
                         }
                     }
+                    loadingDialog.dismiss()
                 }
-
-                loadingDialog.dismiss()
-
-            } else if (it.equals("yet")) {
-                loadingDialog
-            } else if (it.equals("isNotSuccessful") || it.equals("timeout")) {
-                Toast.makeText(this, "서버 오류로 로딩이 불가합니다 :(", Toast.LENGTH_LONG).show()
-                loadingDialog.dismiss()
+                "isNotSuccessful", "failed" -> {
+                    loadingDialog.dismiss()
+                    networkErrorDialog()
+                }
             }
         }
 
@@ -171,7 +172,6 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun loadDialog(): Dialog {
-
         val dialog = Dialog(this)
         dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
         dialog.setContentView(R.layout.progressbar)
@@ -183,6 +183,21 @@ class MainActivity : AppCompatActivity() {
         dialog.show()
 
         return dialog
+    }
+
+    private fun networkErrorDialog() {
+        val dialog = Dialog(this)
+        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
+        dialog.setContentView(R.layout.dialog_one_button)
+        dialog.window!!.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+        dialog.show()
+
+        dialog.findViewById<Button>(R.id.confirmButton).setOnClickListener{
+            Log.d(TAG, "networkErrorDialog: 클릭")
+            dialog.dismiss()
+            finish()
+        }
+
     }
 
     override fun onDestroy() {

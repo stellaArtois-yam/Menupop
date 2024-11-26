@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="300dp"
+    android:layout_height="200dp"
+    android:background="@drawable/dialog_background"
+    android:gravity="center">
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+
+        android:text="네트워크 오류"
+        android:textColor="@color/orange"
+        android:textSize="20sp"
+        android:textStyle="bold" />
+
+
+    <TextView
+        android:layout_width="300dp"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:padding="20dp"
+        android:text="@string/network_error"
+
+        android:textColor="@color/black"
+        android:textSize="16sp" />
+
+    <androidx.appcompat.widget.AppCompatButton
+        android:id="@+id/confirmButton"
+        android:layout_width="100dp"
+        android:layout_height="wrap_content"
+        android:text="확인"
+        android:textStyle="bold"
+        android:textColor="@color/white"
+        android:textSize="16sp"
+        android:background="@drawable/profile_button"/>
+
+</LinearLayout>

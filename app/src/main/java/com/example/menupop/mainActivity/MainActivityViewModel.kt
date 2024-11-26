@@ -67,7 +67,6 @@ class MainActivityViewModel(private val application: Application) : AndroidViewM
 
 
     private val _isLoaded = MutableLiveData<String>() //유저 정보 로드
-        .apply { value = "yet" }
     val isLoaded: LiveData<String>
         get() = _isLoaded
 

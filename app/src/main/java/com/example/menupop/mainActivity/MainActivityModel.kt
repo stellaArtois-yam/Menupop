@@ -166,21 +166,12 @@ class MainActivityModel(val application: Application) {
                     response
                 } else {
                     Log.d(TAG, "isNotSuccessful: $response")
-                    UserInformationDTO(
-                        "isNotSuccessful",
-                        null, null, null, 0,
-                        0, 0, 0, 0,
-                        0
-                    )
+                    UserInformationDTO("isNotSuccessful",
+                        null, null, null)
                 }
             } catch (e: Exception) {
                 Log.d(TAG, "request user info onFailure: ${e.message}")
-                UserInformationDTO(
-                    e.message,
-                    null, null, null, 0,
-                    0, 0, 0, 0,
-                    0
-                )
+                UserInformationDTO("failed", null, null, null)
             }
         }
 
