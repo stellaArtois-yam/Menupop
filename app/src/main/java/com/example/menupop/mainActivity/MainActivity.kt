@@ -190,10 +190,16 @@ class MainActivity : AppCompatActivity() {
         dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
         dialog.setContentView(R.layout.dialog_one_button)
         dialog.window!!.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+        val size = mainActivityViewModel.getDisplaySize(0.9f, 0.35f)
+        dialog.window!!.setLayout(size.first, size.second)
+
+        dialog.findViewById<TextView>(R.id.title).text = "네트워크 오류"
+        dialog.findViewById<TextView>(R.id.content).text = resources.getString(R.string.network_error)
+        dialog.findViewById<Button>(R.id.confirmButton).text = "확인"
+
         dialog.show()
 
         dialog.findViewById<Button>(R.id.confirmButton).setOnClickListener{
-            Log.d(TAG, "networkErrorDialog: 클릭")
             dialog.dismiss()
             finish()
         }

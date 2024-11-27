@@ -250,7 +250,18 @@ class LoginActivity : AppCompatActivity() {
             dialog.findViewById<ProgressBar>(R.id.progress_bar).visibility = View.VISIBLE
             dialog.setCancelable(false)
         }else{
-            dialog.setContentView(R.layout.dialog_warning)
+            dialog.setContentView(R.layout.dialog_one_button)
+            val size = getDisplaySize(0.9f, 0.4f)
+            dialog.window?.setLayout(size.first, size.second)
+
+            dialog.findViewById<TextView>(R.id.title).text = "잘못된 계정 정보"
+            dialog.findViewById<TextView>(R.id.content).text = resources.getString(R.string.login_failed_warning)
+            val retryButton = dialog.findViewById<Button>(R.id.confirmButton)
+
+            retryButton.text = "다시 시도"
+            retryButton.setOnClickListener {
+                dialog.dismiss()
+            }
         }
 
         return dialog
