@@ -9,7 +9,6 @@ import android.graphics.drawable.Drawable
 
 import android.os.Build
 import android.util.Log
-import android.view.View
 import android.view.WindowManager
 import androidx.annotation.RequiresApi
 import androidx.core.content.res.ResourcesCompat
@@ -57,9 +56,6 @@ class MainActivityViewModel(private val application: Application) : AndroidViewM
 
     val accountWithdrawal: LiveData<String>
         get() = _accountWithdrawal
-
-    private val _countrySelection = MutableLiveData<String>()
-    val countrySelection: LiveData<String> get() = _countrySelection
 
     private var _isFreeTicket = MutableLiveData(false) // dialog 티켓 상태 결정
     val isFreeTicket: LiveData<Boolean>
@@ -625,18 +621,6 @@ class MainActivityViewModel(private val application: Application) : AndroidViewM
         mainActivityModel.scheduleMidnightWork(application, callback)
     }
 
-    fun selectionCountry(view: View) {
-        Log.d(TAG, "selectionCountry: 실행")
-        when (view.id) {
-            R.id.country_selection_america -> _countrySelection.value = "america"
-            R.id.country_selection_china -> _countrySelection.value = "china"
-            R.id.country_selection_hongkong -> _countrySelection.value = "hongkong"
-            R.id.country_selection_japan -> _countrySelection.value = "japan"
-            R.id.country_selection_taiwan -> _countrySelection.value = "taiwan"
-            R.id.country_selection_vietnam -> _countrySelection.value = "vietnam"
-        }
-
-    }
 
     fun getDisplaySize(width: Float, height: Float): Pair<Int, Int> {
         val windowManager = application.getSystemService(Context.WINDOW_SERVICE) as WindowManager

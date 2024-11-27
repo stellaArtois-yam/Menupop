@@ -61,14 +61,12 @@ class CameraModel {
 
     suspend fun recognizedText(image: InputImage, country: String) : Text{
 
-        var recognizer = TextRecognition.getClient(TextRecognizerOptions.DEFAULT_OPTIONS)
-
-        if (country == "japan") {
-            recognizer = TextRecognition.getClient(JapaneseTextRecognizerOptions.Builder().build())
-
-        } else if (country == "china" || country == "hongkong" || country == "taiwan") {
-            recognizer = TextRecognition.getClient(ChineseTextRecognizerOptions.Builder().build())
+        val recognizer = when(country){
+            "japan" -> TextRecognition.getClient(JapaneseTextRecognizerOptions.Builder().build())
+            "china", "taiwan" -> TextRecognition.getClient(ChineseTextRecognizerOptions.Builder().build())
+            else -> TextRecognition.getClient(TextRecognizerOptions.DEFAULT_OPTIONS)
         }
+
         return withContext(Dispatchers.IO) {
             try {
                 // Task를 suspend 함수로 변환
@@ -92,29 +90,6 @@ class CameraModel {
                 .setConfidenceThreshold(0.2f)
                 .build())
 
-//        languageIdentifier.identifyPossibleLanguages(text)
-//            .addOnSuccessListener { identifiedLanguages ->
-//                for (identifiedLanguage in identifiedLanguages) {
-//                    val language = identifiedLanguage.languageTag
-//                    val confidence = identifiedLanguage.confidence
-//                    Log.i(TAG, "$language $confidence")
-
-//                    if (language != "und") {
-//                    Log.d(TAG, "checkLanguage: $languageCode")
-//                        callback(language)
-//
-//                    } else {
-//                        Log.d(TAG, "checkLanguage und")
-//                        callback("und")
-//
-//                    }
-//                }
-//            }
-//            .addOnFailureListener {
-//                Log.d(TAG, "checkLanguage e: ${it.message}")
-//                callback("failed")
-//            }
-
         return withContext(Dispatchers.IO) {
             try {
                 // Task를 suspend 함수로 변환
@@ -126,6 +101,29 @@ class CameraModel {
                 throw e // 실패 시 예외를 던져서 호출한 곳에서 처리
             }
         }
+    }
 
+    suspend fun useTranslationTicket(identifier : Int) : String {
+        val retrofit = Retrofit.Builder()
+            .baseUrl(BuildConfig.SERVER_IP)
+            .addConverterFactory(ScalarsConverterFactory.create())
+            .addConverterFactory(GsonConverterFactory.create(gson))
+            .client(okHttpClient)
+            .build()
+
+        val service = retrofit.create(RetrofitService::class.java)
+
+        return withContext(Dispatchers.IO){
+            try{
+                val response = service.useTranslationTicket(identifier)
+                if(response.isSuccessful){
+                    response.body()!!
+                }else{
+                    "failed"
+                }
+            }catch (e : Exception){
+                "failed"
+            }
+        }
     }
 }

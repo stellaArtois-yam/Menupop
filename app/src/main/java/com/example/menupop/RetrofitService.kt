@@ -193,5 +193,8 @@ interface RetrofitService {
         @Field("text") text: String,
         @Field("language") language: String
     ): Response<String>
-
+    @POST("UseTranslationTicket.php")
+    @FormUrlEncoded
+    suspend fun useTranslationTicket(
+        @Field("identifier") identifier : Int) : Response<String>
 }

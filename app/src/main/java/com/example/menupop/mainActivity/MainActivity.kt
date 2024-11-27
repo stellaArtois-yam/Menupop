@@ -138,27 +138,6 @@ class MainActivity : AppCompatActivity() {
             Log.d(TAG, "isLoaded: $it")
             when(it){
                 "success" ->{
-                    //번역에 성공해서 번역 티켓을 사용해야한다
-                    if (checkingTranslation) {
-                        //사용자에게 무료 번역 티켓이 존재
-                        lifecycleScope.launch {
-                            if (mainActivityViewModel.userInformation.value!!.freeTranslationTicket > 0) {
-                                //"free_transaltion_ticket" 타입의 티켓을 업데이트 한다
-                                mainActivityViewModel.updateTicketQuantity(
-                                    ticketType = "free_translation_ticket",
-                                    operator = "-",
-                                    quantity = 1
-                                )
-
-                            } else {
-                                //없으면 ticket을 업데이트 한다
-                                mainActivityViewModel.updateTicketQuantity(
-                                    ticketType = "translation_ticket",
-                                    operator = "-",
-                                    quantity = 1)
-                            }
-                        }
-                    }
                     loadingDialog.dismiss()
                 }
                 "isNotSuccessful", "failed" -> {

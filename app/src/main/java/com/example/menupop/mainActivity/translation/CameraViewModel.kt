@@ -28,14 +28,11 @@ class CameraViewModel(val application: Application) : ViewModel() {
         const val TAG = "CameraViewModel"
     }
 
+    private val cameraModel = CameraModel()
+
     private val _scannerResult = MutableLiveData<ScannerResults>()
     val scannerResult: LiveData<ScannerResults>
         get() = _scannerResult
-    private val cameraModel = CameraModel()
-
-    fun successScanning(scannerResults: ScannerResults) {
-        _scannerResult.value = scannerResults
-    }
 
     private val _failed = MutableLiveData<Boolean>()
     val failed: LiveData<Boolean>
@@ -44,11 +41,17 @@ class CameraViewModel(val application: Application) : ViewModel() {
     private val _textPosition = MutableLiveData<ArrayList<Rect>>()
 
     private val _image = MutableLiveData<Drawable>()
+    val image: LiveData<Drawable>
+        get() = _image
+
+
+    fun successScanning(scannerResults: ScannerResults) {
+        _scannerResult.value = scannerResults
+    }
 
     private lateinit var likesFoodList: ArrayList<String>
     private lateinit var unLikesFoodList: ArrayList<String>
-    val image: LiveData<Drawable>
-        get() = _image
+
 
 
     fun setFoodPreference(foodPreference: ArrayList<FoodPreference>) {
@@ -68,7 +71,7 @@ class CameraViewModel(val application: Application) : ViewModel() {
 
                 val resultText = getText(visionText)
 
-                if (country == "taiwan") {
+                if (country == "taiwan" ) {
                     requestTranslation(resultText, "zh-TW")
                 } else {
                     checkLanguage(resultText)
@@ -123,7 +126,6 @@ class CameraViewModel(val application: Application) : ViewModel() {
 
                 Log.d(TAG, "requestTranslation: ${decodeList}\nsize : ${decodeList.size}")
                 if (decode != null) {
-
                     drawTranslatedText(decodeList)
                 }
             } else {
@@ -189,7 +191,6 @@ class CameraViewModel(val application: Application) : ViewModel() {
             for (text in likesFoodList) {
                 if (textList[i].contains(text)) {
                     color = Color.rgb(255, 127, 9)
-//                    color = Color.BLUE
                     break
                 }
             }
@@ -197,7 +198,6 @@ class CameraViewModel(val application: Application) : ViewModel() {
             for (text in unLikesFoodList) {
                 if (textList[i].contains(text)) {
                     color = Color.rgb(255, 173, 13)
-//                    color = Color.RED
                     break
                 }
             }
@@ -209,7 +209,6 @@ class CameraViewModel(val application: Application) : ViewModel() {
         }
 
         _image.value = BitmapDrawable(application.applicationContext.resources, mutableBitmap)
-
     }
 
 
@@ -237,6 +236,15 @@ class CameraViewModel(val application: Application) : ViewModel() {
 
         return Triple(paint, x.toFloat(), y.toFloat())
 
+    }
+
+    suspend fun useTranslationTicket(identifier : Int){
+        viewModelScope.launch {
+            when(cameraModel.useTranslationTicket(identifier)){
+                "success" -> _failed.value = false
+                "failed" -> _failed.value = true
+            }
+        }
     }
 
 }
