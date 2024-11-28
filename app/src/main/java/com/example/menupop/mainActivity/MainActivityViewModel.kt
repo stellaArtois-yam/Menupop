@@ -48,8 +48,8 @@ class MainActivityViewModel(private val application: Application) : AndroidViewM
     val foodPreferenceList: LiveData<FoodPreferenceDataClass>
         get() = _foodPreferenceList
 
-    private val _registerResult = MutableLiveData<Boolean>()
-    val registerResult: LiveData<Boolean>
+    private val _registerResult = MutableLiveData<Boolean?>()
+    val registerResult: LiveData<Boolean?>
         get() = _registerResult
 
     private val _accountWithdrawal = MutableLiveData<String>()
@@ -66,8 +66,8 @@ class MainActivityViewModel(private val application: Application) : AndroidViewM
     val isLoaded: LiveData<String>
         get() = _isLoaded
 
-    private val _deletedResult = MutableLiveData<Boolean>()
-    val deletedResult: LiveData<Boolean>
+    private val _deletedResult = MutableLiveData<Boolean?>()
+    val deletedResult: LiveData<Boolean?>
         get() = _deletedResult
 
     private val _userInformation = MutableLiveData<UserInformationDTO>()
@@ -110,10 +110,14 @@ class MainActivityViewModel(private val application: Application) : AndroidViewM
                 foodName,
                 classification
             )
-            _registerResult.value = result == "success"
+            Log.d(TAG, "foodPreferenceRegister: ${result.trim() == "success"}")
+            _registerResult.value = result.trim() == "success"
             searchFood.value?.clear()
-            Log.d(TAG, "foodPreferenceRegister: ${searchFood.value}")
         }
+    }
+
+    fun initializeRegisterResult(){
+        _registerResult.value = null
     }
 
     fun checkingTranslationTicket(): Boolean {
@@ -128,8 +132,16 @@ class MainActivityViewModel(private val application: Application) : AndroidViewM
     fun deleteFoodPreference(foodName: String) {
         viewModelScope.launch {
             val result = mainActivityModel.deleteFoodPreference(_identifier.value!!, foodName)
-            _deletedResult.value = result == "success"
+            Log.d(TAG, "deleteFoodPreference: $result")
+            when(result.trim()){
+                "success" -> _deletedResult.value = true
+                else -> _deletedResult.value = false
+            }
         }
+    }
+
+    fun initializeDeleteResult(){
+        _deletedResult.value = null
     }
 
     fun searchFood(query: String) {
@@ -245,6 +257,7 @@ class MainActivityViewModel(private val application: Application) : AndroidViewM
     suspend fun getFoodPreference() {
         viewModelScope.launch {
             val foodPreference = mainActivityModel.getFoodPreference(_identifier.value!!)
+            Log.d(TAG, "getFoodPreference: $foodPreference")
             _foodPreferenceList.value = foodPreference
             _userInformation.value!!.foodPreference = foodPreference.foodList
         }
@@ -599,10 +612,6 @@ class MainActivityViewModel(private val application: Application) : AndroidViewM
 
     fun logout(sharedPreferences: SharedPreferences) {
         mainActivityModel.logout(sharedPreferences)
-    }
-
-    fun registerVariableReset() {
-        _registerResult.value = false
     }
 
 

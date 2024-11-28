@@ -49,17 +49,11 @@ class CameraViewModel(val application: Application) : ViewModel() {
         _scannerResult.value = scannerResults
     }
 
-    private lateinit var likesFoodList: ArrayList<String>
-    private lateinit var unLikesFoodList: ArrayList<String>
-
-
+    private lateinit var foodHash: HashMap<String, String>
 
     fun setFoodPreference(foodPreference: ArrayList<FoodPreference>) {
         if (foodPreference.isNotEmpty()) {
-            val (likesFoodList, unLikesFoodList) = splitFoodPreferenceList(foodPreference)
-            this.likesFoodList = likesFoodList
-            this.unLikesFoodList = unLikesFoodList
-            Log.d(TAG, "setFoodPreference: $likesFoodList, $unLikesFoodList")
+            setFoodPreferenceList(foodPreference)
         }
     }
 
@@ -71,7 +65,7 @@ class CameraViewModel(val application: Application) : ViewModel() {
 
                 val resultText = getText(visionText)
 
-                if (country == "taiwan" ) {
+                if (country == "taiwan") {
                     requestTranslation(resultText, "zh-TW")
                 } else {
                     checkLanguage(resultText)
@@ -95,21 +89,14 @@ class CameraViewModel(val application: Application) : ViewModel() {
         }
     }
 
-    private fun splitFoodPreferenceList(foodPreferenceList: List<FoodPreference>): Pair<ArrayList<String>, ArrayList<String>> {
-        val likes = ArrayList<String>()
-        val dislikes = ArrayList<String>()
-
+    private fun setFoodPreferenceList(foodPreferenceList: List<FoodPreference>) {
+        foodHash = HashMap()
         for (foodPreference in foodPreferenceList) {
-            if (foodPreference.classification == "호") {
-//                Log.d(TAG, "호: ${foodPreference.foodName}")
-                likes.add(foodPreference.foodName)
-            } else if (foodPreference.classification == "불호") {
-//                Log.d(TAG, "불호: ${foodPreference.foodName}")
-                dislikes.add(foodPreference.foodName)
+            val value = foodPreference.classification
+            for (ingredient in foodPreference.ingredients) {
+                foodHash[ingredient] = value
             }
         }
-
-        return Pair(likes, dislikes)
     }
 
 
@@ -117,8 +104,6 @@ class CameraViewModel(val application: Application) : ViewModel() {
         viewModelScope.launch {
             val result = cameraModel.requestTranslation(text, langCode)
             if (result != "failed") {
-                Log.d(TAG, "translated Text: $result")
-
                 val jsonArray = JSONArray(result)
                 val decode = jsonArray.getString(0)
 
@@ -188,17 +173,14 @@ class CameraViewModel(val application: Application) : ViewModel() {
 
             var color = Color.BLACK // 기본 색상
 
-            for (text in likesFoodList) {
-                if (textList[i].contains(text)) {
-                    color = Color.rgb(255, 127, 9)
-                    break
-                }
-            }
-
-            for (text in unLikesFoodList) {
-                if (textList[i].contains(text)) {
-                    color = Color.rgb(255, 173, 13)
-                    break
+            for ((ingredient, preference) in foodHash) {
+                if (textList[i].contains(ingredient)) {
+                    color = if (preference == "호") {
+                        Color.rgb(255, 127, 9) // 호일 경우 오렌지
+                    } else {
+                        Color.rgb(255, 173, 13) // 불호일 경우 노란색
+                    }
+                    break // 첫 번째 일치 항목만 처리하고 종료
                 }
             }
 
@@ -238,9 +220,9 @@ class CameraViewModel(val application: Application) : ViewModel() {
 
     }
 
-    suspend fun useTranslationTicket(identifier : Int){
+    suspend fun useTranslationTicket(identifier: Int) {
         viewModelScope.launch {
-            when(cameraModel.useTranslationTicket(identifier)){
+            when (cameraModel.useTranslationTicket(identifier)) {
                 "success" -> _failed.value = false
                 "failed" -> _failed.value = true
             }

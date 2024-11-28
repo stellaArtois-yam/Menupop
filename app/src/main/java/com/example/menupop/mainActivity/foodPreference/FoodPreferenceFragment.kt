@@ -46,6 +46,8 @@ class FoodPreferenceFragment : Fragment() {
     private lateinit var searchAdapter: FoodPreferenceSearchAdapter
     private lateinit var foodPreferenceAdapter: FoodPreferenceAdapter
     private lateinit var existBottomSheetDialog: BottomSheetDialog
+    private lateinit var deleteDialog : Dialog
+    private var index : Int? = null
 
 
     override fun onCreateView(
@@ -93,11 +95,16 @@ class FoodPreferenceFragment : Fragment() {
         foodPreferenceAdapter = FoodPreferenceAdapter(object : FoodPreferenceClickListener {
             @RequiresApi(Build.VERSION_CODES.R)
             override fun deleteBtnClick(foodPreference: FoodPreference, idx: Int) {
-                deleteFoodPreferenceItem(
+                val result : Pair<Dialog, Int> = deleteFoodPreferenceItem(
                     foodPreference.foodName,
                     foodPreference.classification,
                     idx
                 )
+
+                deleteDialog = result.first
+                deleteDialog.show()
+
+                index = result.second
             }
         })
 
@@ -202,7 +209,7 @@ class FoodPreferenceFragment : Fragment() {
 
     @RequiresApi(Build.VERSION_CODES.R)
     @SuppressLint("NotifyDataSetChanged")
-    fun deleteFoodPreferenceItem(foodName: String, classification: String, idx: Int) {
+    fun deleteFoodPreferenceItem(foodName: String, classification: String, idx: Int) : Pair<Dialog, Int> {
         val dialog = Dialog(requireContext())
         val binding: DialogDeletePreferenceBinding = DataBindingUtil.inflate(
             LayoutInflater.from(requireContext()),
@@ -223,24 +230,13 @@ class FoodPreferenceFragment : Fragment() {
             classification
         )
         binding.dialogDeletePreferenceDeleteButton.setOnClickListener {
-
-            mainViewModel.deletedResult.observe(viewLifecycleOwner) { result ->
-                if (result) {
-                    dialog.dismiss()
-                    mainViewModel.foodPreferenceList.value?.foodList?.removeAt(idx)
-                    foodPreferenceAdapter.notifyDataSetChanged()
-                } else {
-                    Toast.makeText(requireContext(), "잠시 후 다시 시도해주세요.", Toast.LENGTH_SHORT).show()
-                }
-            }
-
             mainViewModel.deleteFoodPreference(foodName)
         }
+
         binding.dialogDeletePreferenceCancelButton.setOnClickListener {
             dialog.dismiss()
         }
-
-        dialog.show()
+        return Pair(dialog, idx)
     }
 
     private fun showCustomDialog() {
@@ -290,16 +286,12 @@ class FoodPreferenceFragment : Fragment() {
                     foodPreferenceAdapter.setFoodList(it.foodList!!)
                     binding.foodPreferenceEmptyListWarring.visibility = View.GONE
                 }
-
                 "notRegister" -> {
                     Log.d(TAG, "init not register")
                     binding.foodPreferenceEmptyListWarring.visibility = View.VISIBLE
                     binding.foodPreferenceRecyclerview.visibility = View.INVISIBLE
                 }
-
-                else -> {
-                    Log.d(TAG, "null 호출")
-                }
+                else -> Log.d(TAG, "foodPreferenceList is null")
             }
         }
 
@@ -315,28 +307,50 @@ class FoodPreferenceFragment : Fragment() {
         }
 
         mainViewModel.registerResult.observe(viewLifecycleOwner) { result ->
-            if (result) {
-                existBottomSheetDialog.dismiss()
-                lifecycleScope.launch {
-                    if (mainViewModel.userInformation.value?.freeFoodTicket!! > 0) {
-                        mainViewModel.updateTicketQuantity("free_food_ticket", "-", 1)
-                    } else {
-                        mainViewModel.updateTicketQuantity("food_ticket", "-", 1)
+            Log.d(TAG, "foodPreferenceRegister: $result")
+            when(result){
+                true -> {
+                    existBottomSheetDialog.dismiss()
+                    lifecycleScope.launch {
+                        if (mainViewModel.userInformation.value?.freeFoodTicket!! > 0) {
+                            mainViewModel.updateTicketQuantity("free_food_ticket", "-", 1)
+                        } else {
+                            mainViewModel.updateTicketQuantity("food_ticket", "-", 1)
+                        }
+
+                        val imm =
+                            requireContext().getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+                        imm.hideSoftInputFromWindow(requireActivity().currentFocus?.windowToken, 0)
+
+                        binding.foodPreferenceRecyclerview.visibility = View.VISIBLE
+                        binding.foodPreferenceSearchRecyclerview.visibility = View.GONE
+                        mainViewModel.getFoodPreference()
                     }
-
-                    val imm =
-                        requireContext().getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
-                    imm.hideSoftInputFromWindow(requireActivity().currentFocus?.windowToken, 0)
-
-                    binding.foodPreferenceRecyclerview.visibility = View.VISIBLE
-                    binding.foodPreferenceSearchRecyclerview.visibility = View.GONE
-                    mainViewModel.getFoodPreference()
+                    mainViewModel.initializeRegisterResult()
                 }
+                false -> {
+                    Toast.makeText(requireContext(), resources.getString(R.string.network_error),Toast.LENGTH_SHORT).show()
+                    mainViewModel.initializeRegisterResult()
+                }
+                else -> Log.d(TAG, "registerResult: $result")
+            }
+        }
 
-                mainViewModel.registerVariableReset()
-
-            } else {
-                Log.d(TAG, "existTicketShowDialog: 실패")
+        mainViewModel.deletedResult.observe(viewLifecycleOwner) { result ->
+            Log.d(TAG, "deleteFoodPreferenceItem: $result")
+            when(result){
+                true -> {
+                    deleteDialog.dismiss()
+                    mainViewModel.foodPreferenceList.value?.foodList?.removeAt(index!!)
+                    foodPreferenceAdapter.notifyDataSetChanged()
+                    mainViewModel.initializeDeleteResult()
+                }
+                false -> {
+                    deleteDialog.dismiss()
+                    Toast.makeText(requireContext(), resources.getString(R.string.network_error), Toast.LENGTH_SHORT).show()
+                    mainViewModel.initializeDeleteResult()
+                }
+                else -> { Log.d(TAG, "deleteFoodPreferenceItem is null")}
             }
         }
     }

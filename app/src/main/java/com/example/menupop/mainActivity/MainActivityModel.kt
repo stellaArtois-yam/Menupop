@@ -310,14 +310,15 @@ class MainActivityModel(val application: Application) {
     suspend fun deleteFoodPreference(identifier: Int, foodName: String): String {
         return withContext(Dispatchers.IO) {
             val response = service.deleteFoodPreference(identifier, foodName)
+            Log.d(TAG, "deleteFoodPreference: ${response.body()}")
             try {
                 if (response.isSuccessful) {
                     response.body()!!
                 } else {
-                    response.code().toString()
+                    "failed"
                 }
             } catch (e: Exception) {
-                e.message!!
+                "failed"
             }
         }
     }
