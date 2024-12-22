@@ -1,158 +1,140 @@
 <?xml version="1.0" encoding="utf-8"?>
-<layout>
-    <data>
-        <variable
-            name="mainActivityViewModel"
-            type="com.example.menupop.mainActivity.MainActivityViewModel" />
-    </data>
-
 
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    xmlns:app="http://schemas.android.com/apk/res-auto">
+    android:visibility="visible">
 
     <TextView
         android:id="@+id/country_selection_info"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
 
-        android:text="번역 하려는 언어의\n국가를 선택해주세요."
-        android:textSize="25sp"
-        android:textStyle="bold"
-        android:textColor="@color/black"
-        android:textAlignment="center"
-
-        android:padding="30dp"
-        android:background="@drawable/radius_30_stroke_light_gray"
-        android:backgroundTint="@color/pale_gray"
         android:layout_marginStart="@dimen/basic_margin"
         android:layout_marginEnd="@dimen/basic_margin"
+        android:background="@drawable/radius_30_stroke_light_gray"
+        android:backgroundTint="@color/pale_gray"
 
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
+        android:padding="20dp"
+
+        android:text="@string/translation_info"
+        android:textAlignment="center"
+        android:textColor="@color/black"
+        android:textSize="16sp"
+        android:breakStrategy="balanced"
+
+        app:layout_constraintBottom_toTopOf="@id/country_selection_japan"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintBottom_toTopOf="@id/country_selection_japan"/>
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
         android:id="@+id/country_selection_japan"
-        android:layout_width="150dp"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="@drawable/radius_30_stroke_light_gray"
         android:backgroundTint="@color/yellow"
 
         android:padding="20dp"
+        android:layout_marginStart="@dimen/basic_margin"
+        android:layout_marginEnd="@dimen/basic_margin"
 
         android:text="일본"
         android:textAlignment="center"
         android:textColor="@color/black"
         android:textSize="20sp"
-
         android:textStyle="bold"
-        app:layout_constraintEnd_toStartOf="@id/country_selection_china"
+
+        app:layout_constraintBottom_toTopOf="@id/country_selection_china"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/country_selection_info"
-        app:layout_constraintBottom_toTopOf="@id/country_selection_taiwan"/>
+        app:layout_constraintTop_toBottomOf="@id/country_selection_info" />
 
     <TextView
         android:id="@+id/country_selection_china"
-        android:layout_width="150dp"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="@drawable/radius_30_stroke_light_gray"
         android:backgroundTint="@color/yellow"
-        android:padding="20dp"
-        android:text="중국"
 
+        android:padding="20dp"
+        android:layout_marginStart="@dimen/basic_margin"
+        android:layout_marginEnd="@dimen/basic_margin"
+
+        android:text="중국(간체)"
         android:textAlignment="center"
         android:textColor="@color/black"
         android:textSize="20sp"
-
         android:textStyle="bold"
+
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@id/country_selection_japan"
-        app:layout_constraintTop_toBottomOf="@id/country_selection_info"
-        app:layout_constraintBottom_toTopOf="@id/country_selection_hongkong"/>
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/country_selection_japan"
+        app:layout_constraintBottom_toTopOf="@id/country_selection_taiwan"/>
 
     <TextView
         android:id="@+id/country_selection_taiwan"
-        android:layout_width="150dp"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="@drawable/radius_30_stroke_light_gray"
         android:backgroundTint="@color/yellow"
+
         android:padding="20dp"
+        android:layout_marginStart="@dimen/basic_margin"
+        android:layout_marginEnd="@dimen/basic_margin"
 
-        android:text="대만"
-        android:textAlignment="center"
-        android:textColor="@color/black"
-        android:textSize="20sp"
-        android:textStyle="bold"
-
-        app:layout_constraintEnd_toStartOf="@id/country_selection_hongkong"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/country_selection_japan"
-        app:layout_constraintBottom_toTopOf="@id/country_selection_vietnam"/>
-
-    <TextView
-        android:id="@+id/country_selection_hongkong"
-        android:layout_width="150dp"
-        android:layout_height="wrap_content"
-        android:background="@drawable/radius_30_stroke_light_gray"
-        android:backgroundTint="@color/yellow"
-        android:padding="20dp"
-
-        android:text="홍콩"
+        android:text="대만(번체)"
         android:textAlignment="center"
         android:textColor="@color/black"
         android:textSize="20sp"
         android:textStyle="bold"
 
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@id/country_selection_taiwan"
+        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/country_selection_china"
-        app:layout_constraintBottom_toTopOf="@id/country_selection_america"/>
+        app:layout_constraintBottom_toTopOf="@id/country_selection_others"/>
 
     <TextView
-        android:id="@+id/country_selection_vietnam"
-        android:layout_width="150dp"
+        android:id="@+id/country_selection_others"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="@drawable/radius_30_stroke_light_gray"
         android:backgroundTint="@color/yellow"
+
         android:padding="20dp"
+        android:layout_marginStart="@dimen/basic_margin"
+        android:layout_marginEnd="@dimen/basic_margin"
 
-        android:text="베트남"
-        android:textAlignment="center"
-        android:textColor="@color/black"
-        android:textSize="20sp"
-        android:textStyle="bold"
-
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/country_selection_taiwan"
-        app:layout_constraintEnd_toStartOf="@id/country_selection_america"
-        app:layout_constraintBottom_toBottomOf="parent"/>
-
-    <TextView
-        android:id="@+id/country_selection_america"
-        android:layout_width="150dp"
-        android:layout_height="wrap_content"
-        android:background="@drawable/radius_30_stroke_light_gray"
-        android:backgroundTint="@color/yellow"
-        android:padding="20dp"
-
-        android:text="미국"
+        android:text="그 외 국가"
         android:textAlignment="center"
         android:textColor="@color/black"
         android:textSize="20sp"
         android:textStyle="bold"
 
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/country_selection_taiwan"
-        app:layout_constraintStart_toEndOf="@id/country_selection_vietnam"
+        app:layout_constraintBottom_toTopOf="@id/country_selection_exception"/>
+
+    <TextView
+        android:id="@+id/country_selection_exception"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+
+        android:layout_marginStart="@dimen/basic_margin"
+        android:layout_marginEnd="@dimen/basic_margin"
+
+        android:text="@string/not_supported_country"
+        android:textColor="@color/light_gray"
+        android:textSize="13sp"
+        android:textAlignment="center"
+
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/country_selection_others"
         app:layout_constraintBottom_toBottomOf="parent"/>
-
-
-
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>
 
-</layout>

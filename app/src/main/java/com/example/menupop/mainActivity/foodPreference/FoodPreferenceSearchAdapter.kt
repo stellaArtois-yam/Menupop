@@ -24,10 +24,10 @@ class FoodPreferenceSearchAdapter(private val listener: FoodPreferenceItemClickL
     override fun onBindViewHolder(holder: FoodPreferenceSearchViewHolder, position: Int) {
         holder.binding.item = foodList[position]
         holder.binding.foodPreferenceSearchFavorite.setOnClickListener {
-            listener.favoriteItemClick(foodList[position])
+            listener.itemClick(foodList[position], true)
         }
         holder.binding.foodPreferenceSearchUnfavorite.setOnClickListener {
-            listener.unFavoriteItemClick(foodList[position])
+            listener.itemClick(foodList[position], false)
         }
     }
 

@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/find_id_nav_graph"
+    app:startDestination="@id/findIdFragment">
+
+    <fragment
+        android:id="@+id/findIdFragment"
+        android:name="com.example.menupop.findId.FindIdFragment"
+        android:label="아이디 찾기"
+        tools:layout="@layout/fragment_find_id"/>
+    <fragment
+        android:id="@+id/findIdResultFragment"
+        android:name="com.example.menupop.findId.FindIdResultFragment"
+        android:label="아이디 확인"
+        tools:layout="@layout/fragment_find_id_result"/>
+</navigation>

@@ -3,6 +3,10 @@
     <string name="checkbox_information"><u>내용보기</u></string>
 
     <string name="social_login_info_naver_client_name">네이버 아이디 로그인</string>
+    <string name="id_empty">아이디를 입력해주세요.</string>
+    <string name="check_verify_code">인증번호를 확인해주세요</string>
+    <string name="check_id_email_match">사용자가 입력한 아아디와 일치하지 않은 이메일입니다</string>
+    <string name="check_verify">이메일 인증이 완료되지 않았습니다</string>
 
     <string name="password_reset_check_id">회원가입 시 등록하신 정보로\n\n비밀번호를 재설정 하실 수 있습니다 :)</string>
     <string name="password_reset_email">이메일 인증 후 비밀번호를 재설정\n\n하실 수 있습니다 :)</string>
@@ -12,11 +16,19 @@
     <string name="id_rule">아이디는 6-12자 이내, 영문, 숫자 사용 가능</string>
     <string name="password_rule">비밀번호(최소 8자, 영문, 숫자, 기호 중 2가지 사용)</string>
     <string name="password_rule_warning">비밀번호는 최소 8자, 영문, 숫자, 기호 중 2가지 이상 사용</string>
-    <string name="password_confirm_warning">비밀번호가 일치하지 않음</string>
-    <string name="email_rule_warning">이메일 형식이 일치하지 않음</string>
+    <string name="password_confirm_warning">비밀번호가 일치하지 않습니다</string>
+    <string name="email_rule_warning">이메일 형식이 일치하지 않습니다</string>
+    <string name="signup_warning">모든 항목을 올바르게 입력했는지 확인해주세요. 입력하지 않았거나 형식이 맞지 않은 항목이 있습니다.</string>
 
-    <string name="login_failed_warning">입력하신 아이디, 비밀번호와 일치하는 회원정보가 존재하지 않습니다.\n아이디, 비밀번호를 확인해주세요.</string>
+    <string name="exchange_warning">기준 화폐를 선택한 후 환전 화폐를 선택해주세요.</string>
+    <string name="available_reward">사용할 수 있는 리워드가 있습니다.\n리워드로 차감 후 티켓을 구매할까요?</string>
+
+    <string name="login_failed_warning">입력하신 아이디, 비밀번호와 일치하는\n회원정보가 존재하지 않습니다.\n아이디, 비밀번호를 확인해주세요.</string>
     <string name="dialog_delete_warning">삭제하시면 다시 복구되지 않습니다.\n신중하게 선택해주세요 :)</string>
+
+    <string name="network_error">네트워크에 문제가 발생했습니다.\n잠시 후 다시 시도해주세요 :(</string>
+    <string name="translation_info">번역 하려는 언어의 국가를 선택해주세요.국가를 정확히 선택하지 않으면 문제가 발생할 수 있습니다.</string>
+    <string name="not_supported_country">태국, 인도네시아 등 일부 국가 사용 불가\n\n광동어(홍콩)의 경우 대만을 선택해주세요.\n\n주의 : 같은 간체자를 사용하지만 정확도가 떨어질 수 있습니다.</string>
 
     <string-array name="spinner_items">
         <item>선택</item>
@@ -64,12 +76,5 @@
         <item>pucca_hair</item>
         <item>woman</item>
     </string-array>
-
-
-    <string name="exchange_warning">기준 화폐를 선택한 후 환전 화폐를 선택해주세요.</string>
-    <string name="payment_type">사용할 수 있는 리워드가 있습니다.\n리워드로 티켓을 구매할까요?</string>
-    <!-- TODO: Remove or change this placeholder text -->
-    <string name="hello_blank_fragment">Hello blank fragment</string>
-
 
 </resources>

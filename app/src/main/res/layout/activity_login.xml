@@ -5,6 +5,7 @@
             name="loginViewModel"
             type="com.example.menupop.login.LoginViewModel" />
     </data>
+
     <androidx.constraintlayout.widget.ConstraintLayout
         xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:app="http://schemas.android.com/apk/res-auto"
@@ -29,10 +30,12 @@
             android:layout_width="match_parent"
             android:layout_height="@dimen/login_height"
             android:background="@drawable/stroke"
+
+            android:textColorHint="@color/light_gray"
             android:hint="아이디 입력"
 
             android:textColor="@color/light_gray"
-            android:textSize="16sp"
+            android:textSize="15sp"
             android:padding="10dp"
             android:layout_marginStart="@dimen/login_margin"
             android:layout_marginEnd="@dimen/login_margin"
@@ -64,8 +67,8 @@
                 android:hint="비밀번호 입력"
 
                 android:inputType="textPassword"
+                android:textSize="15sp"
                 android:textColor="@color/light_gray"
-                android:textSize="16sp"
 
                 android:layout_marginStart="@dimen/login_margin"
                 android:layout_marginEnd="@dimen/login_margin"
@@ -75,9 +78,6 @@
                 android:layout_marginTop="@dimen/login_margin_top" />
 
         </com.google.android.material.textfield.TextInputLayout>
-
-
-
 
         <androidx.appcompat.widget.AppCompatButton
             android:id="@+id/login_button"
@@ -158,14 +158,11 @@
                 android:paddingTop="12dp"
                 android:paddingBottom="12dp"
                 android:text="회원가입"
-                android:textColor="@color/black"
                 android:textSize="15.5sp"
                 android:textAlignment="center"/>
 
 
         </LinearLayout>
-
-
 
         <LinearLayout
             android:id="@+id/login_social_linear"
@@ -203,14 +200,7 @@
                 android:layout_weight="0.4"
                 android:layout_height="2dp"
                 android:background="@color/light_gray" />
-
-
         </LinearLayout>
-
-
-
-
-
 
 
         <LinearLayout
@@ -247,8 +237,7 @@
                 android:layout_width="@dimen/standard_height"
                 android:layout_height="@dimen/standard_height"
                 android:background="@drawable/kakao_logo"
-                android:layout_gravity="end"
-                />
+                android:layout_gravity="end"/>
 
         </LinearLayout>
 

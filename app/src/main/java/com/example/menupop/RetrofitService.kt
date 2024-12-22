@@ -9,7 +9,9 @@ import com.example.menupop.mainActivity.profile.KakaoPayApproveResponseDTO
 import com.example.menupop.mainActivity.profile.KakaoPayReadyResponseDTO
 import com.example.menupop.mainActivity.UserInformationDTO
 import com.example.menupop.mainActivity.profile.KakaoPayCancelResponseDTO
-import retrofit2.Call
+import com.example.menupop.mainActivity.profile.KakaoPayRequestDTO
+import retrofit2.Response
+import retrofit2.http.Body
 import retrofit2.http.Field
 import retrofit2.http.FieldMap
 import retrofit2.http.FormUrlEncoded
@@ -21,148 +23,180 @@ import retrofit2.http.Query
 
 interface RetrofitService {
 
-    @POST("checkUserIdDuplication.php")
+    @POST("CheckUserIdDuplication.php")
     @FormUrlEncoded
-    fun checkDuplicateId(@Field("userId") id: String)
-                        : Call<SimpleResultDTO>
+    suspend fun checkDuplicateId(@Field("userId") id: String): Response<SimpleResultDTO>
 
 
     @POST("Signup.php")
     @FormUrlEncoded
-    fun saveUserInformation
-                (@Field("id") id: String,
-                 @Field("password") password: String,
-                 @Field("email") email :String,
-                 @Field("identifier") identifier : Int)
-                : Call<SimpleResultDTO>
+    suspend fun saveUserInformation(
+        @Field("id") id: String,
+        @Field("password") password: String,
+        @Field("salt") salt : String,
+        @Field("email") email: String,
+        @Field("identifier") identifier: Int
+    ): Response<SimpleResultDTO>
 
     @POST("GetUserInformation.php")
     @FormUrlEncoded
-    fun requestUserInformation(@Field("identifier") identifier: Int)
-                                : Call<UserInformationDTO>
+    suspend fun requestUserInformation(@Field("identifier") identifier: Int): UserInformationDTO
 
     @POST("FindId.php")
     @FormUrlEncoded
-    fun requestFindID(@Field("email") email: String): Call<FindIdResponseDTO>
+    suspend fun requestFindID(@Field("email") email: String): Response<FindIdResponseDTO>
 
 
     @POST("SignupCheckEmail.php")
     @FormUrlEncoded
-    fun checkEmailExistence(@Field("email") email: String): Call<SimpleResultDTO>
+    suspend fun checkEmailExistence(@Field("email") email: String): Response<SimpleResultDTO>
 
-    @POST("login.php")
+    @POST("Login.php")
     @FormUrlEncoded
-    fun requestLogin(@Field("id") id: String,
-                     @Field("password") password : String)
-                    : Call<LoginResponseModel>
+    suspend fun requestLogin(
+        @Field("id") id: String,
+        @Field("password") password: String
+    ): Response<LoginResponseModel>
+    @POST("GetSalt.php")
+    @FormUrlEncoded
+    suspend fun getSalt(
+        @Field("id") id : String
+    ) : Response<SaltDTO>
 
     @POST("SendEmailVerifyCode.php")
     @FormUrlEncoded
-    fun sendEmailVerifyCode(@Field("email") email: String): Call<String>
+    suspend fun sendEmailVerifyCode(@Field("email") email: String): Response<String>
 
-    @POST("checkEmail.php")
+    @POST("CheckEmail.php")
     @FormUrlEncoded
-    fun checkEmail(@Field("email") email : String,
-                   @Field("id") id : String)
-                    : Call<String>
+    suspend fun checkEmail(
+        @Field("email") email: String,
+        @Field("id") id: String
+    ): Response<String>
 
     @POST("ResetPassword.php")
     @FormUrlEncoded
-    fun resetPassword(@Field("id") id : String,
-                      @Field("password") password : String)
-                        : Call<String>
+    suspend fun resetPassword(
+        @Field("id") id: String,
+        @Field("password") password: String,
+        @Field("salt") salt : String
+    ): Response<String>
 
 
-    @POST("socialLogin.php")
+    @POST("SocialLogin.php")
     @FormUrlEncoded
-    fun socialLoginRequest(@Field("email") email : String,
-                           @Field("identifier") identifier: Int)
-                            : Call<LoginResponseModel>
+    suspend fun socialLoginRequest(
+        @Field("email") email: String,
+        @Field("identifier") identifier: Int
+    ): Response<LoginResponseModel>
 
 
-    @POST("socialAccountMergeLocalAccount.php")
+    @POST("SocialAccountMergeLocalAccount.php")
     @FormUrlEncoded
-    fun socialAccountMergeLocalAccount(@Field("identifier") identifier : Int)
-                                        : Call<LoginResponseModel>
+    suspend fun socialAccountMergeLocalAccount(@Field("identifier") identifier: Int): Response<LoginResponseModel>
 
     @GET("v6/{authKey}/latest/{baseRate}")
-    fun requestExchangeRates(@Path("authKey") authKey:String,
-                             @Path("baseRate")baseRate : String)
-                            : Call<ExchangeRateResponseDTO>
+    suspend fun requestExchangeRates(
+        @Path("authKey") authKey: String,
+        @Path("baseRate") baseRate: String
+    ): Response<ExchangeRateResponseDTO>
 
 
     @POST("v1/payment/ready")
     @FormUrlEncoded
-    fun createPaymentRequest(@Header("Authorization") apiKey : String,
-                             @FieldMap map : HashMap<String,String>)
-                            : Call<KakaoPayReadyResponseDTO>
+    suspend fun createPaymentRequest(
+        @Header("Authorization") apiKey: String,
+        @FieldMap map: HashMap<String, String>
+    ): Response<KakaoPayReadyResponseDTO>
+
     @POST("SavePaymentHistory.php")
     @FormUrlEncoded
-    fun savePaymentHistory(@Field("identifier") identifier : Int,
-                           @Field("tid") tid : String,
-                           @Field("paymentType") paymentType: String,
-                           @Field("item") item : String,
-                           @Field("price") price : Int,
-                           @Field("approvedAt") approvedAt : String,
-                           @Field("translationTicket") translationTicket : Int,
-                           @Field("foodTicket") foodTicket : Int) : Call<SimpleResultDTO>
+    suspend fun savePaymentHistory(
+        @Field("identifier") identifier: Int,
+        @Field("tid") tid: String,
+        @Field("paymentType") paymentType: String,
+        @Field("item") item: String,
+        @Field("price") price: Int,
+        @Field("approvedAt") approvedAt: String,
+        @Field("translationTicket") translationTicket: Int,
+        @Field("foodTicket") foodTicket: Int
+    ): Response<SimpleResultDTO>
 
 
     @POST("v1/payment/approve")
     @FormUrlEncoded
-    fun requestApprovePayment(@Header("Authorization") apiKey : String,
-                              @FieldMap map : HashMap<String, String>)
-                                :Call<KakaoPayApproveResponseDTO>
+    suspend fun requestApprovePayment(
+        @Header("Authorization") apiKey: String,
+        @FieldMap map: HashMap<String, String>
+    ): Response<KakaoPayApproveResponseDTO>
 
     @POST("v1/payment/cancel")
     @FormUrlEncoded
-    fun requestCancelPayment(@Header("Authorization") apiKey : String,
-                             @FieldMap map : HashMap<String, String>)
-                            :Call<KakaoPayCancelResponseDTO>
+    suspend fun requestCancelPayment(
+        @Header("Authorization") apiKey: String,
+        @FieldMap map: HashMap<String, String>
+    ): Response<KakaoPayCancelResponseDTO>
 
 
     @GET("searchFood.php")
-    fun searchFood(@Query("query") searchText :String) : Call<FoodPreferenceSearchDTO>
+    suspend fun searchFood(@Query("query") searchText: String): Response<FoodPreferenceSearchDTO>
 
     @POST("FoodPreferenceRegister.php")
     @FormUrlEncoded
-    fun foodPreferenceRegister(@Field("identifier") identifier: Int , @Field("foodName") foodName : String , @Field("classification") classification : String) : Call<String>
+    suspend fun foodPreferenceRegister(
+        @Field("identifier") identifier: Int,
+        @Field("foodName") foodName: String,
+        @Field("classification") classification: String
+    ): Response<String>
+
     @POST("GetFoodPreference.php")
     @FormUrlEncoded
-    fun getFoodPreference(@Field("identifier") identifier: Int) : Call<FoodPreferenceDataClass>
+    suspend fun getFoodPreference(@Field("identifier") identifier: Int): Response<FoodPreferenceDataClass>
 
     @POST("DeleteFoodPreference.php")
     @FormUrlEncoded
-    fun deleteFoodPreference(@Field("identifier") identifier: Int,@Field("foodName") foodName: String) : Call<String>
+    suspend fun deleteFoodPreference(
+        @Field("identifier") identifier: Int,
+        @Field("foodName") foodName: String
+    ): Response<String>
 
 
     @POST("Withdrawal.php")
     @FormUrlEncoded
-    fun withdrawal(@Field("identifier") identifier: Int,
-                   @Field("email") email: String,
-                   @Field("id") id : String,
-                   @Field("date") date:String) : Call<String>
+    suspend fun withdrawal(
+        @Field("identifier") identifier: Int,
+        @Field("email") email: String,
+        @Field("id") id: String,
+        @Field("date") date: String
+    ): Response<String>
 
 
     @POST("UpdateTicketQuantity.php")
     @FormUrlEncoded
-    fun updateTicketQuantity(@Field("identifier") identifier: Int,
-                             @Field("ticketType") ticketType : String,
-                             @Field("operator") operator : String,
-                             @Field("quantity") quantity : Int) : Call<String>
+    suspend fun updateTicketQuantity(
+        @Field("identifier") identifier: Int,
+        @Field("ticketType") ticketType: String,
+        @Field("operator") operator: String,
+        @Field("quantity") quantity: Int
+    ): Response<String>
 
     @POST("UpdateRewardQuantity.php")
     @FormUrlEncoded
-    fun updateRewardQuantity(@Field("identifier") identifier: Int) : Call<String>
+    suspend fun updateRewardQuantity(@Field("identifier") identifier: Int): Response<String>
 
     @POST("MidnightWork.php")
     @FormUrlEncoded
-    fun midnightWork(@Field("identifier") identifier: Int) : Call<String>
+    suspend fun midnightWork(@Field("identifier") identifier: Int): Response<String>
 
 
     @POST("/")
     @FormUrlEncoded
-    fun requestTranslation(@Field("text") text : String,
-                           @Field("language") language: String): Call<String>
-
+    suspend fun requestTranslation(
+        @Field("text") text: String,
+        @Field("language") language: String
+    ): Response<String>
+    @POST("UseTranslationTicket.php")
+    @FormUrlEncoded
+    suspend fun useTranslationTicket(
+        @Field("identifier") identifier : Int) : Response<String>
 }

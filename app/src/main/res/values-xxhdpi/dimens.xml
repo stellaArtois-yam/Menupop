@@ -17,6 +17,7 @@
     <dimen name="login_margin_side">16dp</dimen>
     <dimen name="login_margin">32dp</dimen>
     <dimen name="basic_margin">20dp</dimen>
+    <dimen name="signup_margin">13dp</dimen>
     <dimen name="button_bottom_margin">56dp</dimen>
 
     <dimen name="signup_password_and_warning_width">360dp</dimen>

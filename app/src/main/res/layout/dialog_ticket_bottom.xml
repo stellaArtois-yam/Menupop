@@ -46,7 +46,7 @@
                 android:id="@+id/dialog_ticket_bottom_translation_ticket"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="번역 티켓 : 01개"
+                android:text='@{viewModel.isFreeTicket() ? "무료 번역 티켓 : " + viewModel.userInformation.freeTranslationTicket + "개" : "번역 티켓 : " + viewModel.userInformation.translationTicket + "개"}'
                 android:textColor="@color/black"
                 android:textSize="18sp"/>
 
@@ -54,7 +54,7 @@
                 android:id="@+id/dialog_ticket_bottom_food_ticket"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="음식 티켓 : 00개"
+                android:text='@{viewModel.isFreeTicket() ? "무료 음식 티켓 : " + viewModel.userInformation.freeFoodTicket + "개" : "음식 티켓 : " + viewModel.userInformation.foodTicket + "개"}'
                 android:textColor="@color/black"
                 android:textSize="18sp"
                 android:layout_marginTop="10dp"/>

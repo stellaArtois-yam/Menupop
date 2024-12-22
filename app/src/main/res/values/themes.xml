@@ -7,8 +7,12 @@
         <item name="colorSecondaryContainer">@android:color/transparent</item>
          <item name="windowActionBar">false</item>
         <item name="android:windowFullscreen">true</item>
+        <item name="toolbarNavigationButtonStyle">@style/AppTheme.Actionbar</item>
     </style>
 
+    <style name="AppTheme.Actionbar" parent="Widget.AppCompat.Toolbar.Button.Navigation">
+        <item name="android:tint">@color/black</item>
+    </style>
 
     <style name="Theme.Menupop" parent="Base.Theme.Menupop" />
 </resources>

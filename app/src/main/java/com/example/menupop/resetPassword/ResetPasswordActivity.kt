@@ -2,69 +2,34 @@ package com.example.menupop.resetPassword
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.util.Log
-import androidx.databinding.DataBindingUtil
-import androidx.lifecycle.ViewModelProvider
+import android.widget.TextView
+import androidx.appcompat.widget.Toolbar
+import androidx.navigation.fragment.NavHostFragment
+import androidx.navigation.ui.AppBarConfiguration
+import androidx.navigation.ui.setupActionBarWithNavController
+
 import com.example.menupop.R
-import com.example.menupop.databinding.ActivityResetPasswordBinding
 
-class ResetPasswordActivity : AppCompatActivity(),ResetPasswordFragmentEvent {
-    private lateinit var resetPasswordViewModel: ResetPasswordViewModel
-    private var TAG = "ResetPasswordActivity"
-    private lateinit var binding : ActivityResetPasswordBinding
-    private lateinit var checkIdFragment : ResetPasswordCheckIdFragment
-    private lateinit var verifyEamilFragment: ResetPasswordEmailFragment
-    private lateinit var conformFragment: ResetPasswordConfirmFragment
-
+class ResetPasswordActivity : AppCompatActivity(){
+    var toolbar : Toolbar? = null
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        setContentView(R.layout.activity_reset_password)
 
-        init()
-    }
-    fun init() {
-        Log.d(TAG, "init: 호출")
+        val navHostFragment = supportFragmentManager.findFragmentById(R.id.resetPasswordContainer) as NavHostFragment
+        val navController = navHostFragment.navController
 
-        checkIdFragment = ResetPasswordCheckIdFragment()
-        verifyEamilFragment = ResetPasswordEmailFragment()
-        conformFragment = ResetPasswordConfirmFragment()
+        toolbar  = findViewById(R.id.toolbar)
+        setSupportActionBar(toolbar)
+        supportActionBar?.setDisplayShowTitleEnabled(false)
 
-        binding = DataBindingUtil.setContentView(this, R.layout.activity_reset_password)
-        resetPasswordViewModel = ViewModelProvider(this).get(ResetPasswordViewModel::class.java)
-        binding.resetPasswordViewModel = resetPasswordViewModel
-        binding.lifecycleOwner = this
-
-        supportFragmentManager.beginTransaction().apply {
-            replace(R.id.resetPasswordContainer,checkIdFragment)
-            commit()
+        navController.addOnDestinationChangedListener {
+                _, _, _ ->
+            findViewById<TextView>(R.id.toolbar_title).text = navController.currentDestination?.label.toString()
         }
 
-    }
-
-    // 아이디 있을때 이메일 인증으로 넘어감
-    override fun existId() {
-        Log.d(TAG, "existId: 호출됨")
-        supportFragmentManager.beginTransaction().apply {
-            replace(R.id.resetPasswordContainer,verifyEamilFragment)
-            commit()
-        }
-    }
-
-    override fun successVerifyEmail() {
-        Log.d(TAG, "successVerifyEmail: 호출됨")
-        supportFragmentManager.beginTransaction().apply {
-            replace(R.id.resetPasswordContainer,conformFragment)
-            commit()
-        }
-    }
-
-    override fun successResetPassword() {
-        Log.d(TAG, "successResetPassword: 호출됨")
-        finish()
-    }
-
-    override fun backBtnClick() {
-        Log.d(TAG, "backBtnClick: 호출됨")
-        finish()
+        val appBarConfiguration = AppBarConfiguration(navController.graph)
+        setupActionBarWithNavController(navController, appBarConfiguration)
     }
 
 }

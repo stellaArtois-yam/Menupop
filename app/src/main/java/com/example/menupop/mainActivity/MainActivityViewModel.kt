@@ -9,54 +9,40 @@ import android.graphics.drawable.Drawable
 
 import android.os.Build
 import android.util.Log
-import android.view.View
 import android.view.WindowManager
 import androidx.annotation.RequiresApi
-import androidx.core.net.toUri
+import androidx.core.content.res.ResourcesCompat
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.viewModelScope
 import com.example.menupop.R
-import com.example.menupop.mainActivity.profile.KakaoPayApproveResponseDTO
 import com.example.menupop.mainActivity.profile.KakaoPayReadyResponseDTO
 import com.example.menupop.mainActivity.profile.TicketSaveDTO
 import com.example.menupop.mainActivity.foodPreference.FoodPreferenceDataClass
-import com.example.menupop.mainActivity.foodPreference.FoodPreferenceSearchDTO
-import com.example.menupop.SimpleResultDTO
-import com.example.menupop.mainActivity.profile.KakaoPayCancelResponseDTO
+import com.example.menupop.mainActivity.profile.KakaoPayWebView
 import com.example.menupop.mainActivity.profile.ProfileSelectionDTO
 import com.google.android.gms.ads.rewarded.RewardedAd
-import org.intellij.lang.annotations.Identifier
+import kotlinx.coroutines.launch
 import java.text.DecimalFormat
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.util.Calendar
-import kotlin.coroutines.coroutineContext
 
 class MainActivityViewModel(private val application: Application) : AndroidViewModel(application) {
-    val TAG = "MainActivityViewModel"
-    val mainActivityModel = MainActivityModel(application)
+    companion object {
+        const val TAG = "mainActivityViewModel"
+    }
 
-    private var callback: ((SimpleResultDTO) -> Unit)? = null
-    private var callbackUserInfo: ((UserInformationDTO) -> Unit)? = null
-    private var callbackKakaoReady: ((KakaoPayReadyResponseDTO) -> Unit)? = null
-    private var callbackKakaoApprove: ((KakaoPayApproveResponseDTO) -> Unit)? = null
-    private var callbackKakaoCancel: ((KakaoPayCancelResponseDTO) -> Unit)? = null
-    private var callbackSearchData: ((FoodPreferenceSearchDTO) -> Unit)? = null
-    private var callbackResult: ((String) -> Unit)? = null
-    private var callbackFoodPreference: ((FoodPreferenceDataClass) -> Unit)? = null
-    private var callbackAd: ((RewardedAd?) -> Unit)? = null
-    private val _tabStatus = MutableLiveData<Int>()
+    private val mainActivityModel = MainActivityModel(application)
 
-    val tabStatus : LiveData<Int> get()= _tabStatus
-
-
-
-
-    private val _rewardedAd = MutableLiveData<RewardedAd>()
-
-    val rewardedAd: LiveData<RewardedAd>
+    private val _rewardedAd = MutableLiveData<RewardedAd?>()
+    val rewardedAd: LiveData<RewardedAd?>
         get() = _rewardedAd
+
+    private val _isRewardSuccessful = MutableLiveData<Boolean?>()
+    val isRewardSuccessful : LiveData<Boolean?>
+        get() = _isRewardSuccessful
 
     private val _searchFood = MutableLiveData<ArrayList<String>>()
     val searchFood: LiveData<ArrayList<String>>
@@ -66,8 +52,8 @@ class MainActivityViewModel(private val application: Application) : AndroidViewM
     val foodPreferenceList: LiveData<FoodPreferenceDataClass>
         get() = _foodPreferenceList
 
-    private val _registerResult = MutableLiveData<Boolean>()
-    val registerResult: LiveData<Boolean>
+    private val _registerResult = MutableLiveData<Boolean?>()
+    val registerResult: LiveData<Boolean?>
         get() = _registerResult
 
     private val _accountWithdrawal = MutableLiveData<String>()
@@ -75,161 +61,109 @@ class MainActivityViewModel(private val application: Application) : AndroidViewM
     val accountWithdrawal: LiveData<String>
         get() = _accountWithdrawal
 
-
-    // 받은 리워드
-    private val _todayRewarded = MutableLiveData<Int>()
-
-    val todayRewarded: LiveData<Int>
-        get() = _todayRewarded
-
-    private val _countrySelection = MutableLiveData<String>()
-
-    val countrySelection: LiveData<String> get() = _countrySelection
-
-    fun getProfileList(resources: Resources): ArrayList<ProfileSelectionDTO> {
-        val imageNames = resources.getStringArray(R.array.profile)
-        var imageList: ArrayList<ProfileSelectionDTO> = ArrayList()
-
-        for (name in imageNames) {
-            val imageName = resources.getIdentifier(name, "drawable", application.packageName)
-            val image = resources.getDrawable(imageName)
-            imageList.add(ProfileSelectionDTO(image))
-        }
+    private var _isFreeTicket = MutableLiveData(false) // dialog 티켓 상태 결정
+    val isFreeTicket: LiveData<Boolean>
+        get() = _isFreeTicket
 
 
-        return imageList
-    }
+    private val _isLoaded = MutableLiveData<String>() //유저 정보 로드
+    val isLoaded: LiveData<String>
+        get() = _isLoaded
 
-
-    fun setTabStatus(status : Int){
-        _tabStatus.value = status
-    }
-
-    /**
-     * 메인
-     */
-    private val _isLoading = MutableLiveData<String>()
-        .apply { value = "yet" }
-    val isLoading: LiveData<String>
-        get() = _isLoading
-
-    private val _deletedResult = MutableLiveData<Boolean>()
-    val deletedResult: LiveData<Boolean>
+    private val _deletedResult = MutableLiveData<Boolean?>()
+    val deletedResult: LiveData<Boolean?>
         get() = _deletedResult
 
     private val _userInformation = MutableLiveData<UserInformationDTO>()
     val userInformation: LiveData<UserInformationDTO>
         get() = _userInformation
 
-    private val _checkingTranslationTicket = MutableLiveData<Boolean>()
-
-    private val _profileImage = MutableLiveData<Drawable>()
-    val profileImage: LiveData<Drawable>
+    private val _profileImage = MutableLiveData<Drawable?>()
+    val profileImage: MutableLiveData<Drawable?>
         get() = _profileImage
 
-    val checkingTranslationTicket: LiveData<Boolean>
-        get() = _checkingTranslationTicket
+    fun getProfileList(resources: Resources): ArrayList<ProfileSelectionDTO> {
+        val imageNames = resources.getStringArray(R.array.profile)
+        val imageList: ArrayList<ProfileSelectionDTO> = ArrayList()
 
-
-    fun updateTicketQuantity(ticketType: String, operator: String, quantity: Int) {
-        callbackResult = {
-            Log.d(TAG, "updateTicketQuantity ticketType : $ticketType")
-            //여기서 update를 하자, switch문 같은거 쓰면 될듯
-            if (it == "success") {
-                if (operator == "-") {
-                    when (ticketType) {
-                        "free_translation_ticket" -> _userInformation.value!!.freeTranslationTicket -= 1
-                        "free_food_ticket" -> _userInformation.value!!.freeFoodTicket -= 1
-                        "translation_ticket" -> _userInformation.value!!.translationTicket -= 1
-                        "food_ticket" -> _userInformation.value!!.foodTicket -= 1
-                        "have_rewarded" -> buyTicketUsingReward(quantity)
-                        else -> Log.d(TAG, "updateTicketQuantity not match")
-
-                    }
-                }
-                _changeTicket.value = "success"
-                Log.d(TAG, "updateTicketQuantity after use: ${_userInformation.value}")
-
-            } else {
-                Log.d(TAG, "updateTicketQuantity result failed: ")
-            }
+        for (name in imageNames) {
+            val imageName = resources.getIdentifier(name, "drawable", application.packageName)
+            val image = ResourcesCompat.getDrawable(resources, imageName, null)
+            imageList.add(ProfileSelectionDTO(image!!))
         }
-        mainActivityModel.updateTicketQuantity(
-            _identifier.value!!,
-            ticketType,
-            operator,
-            quantity,
-            callbackResult!!
-        )
 
+        return imageList
     }
 
-    fun buyTicketUsingReward(quantity: Int) {
-        Log.d(TAG, "buyTicketUsingReward")
-        _userInformation.value!!.haveRewarded = _userInformation.value!!.haveRewarded - quantity
-        _userInformation.value!!.foodTicket =
-            _userInformation.value!!.foodTicket + _rewardFoodAmount.value!!
-        _userInformation.value!!.translationTicket =
-            _userInformation.value!!.translationTicket + _rewardTranslationAmount.value!!
 
+    fun checkFoodTicketEmpty(): Boolean {
+        if (userInformation.value?.foodTicket!! > 0 || userInformation.value?.freeFoodTicket!! > 0) {
+            return false
+        }
+        return true
     }
 
-    fun foodPreferenceRegister(foodName: String, classification: String) {
-        Log.d(TAG, "foodPreferenceRegister: 호출됨")
+    fun setTicketStatus(boolean: Boolean) {
+        _isFreeTicket.value = boolean
+    }
 
-        callbackResult = { result ->
-            Log.d(TAG, "foodPreferenceRegister: ${result}")
-            _registerResult.value = result == "success"
+    suspend fun foodPreferenceRegister(foodName: String, classification: String) {
+        viewModelScope.launch {
+            val result = mainActivityModel.foodPreferenceRegister(
+                _identifier.value!!,
+                foodName,
+                classification
+            )
+            Log.d(TAG, "foodPreferenceRegister: ${result.trim() == "success"}")
+            _registerResult.value = result.trim() == "success"
             searchFood.value?.clear()
-            Log.d(TAG, "foodPreferenceRegister: ${searchFood.value}")
         }
-        mainActivityModel.foodPreferenceRegister(
-            _identifier.value!!,
-            foodName,
-            classification,
-            callbackResult!!
-        )
     }
 
-    fun checkingTranslationTicket() {
-        _checkingTranslationTicket.value =
-            userInformation.value?.translationTicket!! > 0 || _userInformation.value!!.dailyReward > 0
+    fun initializeRegisterResult() {
+        _registerResult.value = null
+    }
 
+    fun checkingTranslationTicket(): Boolean {
+        Log.d(
+            TAG,
+            "checkingTranslationTicket: translationTicket(${userInformation.value!!.translationTicket}), freeTranslationTicket(${_userInformation.value!!.freeTranslationTicket})"
+        )
+        return userInformation.value!!.translationTicket > 0 || _userInformation.value!!.freeTranslationTicket > 0
     }
 
 
     fun deleteFoodPreference(foodName: String) {
-        callbackResult = { result ->
-            Log.d(TAG, "deleteFoodPreference:$result d ${result == "success"}")
-            if (result.trim() == "success") {
-                Log.d(TAG, "deleteFoodPreference: 성공")
-                _deletedResult.value = true
-            } else {
-                _deletedResult.value = false
+        viewModelScope.launch {
+            val result = mainActivityModel.deleteFoodPreference(_identifier.value!!, foodName)
+            Log.d(TAG, "deleteFoodPreference: $result")
+            when (result.trim()) {
+                "success" -> _deletedResult.value = true
+                else -> _deletedResult.value = false
             }
         }
+    }
 
-        mainActivityModel.deleteFoodPreference(_identifier.value!!, foodName, callbackResult!!)
-
+    fun initializeDeleteResult() {
+        _deletedResult.value = null
     }
 
     fun searchFood(query: String) {
-        callbackSearchData = { result ->
-            Log.d(TAG, "searchFood: test")
-            if (result.result == "success") {
+        viewModelScope.launch {
+            val response = mainActivityModel.searchFood(query)
+            if (response.result == "success") {
                 val foodPreferenceLists = ArrayList<String>()
-                _foodPreferenceList.value?.foodList?.forEach { it ->
+                _userInformation.value?.foodPreference?.forEach {
                     foodPreferenceLists.add(it.foodName)
                 }
-                result.foodList.removeAll(foodPreferenceLists)
-            } else if (result.result == "notFound") {
+
+                response.foodList.removeAll(foodPreferenceLists.toSet())
+            } else {
                 Log.d(TAG, "searchFood: 찾을 수 없음")
             }
-            _searchFood.value = result.foodList
-            Log.d(TAG, "searchFood: $result")
+            _searchFood.value = response.foodList
+            Log.d(TAG, "searchFood: ${response.foodList}")
         }
-        mainActivityModel.searchFood(query, callbackSearchData!!)
-
     }
 
     private val _identifier = MutableLiveData<Int>()
@@ -241,28 +175,25 @@ class MainActivityViewModel(private val application: Application) : AndroidViewM
     }
 
 
-    fun requestUserInformation(identifier: Int) {
-
-        callbackUserInfo = { response ->
-
-            _userInformation.value = response
-            Log.d(
-                TAG,
-                "requestUserInformation:  ${response}"
-            )
-            _todayRewarded.value = 3 - _userInformation.value!!.dailyReward
-            _isLoading.value = response.result
-
+    suspend fun requestUserInformation(identifier: Int) {
+        viewModelScope.launch {
+            _userInformation.value = mainActivityModel.requestUserInformation(identifier)
+            _isLoaded.value = _userInformation.value!!.result
+            getFoodPreference()
+            Log.d(TAG, "requestUserInformation: ${_userInformation.value}")
         }
-        mainActivityModel.requestUserInformation(identifier, callbackUserInfo!!)
     }
 
-    fun loadAd(key: String) {
-        callbackAd = { ad ->
-            Log.d(TAG, "loadAd: ${ad}")
-            _rewardedAd.value = ad
+    suspend fun loadAd(key: String) {
+        viewModelScope.launch {
+            val ad = mainActivityModel.requestAd(key)
+            Log.d(TAG, "loadAd: ${ad?.responseInfo}")
+            if(ad == null){
+                _isRewardSuccessful.value = false
+            }else{
+                _rewardedAd.value = ad
+            }
         }
-        mainActivityModel.requestAd(key, callbackAd!!)
     }
 
     private val _isChangedProfile = MutableLiveData<Boolean>()
@@ -274,19 +205,14 @@ class MainActivityViewModel(private val application: Application) : AndroidViewM
         sharedPreferences: SharedPreferences,
         resources: Resources
     ) {
-
-        callbackResult = {
-            if (it == "success") {
-                Log.d(TAG, "saveSelectedProfile: $it")
-                val image = resources.getIdentifier(imageName, "drawable", application.packageName)
-                _profileImage.value = resources.getDrawable(image)
-                _isChangedProfile.value = true
-            }else{
-                Log.d(TAG, "saveSelectedProfile not success")
-            }
+        val result = mainActivityModel.saveSelectedProfile(imageName, sharedPreferences)
+        if (result == "success") {
+            val image = resources.getIdentifier(imageName, "drawable", application.packageName)
+            _profileImage.value = ResourcesCompat.getDrawable(resources, image, null)
+            _isChangedProfile.value = true
+        } else {
+            Log.d(TAG, "saveSelectedProfile not success")
         }
-        mainActivityModel.saveSelectedProfile(imageName, sharedPreferences, callbackResult!!)
-
     }
 
 
@@ -295,130 +221,121 @@ class MainActivityViewModel(private val application: Application) : AndroidViewM
 
         if (getResult != null) {
             val image = resources.getIdentifier(getResult, "drawable", application.packageName)
-            _profileImage.value = resources.getDrawable(image)
+            _profileImage.value = ResourcesCompat.getDrawable(resources, image, null)
             _isChangedProfile.value = false
-            Log.d(TAG, "getProfileImage not null")
         } else {
             _profileImage.value = null
-            Log.d(TAG, "getProfileImage is null")
         }
 
     }
 
-    fun rewardedSuccess() {
+    suspend fun rewardedSuccess() {
+        _rewardedAd.value = null
 
-        callbackResult = {
-            if (it == "success") {
-                _userInformation.value!!.haveRewarded += 1
+        viewModelScope.launch {
+            val result = mainActivityModel.updateRewardQuantity(_identifier.value!!)
+            if (result == "success") {
+                _userInformation.value!!.availableReward += 1
                 _userInformation.value!!.dailyReward -= 1
-                _todayRewarded.value = 3 - _userInformation.value!!.dailyReward
+                _isRewardSuccessful.value = true
             } else {
                 Log.d(TAG, "rewardedSuccess failed: ")
             }
         }
-
-        mainActivityModel.updateRewardQuantity(_identifier.value!!, callbackResult!!)
-
     }
 
 
     @RequiresApi(Build.VERSION_CODES.O)
-    fun withdrawal(sharedPreferences: SharedPreferences) {
-        callbackResult = {
-            Log.d(TAG, "withdrawal: $it")
-            _accountWithdrawal.value = it
-            if (it == "success") {
-                logout(sharedPreferences)
-            }
-        }
+    suspend fun withdrawal(sharedPreferences: SharedPreferences) {
         val email = userInformation.value?.email
         val id = userInformation.value?.id
         val localDate: LocalDate = LocalDate.now()
-        mainActivityModel.withdrawal(
-            _identifier.value!!,
-            email!!,
-            id!!,
-            localDate.toString(),
-            callbackResult!!
-        )
-    }
 
-    fun getFoodPreference() {
-        callbackFoodPreference = { foodPreferenceDataClass ->
-//            Log.d(TAG, "getFoodPreference: ${foodPreferenceDataClass}")
-            _foodPreferenceList.value = foodPreferenceDataClass
+        viewModelScope.launch {
+            val result = mainActivityModel.withdrawal(
+                _identifier.value!!,
+                email!!,
+                id!!,
+                localDate.toString()
+            )
+            _accountWithdrawal.value = result
+            if (result == "success") {
+                logout(sharedPreferences)
+            }
         }
-        mainActivityModel.getFoodPreference(_identifier.value!!, callbackFoodPreference!!)
     }
 
+    suspend fun getFoodPreference() {
+        viewModelScope.launch {
+            val foodPreference = mainActivityModel.getFoodPreference(_identifier.value!!)
+            Log.d(TAG, "getFoodPreference: $foodPreference")
+            _foodPreferenceList.value = foodPreference
+            _userInformation.value!!.foodPreference = foodPreference.foodList
+        }
+    }
 
-    /**
-     * 티켓 구매 + 다이얼로그
-     */
 
     private val _paymentType = MutableLiveData<String>()
 
-    private val _regularTranslationAmount = MutableLiveData<Int>()
-    val regularTranslationAmount: LiveData<Int>
-        get() = _regularTranslationAmount
+    private val _translationAmount = MutableLiveData<Int>()
+    val translationAmount: LiveData<Int>
+        get() = _translationAmount
 
-    private val _rewardTranslationAmount = MutableLiveData<Int>()
-    val rewardTranslationAmount: LiveData<Int>
-        get() = _rewardTranslationAmount
+    private val _translationPrice = MutableLiveData<String>()
+    val translationPrice: LiveData<String>
+        get() = _translationPrice
 
-    private val _regularTranslationPrice = MutableLiveData<String>()
-    val regularTranslationPrice: LiveData<String>
-        get() = _regularTranslationPrice
+    private val _foodAmount = MutableLiveData<Int>()
+    val foodAmount: LiveData<Int>
+        get() = _foodAmount
 
-    private val _regularFoodAmount = MutableLiveData<Int>()
-    val regularFoodAmount: LiveData<Int>
-        get() = _regularFoodAmount
+    private val _foodPrice = MutableLiveData<String>()
+    val foodPrice: LiveData<String>
+        get() = _foodPrice
 
-    private val _rewardFoodAmount = MutableLiveData<Int>()
-    val rewardFoodAmount: LiveData<Int>
-        get() = _rewardFoodAmount
+    private val _totalPrice = MutableLiveData<String>()
 
-    private val _regularFoodPrice = MutableLiveData<String>()
-    val regularFoodPrice: LiveData<String>
-        get() = _regularFoodPrice
+    val totalPrice: LiveData<String>
+        get() = _totalPrice
 
-    private val _regularTotalPrice = MutableLiveData<String>()
+    private var _totalPriceForPay = MutableLiveData<String>()
 
-    val regularTotalPrice: LiveData<String>
-        get() = _regularTotalPrice
-
-    private val _totalPriceForPay = MutableLiveData<String>()
+    private var _usedRewards = MutableLiveData<Int>()
 
     fun updatePaymentType(type: String) {
         Log.d(TAG, "updatePaymentType: $type")
         _paymentType.value = type
     }
 
-    fun adjustRegularTicketQuantity(ticketType: String, operator: String) {
+    fun adjustTicketQuantity(ticketType: String, operator: String) {
         when {
             ticketType == "translation" && operator == "+"
             -> changeTicketAmount(
-                _regularTranslationAmount,
-                _regularTranslationPrice,
-                _regularFoodAmount
+                _translationAmount,
+                _translationPrice,
+                _foodAmount
             )
 
             ticketType == "food" && operator == "+"
-            -> changeTicketAmount(_regularFoodAmount, _regularFoodPrice, _regularTranslationAmount)
-
-            ticketType == "translation" && operator == "-" && _regularTranslationAmount.value!! > 0
             -> changeTicketAmount(
-                _regularTranslationAmount,
-                _regularTranslationPrice,
-                _regularFoodAmount,
+                _foodAmount,
+                _foodPrice,
+                _translationAmount
+            )
+
+            ticketType == "translation" && operator == "-" && _translationAmount.value!! > 0
+            -> changeTicketAmount(
+                _translationAmount,
+                _translationPrice,
+                _foodAmount,
                 -1
             )
 
-            ticketType == "food" && operator == "-" && _regularFoodAmount.value!! > 0
+            ticketType == "food" && operator == "-" && _foodAmount.value!! > 0
             -> changeTicketAmount(
-                _regularFoodAmount,
-                _regularFoodPrice,
-                _regularTranslationAmount,
+                _foodAmount,
+                _foodPrice,
+                _translationAmount,
                 -1
             )
 
@@ -426,57 +343,37 @@ class MainActivityViewModel(private val application: Application) : AndroidViewM
         }
     }
 
-    fun adjustRewardTicketQuantity(ticketType: String, operator: String) {
-        when {
-            ticketType == "translation" && operator == "+"
-            -> incrementRewardAmount(_rewardTranslationAmount)
-
-            ticketType == "food" && operator == "+"
-            -> incrementRewardAmount(_rewardFoodAmount)
-
-            ticketType == "translation" && operator == "-"
-            -> decrementRewardAmount(_rewardTranslationAmount)
-
-            ticketType == "food" && operator == "-"
-            -> decrementRewardAmount(_rewardFoodAmount)
-
-            else -> Log.d(TAG, "adjustRewardTicketQuantity: not match case")
-
-        }
-    }
-
-
-    private fun incrementRewardAmount(amount: MutableLiveData<Int>) {
-        amount.value = amount.value!! + 1
-    }
-
-    private fun decrementRewardAmount(amount: MutableLiveData<Int>) {
-        if (amount.value!! > 0) {
-            amount.value = amount.value!! - 1
-        }
-    }
-
-
-    private val _isRewardExceeded = MutableLiveData<Boolean>()
-    val isRewardExceeded: LiveData<Boolean>
-        get() = _isRewardExceeded
 
     @RequiresApi(Build.VERSION_CODES.O)
-    fun rewardPayment(identifier: Int) {
+    fun useRewards() {
+        // 현재 값과 리워드 정보 확인
+        val currentPrice = _totalPriceForPay.value?.toIntOrNull() ?: 0
+        val availableReward = _userInformation.value?.availableReward ?: 0
 
-        if (_userInformation.value!!.haveRewarded < (_rewardFoodAmount.value!! + _rewardTranslationAmount.value!!)) {
-            _isRewardExceeded.value = true
+        val deduction = minOf(currentPrice, availableReward * 2000) // 최대 차감 금액
+        _usedRewards.value = deduction / 2000  // 실제 사용한 리워드 개수
 
+        val updatedPrice = maxOf(0, currentPrice - deduction)
+        _totalPriceForPay.value = updatedPrice.toString()
+
+        if (updatedPrice > 0) {
+            createPaymentRequest() //결제 금액이 남으면 카카오페이로 결제
+            updatePaymentType("together")
         } else {
-            _isRewardExceeded.value = false
-            var item = itemName(_rewardTranslationAmount, _rewardFoodAmount)
-            Log.d(TAG, "rewardPayment itemName: $item")
+            val item = itemName(_translationAmount, _foodAmount)
+            updatePaymentType("reward")
 
-            var time = LocalDateTime.now().toString()
-
-            savePaymentHistory(
-                identifier, Calendar.getInstance().hashCode().toString(), "REWARD", item, 0, time
-            )
+            val time = LocalDateTime.now().toString()
+            viewModelScope.launch {
+                savePaymentHistory(
+                    identifier = _identifier.value!!,
+                    tid = Calendar.getInstance().hashCode().toString(),
+                    paymentType = "REWARD",
+                    item = item,
+                    price = 0,
+                    approveAt = time
+                )
+            }
         }
     }
 
@@ -500,211 +397,241 @@ class MainActivityViewModel(private val application: Application) : AndroidViewM
         val totalPrice = price + otherTicketPrice
 
         _totalPriceForPay.value = totalPrice.toString()
-        Log.d(TAG, "totalPriceForPay: ${_totalPriceForPay.value}")
 
-        _regularTotalPrice.value = "총 결제 금액 : ${dec.format(totalPrice)}원"
+        _totalPrice.value = "총 결제 금액 : ${dec.format(totalPrice)}원"
     }
 
 
-    fun countTicket(
+    private fun countTicket(
         ticketAmount: MutableLiveData<Int>,
         otherTicketAmount: MutableLiveData<Int>
     ): Int {
-        if (ticketAmount.value!! > 0 && otherTicketAmount.value!! > 0) {
-
-            return ticketAmount.value!! + otherTicketAmount.value!!
+        return if (ticketAmount.value!! > 0 && otherTicketAmount.value!! > 0) {
+            ticketAmount.value!! + otherTicketAmount.value!!
         } else {
-            return 1
+            1
         }
     }
 
-    fun itemName(
+    private fun itemName(
         ticketAmount: MutableLiveData<Int>,
         otherTicketAmount: MutableLiveData<Int>
     ): String {
-        if (ticketAmount.value!! > 0 && otherTicketAmount.value!! > 0) {
+        return if (ticketAmount.value!! > 0 && otherTicketAmount.value!! > 0) {
             val total = ticketAmount.value!! + otherTicketAmount.value!! - 1
-            return "번역 티켓 외 $total"
+            "번역 티켓 외 $total"
 
         } else if (ticketAmount.value!! > 0 && otherTicketAmount.value!! == 0) {
-            return "번역 티켓"
+            "번역 티켓"
         } else {
-            return "음식 티켓"
+            "음식 티켓"
         }
     }
 
+    private val _isUseRewards = MutableLiveData<Boolean?>(null) // 리워드 사용 여부
+    val isUseRewards: LiveData<Boolean?>
+        get() = _isUseRewards
+
+    private val _cancelBuyTicket = MutableLiveData<Boolean?>(null) // 결제 취소
+    val cancelBuyTicket: LiveData<Boolean?>
+        get() = _cancelBuyTicket
+
+    private val _isFailedToBuyTicket = MutableLiveData<Boolean?>(null)
+    val isFailedToBuyTicket: LiveData<Boolean?> // 결제 실패
+        get() = _isFailedToBuyTicket
 
     private val _paymentReady = MutableLiveData<KakaoPayReadyResponseDTO>()
-    val paymentReady: LiveData<KakaoPayReadyResponseDTO>
+    val paymentReady: MutableLiveData<KakaoPayReadyResponseDTO> //초기 결제 준비 상태
         get() = _paymentReady
 
-    private val _pgToken = MutableLiveData<String>()
-
-
-    @RequiresApi(Build.VERSION_CODES.O)
-    fun updatePgToken(token: String) {
-
-        Log.d(TAG, "updatePgToken: $token")
-        _pgToken.value = token
-
-        if (_pgToken.value != null) {
-            Log.d(TAG, "updatePgToken: not null")
-            completePayment(
-                _paymentReady.value!!.tid,
-                _identifier.value.toString(),
-                _pgToken.value!!
-            )
-        }
-    }
-
+    private val _pgToken = MutableLiveData<String>() // 결제 승인 시 필요
 
     @RequiresApi(Build.VERSION_CODES.O)
     fun createPaymentRequest() {
-        Log.d(TAG, "createPaymentRequest: !!!")
-        callbackKakaoReady = { response ->
+        val item = itemName(_translationAmount, _foodAmount)
+        val quantity = countTicket(_translationAmount, _foodAmount)
+        Log.d(TAG, "createPaymentRequest: 호출")
 
-            //여기서 웹뷰로 보내 줘야 함
-            if (response != null) {
+        viewModelScope.launch {
+            val response = mainActivityModel.createPaymentRequest(
+                userId = _identifier.value.toString(),
+                item = item,
+                quantity = quantity.toString(),
+                totalAmount = _totalPriceForPay.value!!
+            )
+            Log.d(KakaoPayWebView.TAG, "createPaymentRequest response : $response")
+            if (response.nextRedirectAppUrl != null) {
                 _paymentReady.value = response
             } else {
-                //결제 실패 toast 처리
+                _paymentReady.value = KakaoPayReadyResponseDTO("N/A")
             }
-
         }
-        val item = itemName(_regularTranslationAmount, _regularFoodAmount)
-        val quantity = countTicket(_regularTranslationAmount, _regularFoodAmount)
-
-
-        mainActivityModel.createPaymentRequest(
-            _identifier.value.toString(), item, quantity.toString(),
-            _totalPriceForPay.value!!, callbackKakaoReady!!
-        )
-
-    }
-
-    fun setPaymentResponse() {
-        _paymentReady.value = null
     }
 
     @RequiresApi(Build.VERSION_CODES.O)
-    fun completePayment(tid: String, userId: String, pgToken: String) {
-        callbackKakaoApprove = { response ->
-            Log.d(TAG, "completePayment: $response")
-            _paymentReady.value = null
+    fun updatePgToken(token: String) {
+        _pgToken.value = token
 
-            // db에 티켓 개수도 수정
-            // 구매 이력 저장
-
-            if (response.approved_at != null) {
-                savePaymentHistory(
-                    response.partner_user_id.toInt(),
-                    response.tid, response.payment_method_type,
-                    response.item_name, response.amount.total.toInt(), response.approved_at
-                )
-            }
-
+        if (_pgToken.value != "N/A") {
+            //_pgToken이 업데이트 되면 결제 승인 요청
+            requestApprovePayment(
+                tid = _paymentReady.value!!.tid,
+                userId = _identifier.value.toString(),
+                pgToken = _pgToken.value!!
+            )
+        } else {
+            _isFailedToBuyTicket.value = true
         }
-        mainActivityModel.requestApprovePayment(tid, userId, pgToken, callbackKakaoApprove!!)
     }
 
-    private val _changeTicket = MutableLiveData<String>()
-
-    val changeTicket: LiveData<String>
-        get() = _changeTicket
-
-    private val _failedBuyTicket = MutableLiveData<Boolean>()
-    val failedBuyTicket: LiveData<Boolean>
-        get() = _failedBuyTicket
-
-    fun setChangeTicket() {
-        _changeTicket.value = "init"
-        Log.d(TAG, "setChangeTicket status: ${_changeTicket.value}")
+    fun initializeKakaoPayVariables() {
+        Log.d(TAG, "initializeKakaoPayVariables 호출")
+        _paymentReady.value = KakaoPayReadyResponseDTO("N/A")
+        _pgToken.value = "N/A"
+        _cancelBuyTicket.value = null
+        _isFailedToBuyTicket.value = null
+        _translationAmount.value = 1
+        _foodAmount.value = 1
     }
 
-    fun requestCancelPayment(tid: String, cancelAmount: String) {
-        callbackKakaoCancel = { response ->
-            when (response.status) {
-                "CANCEL_PAYMENT" -> _failedBuyTicket.value = true
-                "FAILED" -> _failedBuyTicket.value = false
 
-            }
-        }
+    @RequiresApi(Build.VERSION_CODES.O)
+    fun requestApprovePayment(tid: String, userId: String, pgToken: String) {
+        viewModelScope.launch {
+            val result = mainActivityModel.requestApprovePayment(tid, userId, pgToken)
 
-        Log.d(TAG, "requestCancelPayment: 실행")
-
-        mainActivityModel.requestCancelPayment(tid, cancelAmount, callbackKakaoCancel!!)
-    }
-
-    fun savePaymentHistory(
-        identifier: Int, tid: String, paymentType: String, item: String,
-        price: Int, approveAt: String
-    ) {
-        var ticketSaveModel: TicketSaveDTO? = null
-
-        callback = { response ->
-            //여기서 클라이언트 티켓 개수 수정
-
-            if (response.result == "success") {
-                Log.d(TAG, "savePaymentHistory: ${response.result}")
-
-                if (_paymentType.value == "regular") {
-                    _userInformation.value!!.foodTicket =
-                        _userInformation.value!!.foodTicket + _regularFoodAmount.value!!
-                    _userInformation.value!!.translationTicket =
-                        _userInformation.value!!.translationTicket + _regularTranslationAmount.value!!
-
-                    _changeTicket.value = "success"
-
-                } else if (_paymentType.value == "reward") {
-                    Log.d(TAG, "savePaymentHistory reward ")
-                    val quantity = countTicket(_rewardTranslationAmount, _rewardFoodAmount)
-                    updateTicketQuantity("have_rewarded", "-", quantity)
+            if (result.approvedAt!!.isNotEmpty()) {
+                // 결제 승인이 완료하면 db에 티켓 개수 수정 및 구매 이력 저장
+                val paymentType = if (_paymentType.value == "together") {
+                    result.paymentMethodType + "(REWARD)"
+                } else {
+                    result.paymentMethodType
                 }
+                savePaymentHistory(
+                    identifier = result.partnerUserId!!.toInt(),
+                    tid = result.tid!!,
+                    paymentType = paymentType!!,
+                    item = result.itemName!!,
+                    price = result.amount!!.total.toInt(),
+                    approveAt = result.approvedAt
+                )
+            } else {
+                _isFailedToBuyTicket.value = true
+            }
+        }
+    }
 
+
+    fun initializeIsUseRewards() {
+        _isUseRewards.value = null
+        _translationAmount.value = 1
+        _foodAmount.value = 1
+        Log.d(TAG, "initializeIsUseRewards: ${_isUseRewards.value}")
+    }
+
+    fun initializeIsRewardSuccessful(){
+        _isRewardSuccessful.value = null
+    }
+
+    private suspend fun requestCancelPayment(tid: String, cancelAmount: String) {
+        viewModelScope.launch {
+            val response = mainActivityModel.requestCancelPayment(tid, cancelAmount)
+            when (response.status) {
+                "CANCEL_PAYMENT" -> _cancelBuyTicket.value = true //성공
+                "FAILED" -> _cancelBuyTicket.value = false //실패
+            }
+        }
+    }
+
+    private suspend fun savePaymentHistory(
+        identifier: Int,
+        tid: String,
+        paymentType: String,
+        item: String,
+        price: Int,
+        approveAt: String
+    ) {
+
+        val ticketSaveModel = TicketSaveDTO(
+            identifier = identifier,
+            tid = tid,
+            paymentType = paymentType,
+            item = item,
+            price = price,
+            approvedAt = approveAt,
+            translationTicket = _translationAmount.value!!,
+            foodTicket = _foodAmount.value!!
+        )
+
+        viewModelScope.launch {
+            val response = mainActivityModel.savePaymentHistory(ticketSaveModel)
+            if (response.result == "success") {
+
+                _userInformation.value!!.foodTicket += _foodAmount.value!!
+
+                _userInformation.value!!.translationTicket += translationAmount.value!!
+
+                when (_paymentType.value) {
+                    "kakao" -> _isFailedToBuyTicket.value = false
+                    "reward" -> {
+                        val quantity = countTicket(_foodAmount, _translationAmount)
+                        updateTicketQuantity("available_reward", "-", quantity)
+                    }
+
+                    "together" -> updateTicketQuantity(
+                        "available_reward",
+                        "-",
+                        _usedRewards.value!!
+                    )
+                }
+            } else {
+                if (_paymentType.value != "reward") {
+                    requestCancelPayment(tid, price.toString()) //결제 취소
+                } else {
+                    _isUseRewards.value = false
+                }
+            }
+        }
+    }
+
+    suspend fun updateTicketQuantity(ticketType: String, operator: String, quantity: Int) {
+        viewModelScope.launch {
+            val result = mainActivityModel.updateTicketQuantity(
+                identifier = _identifier.value!!,
+                ticketType = ticketType,
+                operator = operator,
+                quantity = quantity
+            )
+            if (result == "success") {
+                when (ticketType) {
+                    "free_translation_ticket" -> _userInformation.value!!.freeTranslationTicket -= 1
+                    "free_food_ticket" -> _userInformation.value!!.freeFoodTicket -= 1
+                    "translation_ticket" -> _userInformation.value!!.translationTicket -= 1
+                    "food_ticket" -> _userInformation.value!!.foodTicket -= 1
+                    "available_reward" -> {
+                        _userInformation.value!!.availableReward -= quantity
+
+                        when (_paymentType.value) {
+                            "reward" -> _isUseRewards.value = true
+                            "together" -> _isFailedToBuyTicket.value = false
+                        }
+
+                        _usedRewards.value = 0
+                        _totalPriceForPay.value = "4000"
+                    }
+
+                    else -> Log.d(TAG, "updateTicketQuantity not match")
+                }
 
             } else {
-                Log.d(TAG, "savePaymentHistory: failed")
-
-                if(_paymentType.value == "regular"){
-                    //결제 취소
-                    requestCancelPayment(tid, price.toString())
-                    _changeTicket.value = "failed"
-                }else{
-                    _changeTicket.value = "failed"
-                    Log.d(TAG, "savePaymentHistory reward: ")
-                }
-
-
+                Log.d(TAG, "updateTicketQuantity result failed: ")
             }
-
-        } //callback
-
-        when (_paymentType.value) {
-            "regular" -> ticketSaveModel = TicketSaveDTO(
-                identifier,
-                tid, paymentType, item, price, approveAt,
-                _regularTranslationAmount.value!!, _regularFoodAmount.value!!
-            )
-
-            "reward" -> ticketSaveModel = TicketSaveDTO(
-                identifier,
-                tid, paymentType, item, price, approveAt,
-                _rewardTranslationAmount.value!!, _rewardFoodAmount.value!!
-            )
         }
-
-
-        mainActivityModel.savePaymentHistory(ticketSaveModel!!, callback!!)
-
     }
 
 
     fun logout(sharedPreferences: SharedPreferences) {
         mainActivityModel.logout(sharedPreferences)
-    }
-
-    fun registerVariableReset() {
-        _registerResult.value = false
     }
 
 
@@ -714,8 +641,7 @@ class MainActivityViewModel(private val application: Application) : AndroidViewM
                 Log.d(TAG, "scheduleMidnightWork: true")
                 _userInformation.value!!.freeTranslationTicket = 3
                 _userInformation.value!!.dailyReward = 3
-                _userInformation.value!!.haveRewarded = 0
-                _todayRewarded.value = 0
+                _userInformation.value!!.availableReward = 0
             } else {
                 Log.d(TAG, "scheduleMidnightWork: false")
             }
@@ -724,30 +650,18 @@ class MainActivityViewModel(private val application: Application) : AndroidViewM
         mainActivityModel.scheduleMidnightWork(application, callback)
     }
 
-    fun selectionCountry(view: View) {
-        Log.d(TAG, "selectionCountry: 실행")
-        when (view.id) {
-            R.id.country_selection_america -> _countrySelection.value = "america"
-            R.id.country_selection_china -> _countrySelection.value = "china"
-            R.id.country_selection_hongkong -> _countrySelection.value = "hongkong"
-            R.id.country_selection_japan -> _countrySelection.value = "japan"
-            R.id.country_selection_taiwan -> _countrySelection.value = "taiwan"
-            R.id.country_selection_vietnam -> _countrySelection.value = "vietnam"
-        }
 
-    }
-
-    fun getDisplaySize(width : Float, height : Float) : Pair<Int, Int>{
+    fun getDisplaySize(width: Float, height: Float): Pair<Int, Int> {
         val windowManager = application.getSystemService(Context.WINDOW_SERVICE) as WindowManager
-        var x = 0
-        var y = 0
-        if(Build.VERSION.SDK_INT < 30){
+        val x: Int
+        val y: Int
+        if (Build.VERSION.SDK_INT < 30) {
             val size = Point()
 
             x = (size.x * width).toInt()
             y = (size.y * height).toInt()
 
-        }else{
+        } else {
             val rect = windowManager.currentWindowMetrics.bounds
 
             x = (rect.width() * width).toInt()
@@ -758,18 +672,12 @@ class MainActivityViewModel(private val application: Application) : AndroidViewM
 
 
     init {
-        _regularTranslationAmount.value = 1
-        _regularFoodAmount.value = 1
-
-        _rewardFoodAmount.value = 1
-        _rewardTranslationAmount.value = 1
-
-
-        _regularTranslationPrice.value = "2,000원"
-        _regularFoodPrice.value = "2,000원"
-        _regularTotalPrice.value = "총 결제 금액 : 4,000원"
+        _translationAmount.value = 1
+        _foodAmount.value = 1
+        _translationPrice.value = "2,000원"
+        _foodPrice.value = "2,000원"
+        _totalPrice.value = "총 결제 금액 : 4,000원"
         _totalPriceForPay.value = "4000"
-
     }
 
 

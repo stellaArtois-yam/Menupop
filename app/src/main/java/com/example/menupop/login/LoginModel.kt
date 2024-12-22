@@ -5,25 +5,26 @@ import android.content.SharedPreferences
 import android.util.Log
 import com.example.menupop.BuildConfig
 import com.example.menupop.RetrofitService
+import com.example.menupop.SaltDTO
 import com.google.gson.Gson
 import com.google.gson.GsonBuilder
-import com.kakao.sdk.auth.model.OAuthToken
-import com.kakao.sdk.user.UserApiClient
 import com.navercorp.nid.NaverIdLoginSDK
 import com.navercorp.nid.oauth.OAuthLoginCallback
-import retrofit2.Call
-import retrofit2.Callback
-import retrofit2.Response
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import retrofit2.converter.scalars.ScalarsConverterFactory
 
 
-class LoginModel(val application: Application)  {
-    private val TAG = "LoginModel"
-    val gson: Gson = GsonBuilder()
+class LoginModel(val application: Application) {
+    companion object{
+        const val TAG = "LoginModel"
+    }
+    private val gson: Gson = GsonBuilder()
         .setLenient()
         .create()
+
     private val retrofit = Retrofit.Builder()
         .baseUrl(BuildConfig.SERVER_IP)
         .addConverterFactory(GsonConverterFactory.create(gson))
@@ -31,81 +32,80 @@ class LoginModel(val application: Application)  {
         .build()
 
     private val service = retrofit.create(RetrofitService::class.java)
-fun requestLogin(id: String, password: String,
-                 callback: (LoginResponseModel) -> Unit) {
-
-    val call: Call<LoginResponseModel> = service.requestLogin(id, password)
-
-    call.enqueue(object : Callback<LoginResponseModel> {
-        override fun onResponse(call: Call<LoginResponseModel>, response: Response<LoginResponseModel>) {
-            if (response.isSuccessful) {
-                callback(response.body()!!)
-                Log.d(TAG, "onResponse: ${response}")
-            } else {
-                callback(LoginResponseModel(0, 0, "failed"))
-            }
-        }
-
-        override fun onFailure(call: Call<LoginResponseModel>, t: Throwable) {
-            callback(LoginResponseModel(0, 0, "failed"))
-        }
-    })
-}
-    fun socialLoginRequest(email:String , callback: (LoginResponseModel) -> Unit){
-        service.socialLoginRequest(email,email.hashCode()).enqueue(object : Callback<LoginResponseModel>{
-            override fun onResponse(
-                call: Call<LoginResponseModel>,
-                response: Response<LoginResponseModel>
-            ) {
-                if (response.isSuccessful) {
-                    callback(response.body()!!)
-                } else {
-                    callback(LoginResponseModel(0, 0, "failed"))
+    suspend fun requestLogin(id: String, password: String) : LoginResponseModel{
+        return withContext(Dispatchers.IO) {
+            try {
+                val response = service.requestLogin(id, password)
+                Log.d(TAG, "requestLogin: $response")
+                if(response.isSuccessful){
+                    response.body()!!
+                }else{
+                    LoginResponseModel(response.code().toString(), 0)
                 }
+            } catch (e: Exception) {
+                LoginResponseModel(e.message!!, 0)
             }
-
-            override fun onFailure(call: Call<LoginResponseModel>, t: Throwable) {
-                Log.d(TAG, "onFailure: ${t.toString()}")
-                callback(LoginResponseModel(0, 0, "failed"))
-            }
-
-        })
+        }
     }
-    fun saveUserIdentifier(sharedPreferences: SharedPreferences,identifier : Int){
-        var editor = sharedPreferences.edit()
-        editor.putInt("identifier",identifier)
+
+    suspend fun getSalt(id: String) : SaltDTO {
+        return withContext(Dispatchers.IO){
+            try{
+                val response = service.getSalt(id)
+                Log.d(TAG, "getSalt response message: ${response.message()}")
+                if(response.isSuccessful){
+                    response.body()!!
+                }else {
+                    SaltDTO(response.message(), "")
+                }
+
+            }catch (e : Exception){
+                SaltDTO(e.message!!, "")
+            }
+        }
+    }
+
+    suspend fun socialLoginRequest(email: String) : LoginResponseModel {
+        return withContext(Dispatchers.IO){
+            try{
+                val response = service.socialLoginRequest(email, email.hashCode())
+                Log.d(TAG, "socialLoginRequest: ${response.body()}")
+                if(response.isSuccessful){
+                    response.body()!!
+                }else{
+                    LoginResponseModel("failed", 0)
+                }
+            }catch (e: Exception){
+                LoginResponseModel("failed", 0)
+            }
+        }
+    }
+
+    fun saveUserIdentifier(sharedPreferences: SharedPreferences, identifier: Int) {
+        val editor = sharedPreferences.edit()
+        editor.putInt("identifier", identifier)
         editor.apply()
     }
-    fun socialAccountMergeLocalAccount(identifier: Int,callback: (LoginResponseModel) -> Unit){
-        service.socialAccountMergeLocalAccount(identifier).enqueue(object : Callback<LoginResponseModel>{
-            override fun onResponse(
-                call: Call<LoginResponseModel>,
-                response: Response<LoginResponseModel>
-            ) {
-                if (response.isSuccessful) {
-                    callback(response.body()!!)
-                } else {
-                    callback(LoginResponseModel(0, 0, "failed"))
+
+    suspend fun socialAccountMergeLocalAccount(identifier: Int) : LoginResponseModel{
+        return withContext(Dispatchers.IO){
+            try{
+                val response = service.socialAccountMergeLocalAccount(identifier)
+                if(response.isSuccessful){
+                    response.body()!!
+                }else{
+                    LoginResponseModel( "failed", 0)
                 }
+            }catch (e: Exception){
+                LoginResponseModel( "failed", 0)
             }
-
-            override fun onFailure(call: Call<LoginResponseModel>, t: Throwable) {
-                Log.d(TAG, "onFailure: ${t.toString()}")
-                callback(LoginResponseModel(0, 0, "failed"))
-
-            }
-
-        })
-    }
-    fun requestNaverSocialLogin(oauthLoginCallback : OAuthLoginCallback){
-        NaverIdLoginSDK.authenticate(application.applicationContext, oauthLoginCallback)
-    }
-    fun requestKakaoSocialLogin(kakaoCallback : (OAuthToken?, Throwable?) -> Unit){
-        if(UserApiClient.instance.isKakaoTalkLoginAvailable(application.applicationContext)){
-            UserApiClient.instance.loginWithKakaoTalk(application.applicationContext, callback = kakaoCallback)
-        }else{
-            UserApiClient.instance.loginWithKakaoAccount(application.applicationContext, callback = kakaoCallback)
         }
     }
+
+    fun requestNaverSocialLogin(oauthLoginCallback: OAuthLoginCallback) {
+        NaverIdLoginSDK.authenticate(application.applicationContext, oauthLoginCallback)
+    }
+
+
 }
 

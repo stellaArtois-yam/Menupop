@@ -2,7 +2,6 @@ package com.example.menupop.mainActivity.translation
 
 import android.app.Dialog
 import android.content.Intent
-import android.content.SharedPreferences
 import android.graphics.Bitmap
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
@@ -12,10 +11,9 @@ import android.util.Log
 import android.view.Window
 import android.widget.ImageView
 import android.widget.Toast
-import android.window.OnBackInvokedDispatcher
 import androidx.activity.OnBackPressedCallback
 import androidx.databinding.DataBindingUtil
-import androidx.lifecycle.Observer
+import androidx.lifecycle.lifecycleScope
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.example.menupop.R
@@ -27,35 +25,29 @@ import com.zynksoftware.documentscanner.ScanActivity
 import com.zynksoftware.documentscanner.model.DocumentScannerErrorModel
 import com.zynksoftware.documentscanner.model.ScannerResults
 import com.zynksoftware.documentscanner.ui.DocumentScanner
+import kotlinx.coroutines.launch
 import java.io.File
 import java.io.IOException
 
 class CameraActivity : ScanActivity() {
 
     lateinit var binding : ActivityCameraBinding
-    lateinit var cameraViewModel: CameraViewModel
+    private lateinit var cameraViewModel: CameraViewModel
     lateinit var image : InputImage
-    lateinit var sharedPreferences: SharedPreferences
-    lateinit var foodPreferenceData : ArrayList<FoodPreference>
-    var isImageSuccess = false
-    lateinit var country : String
+    private lateinit var foodPreferenceData : ArrayList<FoodPreference>
+    private var isImageSuccess = false
+    private lateinit var country : String
 
     var identifier = 0
     val TAG = "CameraActivityTAG"
 
     private val callback = object : OnBackPressedCallback(true) {
         override fun handleOnBackPressed() {
-            backPressed()
+            moveToMain()
         }
     }
 
-    fun backPressed(){
-
-        val sharedPreferences = getSharedPreferences("userInfo", MODE_PRIVATE)
-        identifier = sharedPreferences.getInt("identifier", 0)
-        Log.d(TAG, "backPressed identifier: $identifier")
-
-
+    fun moveToMain(){
         val intent = Intent(this,MainActivity::class.java)
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
         intent.putExtra("checkedTranslation", isImageSuccess)
@@ -67,10 +59,10 @@ class CameraActivity : ScanActivity() {
 
     fun init(){
         val intent = intent
-        if (intent.getSerializableExtra("foodPreference")!=null){
-            foodPreferenceData = intent.getSerializableExtra("foodPreference") as ArrayList<FoodPreference>
+        foodPreferenceData = if (intent.getSerializableExtra("foodPreference")!=null){
+            intent.getSerializableExtra("foodPreference") as ArrayList<FoodPreference>
         }else{
-            foodPreferenceData = ArrayList<FoodPreference>()
+            ArrayList()
         }
         country = intent.getStringExtra("country").toString()
 
@@ -88,8 +80,6 @@ class CameraActivity : ScanActivity() {
             val uri = Uri.fromFile(result.croppedImageFile)
             Log.d(TAG, "uri: $uri")
             try {
-                //여기서 스위치 on/off checking
-                sharedPreferences = getSharedPreferences("util", MODE_PRIVATE)
                 image = InputImage.fromFilePath(applicationContext, uri)
                 showDialog()
                 cameraViewModel.getRecognizedText(image,country)
@@ -97,19 +87,6 @@ class CameraActivity : ScanActivity() {
                 e.printStackTrace()
             }
 
-        }
-
-        cameraViewModel.failed.observe(this){
-            if(it){
-                Toast.makeText(applicationContext, "서버에 문제가 발생하였습니다.\n잠시 후 다시 시도해주세요.", Toast.LENGTH_LONG).show()
-//                val intent = Intent(this,MainActivity::class.java)
-//                Log.d(TAG, "failed imageSuccess: ${isImageSuccess}, identifier : ${identifier}")
-//                intent.putExtra("checkedTranslation", isImageSuccess)
-//                intent.putExtra("identifier", identifier)
-//                startActivity(intent)
-//                finish()
-                backPressed()
-            }
         }
 
         this.onBackPressedDispatcher.addCallback(this, callback)
@@ -125,21 +102,21 @@ class CameraActivity : ScanActivity() {
         binding = DataBindingUtil.setContentView(this, R.layout.activity_camera)
         addFragmentContentLayout()
         cameraViewModel = CameraViewModel(application)
+
+        val sharedPreferences = getSharedPreferences("userInfo", MODE_PRIVATE)
+        identifier = sharedPreferences.getInt("identifier", 0)
         
         init()
     }
 
     override fun onError(error: DocumentScannerErrorModel) {
-        Log.d(TAG, "onError: ")
+        Log.d(TAG, "onError: ${error.errorMessage}")
     }
 
     override fun onSuccess(scannerResults: ScannerResults) {
         cameraViewModel.successScanning(scannerResults)
-        Log.d(TAG, "onSuccess: ${scannerResults}")
-
-
+        Log.d(TAG, "onSuccess: $scannerResults")
     }
-
 
     val File.size get() = if (!exists()) 0.0 else length().toDouble()
     val File.sizeInKb get() = size / 1024
@@ -152,9 +129,8 @@ class CameraActivity : ScanActivity() {
     }
 
 
-    fun showDialog(){
-
-        var dialog = Dialog(this)
+    private fun showDialog(){
+        val dialog = Dialog(this)
         dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
         dialog.setContentView(R.layout.progressbar)
         dialog.setCancelable(false)
@@ -162,23 +138,23 @@ class CameraActivity : ScanActivity() {
 
         dialog.show()
 
-        cameraViewModel.image.observe(this, Observer {
+        cameraViewModel.image.observe(this) {
             if(it != null){
-                Log.d(TAG, "showDialog: image is not null")
                 dialog.dismiss()
                 binding.cropImage.setImageDrawable(it)
-                isImageSuccess = true
+                lifecycleScope.launch {
+                    cameraViewModel.useTranslationTicket(identifier)
+                }
             }
-        })
+        }
 
-        cameraViewModel.failed.observe(this, Observer {
+        cameraViewModel.failed.observe(this) {
             if(it){
                 Log.d(TAG, "showDialog failed")
                 dialog.dismiss()
+                Toast.makeText(this, resources.getString(R.string.network_error), Toast.LENGTH_LONG).show()
+                moveToMain()
             }
-        })
-
-
-
+        }
     }
 }

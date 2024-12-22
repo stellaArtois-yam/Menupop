@@ -13,12 +13,6 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <include
-        android:id="@+id/appbar_menu"
-        layout="@layout/appbar"/>
-
-
-
     <TextView
         android:id="@+id/find_id_result_text_top"
         android:layout_width="match_parent"

@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/nav_graph"
+    app:startDestination="@id/foodPreferenceFragment">
+
+    <fragment
+        android:id="@+id/foodPreferenceFragment"
+        android:name="com.example.menupop.mainActivity.foodPreference.FoodPreferenceFragment"
+        android:label="음식 등록"
+        tools:layout="@layout/fragment_food_preference"/>
+
+    <fragment
+        android:id="@+id/countrySelectionFragment"
+        android:name="com.example.menupop.mainActivity.CountrySelectionFragment"
+        android:label="번역 국가 선택"
+        tools:layout="@layout/fragment_country_selection"/>
+
+    <fragment
+        android:id="@+id/exchangeFragment"
+        android:name="com.example.menupop.mainActivity.exchange.ExchangeFragment"
+        android:label="환율"
+        tools:layout="@layout/fragment_exchange"/>
+
+    <fragment
+        android:id="@+id/profileFragment"
+        android:name="com.example.menupop.mainActivity.profile.ProfileFragment"
+        android:label="프로필"
+        tools:layout="@layout/fragment_profile"/>
+
+    <fragment
+        android:id="@+id/ticketPurchaseFragment"
+        android:name="com.example.menupop.mainActivity.profile.TicketPurchaseFragment"
+        android:label="티켓 구매"
+        tools:layout="@layout/fragment_ticket_purchase"/>
+
+    <fragment
+        android:id="@+id/kakaoPayWebView"
+        android:name="com.example.menupop.mainActivity.profile.KakaoPayWebView"
+        android:label="KakaoPayWebView" />
+
+    <fragment
+        android:id="@+id/profileSelectionFragment"
+        android:name="com.example.menupop.mainActivity.profile.ProfileSelectionFragment"
+        android:label="프로필 캐릭터 선택"
+        tools:layout="@layout/fragment_profile_selection"/>
+
+    <fragment
+        android:id="@+id/withdrawalFragment"
+        android:name="com.example.menupop.mainActivity.profile.WithdrawalFragment"
+        android:label="회원탈퇴"
+        tools:layout="@layout/fragment_withdrawal"/>
+
+</navigation>

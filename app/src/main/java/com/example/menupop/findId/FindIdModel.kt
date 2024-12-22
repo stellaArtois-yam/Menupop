@@ -1,22 +1,21 @@
 package com.example.menupop.findId
 
-import android.util.Log
 import com.example.menupop.BuildConfig
 import com.example.menupop.RetrofitService
 import com.google.gson.Gson
 import com.google.gson.GsonBuilder
-import retrofit2.Call
-import retrofit2.Callback
-import retrofit2.Response
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import retrofit2.converter.scalars.ScalarsConverterFactory
 
 class FindIdModel {
+   companion object{
+       const val TAG = "FindModel"
+   }
 
-    val TAG = "FindModel"
-
-    val gson: Gson = GsonBuilder()
+    private val gson: Gson = GsonBuilder()
         .setLenient()
         .create()
 
@@ -28,26 +27,19 @@ class FindIdModel {
 
     private val service = retrofit.create(RetrofitService::class.java)
 
-    fun checkUserId(email : String, callback : (FindIdResponseDTO) -> Unit){
-        val call : Call<FindIdResponseDTO> = service.requestFindID(email)
-
-        call.enqueue(object : Callback<FindIdResponseDTO> {
-            override fun onResponse(call: Call<FindIdResponseDTO>, response: Response<FindIdResponseDTO>) {
+    suspend fun checkUserId(email : String) : FindIdResponseDTO{
+        return withContext(Dispatchers.IO){
+            try{
+                val response = service.requestFindID(email)
                 if(response.isSuccessful){
-                    Log.d(TAG, "onResponse: ${response.body()}")
-                    callback(response.body()!!)
-
+                    response.body()!!
                 }else{
-                    Log.d(TAG, "onResponse: ${response.body()}")
-                    callback(FindIdResponseDTO("failed", "none"))
+                    FindIdResponseDTO(response.code().toString(), "N/A")
                 }
+            }catch (e : Exception){
+                FindIdResponseDTO(e.message!!, "N/A")
             }
-            override fun onFailure(call: Call<FindIdResponseDTO>, t: Throwable) {
-                Log.d(TAG, "onFailure: ${t.message}")
-                callback(FindIdResponseDTO("failed", "none"))
-            }
-        })
+        }
     }
-
 
 }

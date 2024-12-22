@@ -4,26 +4,16 @@ import android.content.Context
 import android.content.Context.MODE_PRIVATE
 import android.util.Log
 import androidx.work.CoroutineWorker
-import androidx.work.OneTimeWorkRequestBuilder
-import androidx.work.WorkInfo
-import androidx.work.WorkManager
-import androidx.work.Worker
 import androidx.work.WorkerParameters
 import com.google.gson.Gson
 import com.google.gson.GsonBuilder
-import kotlinx.coroutines.CoroutineExceptionHandler
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.withContext
 import retrofit2.Retrofit
-import retrofit2.awaitResponse
 import retrofit2.converter.gson.GsonConverterFactory
 import retrofit2.converter.scalars.ScalarsConverterFactory
 import java.lang.Exception
-import java.util.Calendar
-import java.util.concurrent.TimeUnit
-import kotlin.math.log
 
 class MidnightResetWorker(
     context: Context,
@@ -43,15 +33,14 @@ class MidnightResetWorker(
                 requestInitialize(identifier)
             }
 
-
         Result.success()
     }
 
-    suspend fun requestInitialize(identifier : Int) : String?{
+    private suspend fun requestInitialize(identifier : Int) : String?{
         val gson : Gson = GsonBuilder().setLenient().create()
 
         val retrofit = Retrofit.Builder()
-            .baseUrl("http://3.135.51.201/")
+            .baseUrl(BuildConfig.SERVER_IP)
             .addConverterFactory(ScalarsConverterFactory.create())
             .addConverterFactory(GsonConverterFactory.create(gson))
             .build()
@@ -59,14 +48,14 @@ class MidnightResetWorker(
         val service = retrofit.create(RetrofitService::class.java)
 
         try{
-            val response = service.midnightWork(identifier).awaitResponse()
+            val response = service.midnightWork(identifier)
 
-            if(response.isSuccessful){
+            return if(response.isSuccessful){
                 Log.d(TAG, "requestInitialize response: ${response.body()}")
-                return response.body()
+                response.body()
             }else{
                 Log.d(TAG, "requestInitialize not success: ${response.body()}")
-                return response.body()
+                response.body()
             }
 
 
