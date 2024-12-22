@@ -9,7 +9,9 @@ import com.example.menupop.mainActivity.profile.KakaoPayApproveResponseDTO
 import com.example.menupop.mainActivity.profile.KakaoPayReadyResponseDTO
 import com.example.menupop.mainActivity.UserInformationDTO
 import com.example.menupop.mainActivity.profile.KakaoPayCancelResponseDTO
+import com.example.menupop.mainActivity.profile.KakaoPayRequestDTO
 import retrofit2.Response
+import retrofit2.http.Body
 import retrofit2.http.Field
 import retrofit2.http.FieldMap
 import retrofit2.http.FormUrlEncoded

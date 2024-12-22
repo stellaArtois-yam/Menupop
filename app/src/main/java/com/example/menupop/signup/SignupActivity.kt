@@ -139,15 +139,24 @@ class SignupActivity : AppCompatActivity() {
                 binding.signupCertificationTimer.setTextColor(Color.BLUE)
 
             }else{
-                customDialog("인증번호 불일치", "인증번호가 일치하지 않습니다. \n다시 입력해주세요.", false).show()
+                customDialog("인증번호 불일치", "인증번호가 일치하지 않습니다. \n다시 입력해주세요.",
+                    isProgress = false,
+                    isCompletedSignup = false
+                ).show()
             }
         }
 
         signupViewModel.saveResult.observe(this) {result->
             progressbar!!.dismiss()
             when(result){
-                true -> customDialog("회원가입 완료", "반갑습니다 :) \n로그인 후 이용해주세요", false).show()
-                else -> customDialog("회원가입 실패", resources.getString(R.string.network_error), false).show()
+                true -> customDialog("회원가입 완료", "반갑습니다 :) \n로그인 후 이용해주세요",
+                    isProgress = false,
+                    isCompletedSignup = true
+                ).show()
+                else -> customDialog("회원가입 실패", resources.getString(R.string.network_error),
+                    isProgress = false,
+                    isCompletedSignup = true
+                ).show()
             } }
     }
 
@@ -282,7 +291,10 @@ class SignupActivity : AppCompatActivity() {
                 if(signupViewModel.checkBoxChecked()){
                     lifecycleScope.launch{
                         signupViewModel.sendUserInformation(id, password, email, identifier)
-                        progressbar = customDialog(null, null, true)
+                        progressbar = customDialog(null, null,
+                            isProgress = true,
+                            isCompletedSignup = false
+                        )
                         progressbar!!.show()
                     }
                 }else{
@@ -295,7 +307,8 @@ class SignupActivity : AppCompatActivity() {
         }
     }
 
-    private fun customDialog(title : String?, content : String?, isProgress : Boolean) : Dialog {
+    private fun customDialog(title : String?, content : String?,
+                             isProgress : Boolean, isCompletedSignup : Boolean) : Dialog {
         val dialog = Dialog(this)
         dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
         dialog.window!!.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
@@ -313,12 +326,15 @@ class SignupActivity : AppCompatActivity() {
             titleTextView.text = title
             contentTextView.text = content
 
-            lifecycleScope.launch {
-                delay(1000)
-                dialog.dismiss()
-                val intent = Intent(this@SignupActivity, LoginActivity :: class.java)
-                startActivity(intent)
+            if(isCompletedSignup){
+                lifecycleScope.launch {
+                    delay(1000)
+                    dialog.dismiss()
+                    val intent = Intent(this@SignupActivity, LoginActivity :: class.java)
+                    startActivity(intent)
+                }
             }
+
         }
         return dialog
     }

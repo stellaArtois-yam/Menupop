@@ -52,8 +52,8 @@ class LoginActivity : AppCompatActivity() {
     }
 
     private lateinit var loginViewModel: LoginViewModel
-    private var _binding: ActivityLoginBinding? = null
-    private val binding get() = _binding!!
+    private lateinit var binding: ActivityLoginBinding
+
     private var sharedPreferences: SharedPreferences? = null
     private var socialLoginManager : SocialLoginManager? = null
     private val googleSignInClient: GoogleSignInClient by lazy { getGoogleClient() }
@@ -116,7 +116,10 @@ class LoginActivity : AppCompatActivity() {
         loginViewModel.socialLoginResult.observe(this) {
             Log.d(TAG, "socialLoginResult: $it")
             when (it.result) {
-                "local_login" -> showSocialWarningDialog(it.identifier)
+                "local_login" -> {
+                    progressbar!!.dismiss()
+                    showSocialWarningDialog(it.identifier)
+                }
                 "failed" -> Toast.makeText(this, "잠시 후 다시 시도해주세요.", Toast.LENGTH_SHORT).show()
                 else -> {
                     loginViewModel.saveIdentifier(sharedPreferences!!, it.identifier)
@@ -128,7 +131,7 @@ class LoginActivity : AppCompatActivity() {
 
     fun init() {
         loginViewModel = ViewModelProvider(this)[LoginViewModel::class.java]
-        _binding = DataBindingUtil.setContentView(this, R.layout.activity_login)
+        binding = DataBindingUtil.setContentView(this, R.layout.activity_login)
         binding.loginViewModel = loginViewModel
         binding.lifecycleOwner = this
 
@@ -184,6 +187,8 @@ class LoginActivity : AppCompatActivity() {
 
         binding.googleLoginButton.setOnClickListener {
             signIn()
+            progressbar = showCustomDialog(true)
+            progressbar!!.show()
         }
 
         binding.naverLoginButton.setOnClickListener {
@@ -337,7 +342,6 @@ class LoginActivity : AppCompatActivity() {
 
     override fun onDestroy() {
         super.onDestroy()
-        _binding = null
         progressbar = null
         sharedPreferences = null
         socialLoginManager = null

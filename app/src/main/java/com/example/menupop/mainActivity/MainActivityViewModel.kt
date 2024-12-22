@@ -36,9 +36,13 @@ class MainActivityViewModel(private val application: Application) : AndroidViewM
 
     private val mainActivityModel = MainActivityModel(application)
 
-    private val _rewardedAd = MutableLiveData<RewardedAd>()
-    val rewardedAd: LiveData<RewardedAd>
+    private val _rewardedAd = MutableLiveData<RewardedAd?>()
+    val rewardedAd: LiveData<RewardedAd?>
         get() = _rewardedAd
+
+    private val _isRewardSuccessful = MutableLiveData<Boolean?>()
+    val isRewardSuccessful : LiveData<Boolean?>
+        get() = _isRewardSuccessful
 
     private val _searchFood = MutableLiveData<ArrayList<String>>()
     val searchFood: LiveData<ArrayList<String>>
@@ -116,7 +120,7 @@ class MainActivityViewModel(private val application: Application) : AndroidViewM
         }
     }
 
-    fun initializeRegisterResult(){
+    fun initializeRegisterResult() {
         _registerResult.value = null
     }
 
@@ -133,14 +137,14 @@ class MainActivityViewModel(private val application: Application) : AndroidViewM
         viewModelScope.launch {
             val result = mainActivityModel.deleteFoodPreference(_identifier.value!!, foodName)
             Log.d(TAG, "deleteFoodPreference: $result")
-            when(result.trim()){
+            when (result.trim()) {
                 "success" -> _deletedResult.value = true
                 else -> _deletedResult.value = false
             }
         }
     }
 
-    fun initializeDeleteResult(){
+    fun initializeDeleteResult() {
         _deletedResult.value = null
     }
 
@@ -183,8 +187,12 @@ class MainActivityViewModel(private val application: Application) : AndroidViewM
     suspend fun loadAd(key: String) {
         viewModelScope.launch {
             val ad = mainActivityModel.requestAd(key)
-            Log.d(TAG, "loadAd: $ad")
-            _rewardedAd.value = ad
+            Log.d(TAG, "loadAd: ${ad?.responseInfo}")
+            if(ad == null){
+                _isRewardSuccessful.value = false
+            }else{
+                _rewardedAd.value = ad
+            }
         }
     }
 
@@ -222,11 +230,14 @@ class MainActivityViewModel(private val application: Application) : AndroidViewM
     }
 
     suspend fun rewardedSuccess() {
+        _rewardedAd.value = null
+
         viewModelScope.launch {
             val result = mainActivityModel.updateRewardQuantity(_identifier.value!!)
             if (result == "success") {
                 _userInformation.value!!.availableReward += 1
                 _userInformation.value!!.dailyReward -= 1
+                _isRewardSuccessful.value = true
             } else {
                 Log.d(TAG, "rewardedSuccess failed: ")
             }
@@ -479,6 +490,8 @@ class MainActivityViewModel(private val application: Application) : AndroidViewM
         _pgToken.value = "N/A"
         _cancelBuyTicket.value = null
         _isFailedToBuyTicket.value = null
+        _translationAmount.value = 1
+        _foodAmount.value = 1
     }
 
 
@@ -511,7 +524,13 @@ class MainActivityViewModel(private val application: Application) : AndroidViewM
 
     fun initializeIsUseRewards() {
         _isUseRewards.value = null
+        _translationAmount.value = 1
+        _foodAmount.value = 1
         Log.d(TAG, "initializeIsUseRewards: ${_isUseRewards.value}")
+    }
+
+    fun initializeIsRewardSuccessful(){
+        _isRewardSuccessful.value = null
     }
 
     private suspend fun requestCancelPayment(tid: String, cancelAmount: String) {
@@ -592,7 +611,7 @@ class MainActivityViewModel(private val application: Application) : AndroidViewM
                     "available_reward" -> {
                         _userInformation.value!!.availableReward -= quantity
 
-                        when(_paymentType.value){
+                        when (_paymentType.value) {
                             "reward" -> _isUseRewards.value = true
                             "together" -> _isFailedToBuyTicket.value = false
                         }
@@ -600,6 +619,7 @@ class MainActivityViewModel(private val application: Application) : AndroidViewM
                         _usedRewards.value = 0
                         _totalPriceForPay.value = "4000"
                     }
+
                     else -> Log.d(TAG, "updateTicketQuantity not match")
                 }
 

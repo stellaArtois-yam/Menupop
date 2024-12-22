@@ -15,6 +15,8 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.Window
 import android.widget.Button
+import android.widget.ImageView
+import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
@@ -31,13 +33,15 @@ import kotlinx.coroutines.launch
 
 @SuppressLint("ResourceAsColor")
 class ProfileFragment : Fragment() {
-    companion object{
+    companion object {
         const val TAG = "profileFragment"
     }
+
     private var _binding: FragmentProfileBinding? = null
     private val binding get() = _binding!!
     private lateinit var viewModel: MainActivityViewModel
     private lateinit var sharedPreferences: SharedPreferences
+    private lateinit var loadingDialog: Dialog
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -69,26 +73,47 @@ class ProfileFragment : Fragment() {
                 binding.profileFoodCount.text = "무료티켓 소진"
                 binding.profileFoodCount.setTextColor(Color.RED)
             }
-
         }
 
         viewModel.rewardedAd.observe(viewLifecycleOwner) {
             if (it != null) {
+                loadingDialog.dismiss()
                 it.show(requireActivity()) { rewardItem ->
                     val rewardAmount = rewardItem.amount
                     val rewardType = rewardItem.type
-                    Log.d(MainActivity.TAG, "User earned the reward: $rewardAmount, $rewardType")
-                    lifecycleScope.launch{
+                    Log.d(TAG, "User earned the reward: $rewardAmount, $rewardType")
+                    lifecycleScope.launch {
                         viewModel.rewardedSuccess()
                     }
                 }
-                binding.profileAdButton.isClickable = true
             }
 
         }
 
+        viewModel.isRewardSuccessful.observe(viewLifecycleOwner) {
+            when (it) {
+                true -> {
+                    binding.profileAdCount.text =
+                        "${viewModel.userInformation.value?.availableReward}/3"
+                    viewModel.initializeIsRewardSuccessful()
+                }
 
-         viewModel.profileImage.observe(viewLifecycleOwner) {
+                false -> {
+                    loadingDialog.dismiss()
+                    Toast.makeText(
+                        requireContext(),
+                        resources.getString(R.string.network_error),
+                        Toast.LENGTH_SHORT
+                    ).show()
+                    viewModel.initializeIsRewardSuccessful()
+                }
+
+                else -> Log.d(TAG, "isRewardSuccessful is null")
+            }
+        }
+
+
+        viewModel.profileImage.observe(viewLifecycleOwner) {
             if (it == null) {
                 binding.profileImage.setImageResource(R.drawable.profile_unselected)
             } else {
@@ -112,12 +137,14 @@ class ProfileFragment : Fragment() {
 
         // 광고보러 가기 누르면 광고 프래그먼트로 이동
         binding.profileAdButton.setOnClickListener {
-            binding.profileAdButton.isClickable = false
             if (viewModel.userInformation.value!!.dailyReward == 0) {
-                Toast.makeText(requireContext(), "하루에 받을 수 있는 리워드를 초과했습니다.", Toast.LENGTH_SHORT).show()
+                Toast.makeText(requireContext(), "하루에 받을 수 있는 리워드를 초과했습니다.", Toast.LENGTH_SHORT)
+                    .show()
             } else {
                 val key = BuildConfig.GOOGLE_AD_ID
                 Log.d(MainActivity.TAG, "key: $key")
+                loadingDialog = loadDialog()
+                loadingDialog.show()
                 lifecycleScope.launch {
                     viewModel.loadAd(key)
                 }
@@ -160,7 +187,20 @@ class ProfileFragment : Fragment() {
         dialog.findViewById<Button>(R.id.dialog_two_button_disagree).setOnClickListener {
             dialog.dismiss()
         }
+    }
 
+    private fun loadDialog(): Dialog {
+        val dialog = Dialog(requireContext())
+        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
+        dialog.setContentView(R.layout.progressbar)
+        dialog.setCancelable(false)
+        dialog.window!!.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+        dialog.findViewById<TextView>(R.id.progress_text).visibility = View.GONE
+        dialog.findViewById<ImageView>(R.id.progress_image).visibility = View.GONE
+
+        dialog.show()
+
+        return dialog
     }
 
     override fun onDestroyView() {

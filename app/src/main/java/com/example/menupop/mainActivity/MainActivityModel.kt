@@ -36,7 +36,6 @@ import java.time.LocalDate
 import java.util.Calendar
 import java.util.concurrent.TimeUnit
 import kotlin.coroutines.resume
-import kotlin.coroutines.resumeWithException
 import kotlin.coroutines.suspendCoroutine
 
 
@@ -258,6 +257,7 @@ class MainActivityModel(val application: Application) {
         return withContext(Dispatchers.IO) {
             try {
                 val response = kakaoPayService.createPaymentRequest(apiKey, requestModel)
+                Log.d(TAG, "createPaymentRequest: $response")
                 if (response.isSuccessful) {
                     response.body()!!
                 } else {
@@ -468,14 +468,14 @@ class MainActivityModel(val application: Application) {
     }
 
 
-    suspend fun requestAd(key: String): RewardedAd = suspendCoroutine { continuation ->
+    suspend fun requestAd(key: String): RewardedAd? = suspendCoroutine { continuation ->
         val adRequest: AdRequest = AdRequest.Builder().build()
 
         RewardedAd.load(application, key, adRequest, object : RewardedAdLoadCallback() {
             override fun onAdFailedToLoad(loadAdError: LoadAdError) {
                 // 실패 시 예외를 발생시켜서 코루틴이 예외를 처리하도록 함
-                Log.d(TAG, loadAdError.toString())
-                continuation.resumeWithException(Exception("Failed to load ad"))
+                Log.d(TAG, loadAdError.message)
+                continuation.resume(null)
             }
 
             override fun onAdLoaded(ad: RewardedAd) {
